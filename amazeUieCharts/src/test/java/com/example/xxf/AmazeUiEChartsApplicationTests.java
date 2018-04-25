@@ -52,6 +52,7 @@ public class AmazeUiEChartsApplicationTests {
 	public void contextLoads()throws Exception {
 		List<Map<String,Object>> listMap = dataScreenService.getSalesStaffDistribution();
 		System.out.println(listMap);
+		System.out.print("");
 		listMap=dataScreenService.getPurchaseBrand();
 		System.out.println(listMap);
 
