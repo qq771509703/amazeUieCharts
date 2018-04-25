@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.xxf.mapper.AreaCoordMapper" >
+
+    <select id="getCoordByName" resultType="java.util.Map" parameterType="java.util.Map">
+        select areaname,marker FROM  dbo.mr_area where  left(areaname,2) in
+        <foreach collection="names" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and areaname not like '%区%' and areaname not like '%县%'
+    </select>
+
+</mapper>

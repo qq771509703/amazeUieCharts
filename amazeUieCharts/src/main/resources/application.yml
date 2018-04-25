@@ -1,0 +1,21 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: service-hi
+
+#  datasource:
+#      type: com.alibaba.druid.pool.DruidDataSource
+#      driver-class-name: com.mysql.jdbc.Driver
+#      url: jdbc:mysql://localhost:3306/testDB
+#      username: root
+#      password: root
+
+mybatis:
+     #type-aliases-package: com.cockpit.record.bean
+     mapper-locations: classpath:mybatis/mapper/*.xml
+     config-location: classpath:mybatis/mybatis-config.xml
+logging:
+  pattern:
+    console: "%d - %msg%n"
+  path: E:\iedaLog\

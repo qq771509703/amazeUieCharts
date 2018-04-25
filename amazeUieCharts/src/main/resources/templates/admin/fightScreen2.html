@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Amaze UI Admin index Examples</title>
+    <meta name="description" content="这是一个 index 页面">
+    <meta name="keywords" content="index">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="icon"  type="image/png" th:href="@{/assets/i/favicon.png}" >
+    <link rel="apple-touch-icon-precomposed" th:href="@{/assets/i/app-icon72x72@2x.png}">
+    <meta name="apple-mobile-web-app-title" content="Amaze UI" />
+    <script th:src="@{/assets/js/echarts.min.js}" ></script>
+    <link rel="stylesheet" th:href="@{/assets/css/amazeui.min.css}" />
+    <link rel="stylesheet" th:href="@{/assets/css/amazeui.datatables.min.css}"  />
+    <link rel="stylesheet" th:href="@{/assets/css/app.css}">
+    <script th:src="@{/assets/js/jquery.min.js}"></script>
+    <script th:src="@{/assets/map/js/china.js}"></script>
+    <script th:src="@{/assets/map/bmap/bmap.js}"></script>
+
+    <style type="text/css">
+        .labelDiv{
+
+            height: 33px;
+        }
+        .labelDiv-head {
+
+            height: 100px;
+        }
+        .row-content {
+            padding-top: 10px;
+            padding-left: 20px;
+            padding-right: 12px;
+        }
+        .widget-head {
+            width: 100%;
+            padding: 5px;
+        }
+
+        .mapWidget{
+            width: 205%;
+            background-color: #aa4b00;
+        }
+
+        @media only screen and (min-width: 641px){
+        .am-g .am-g {
+            margin-left: -0.1rem;
+            margin-right: -0.2rem;
+        }
+        }
+        @media screen and (min-width: 641px){
+            [class*=am-u-] {
+                padding-left: 0px;
+                padding-right: 10px;
+            }
+        }
+        .widget {
+            margin-bottom: 10px;
+            min-height: 100px;
+        }
+        .theme-black .widget-primary{
+            padding: 2px 25px;
+        }
+        .theme-black .widget-purple{
+            padding: 2px 25px;
+        }
+
+        .theme-black .widget {
+            border: 1px solid #00b8ff;
+            /*border-top: 2px solid #313639;*/
+            background: rgba(255,255,255,.05);
+            color: #ffffff;
+
+        }
+        .theme-black .widget-head {
+            border-bottom: 1px solid #0daace;
+            background: rgba(0, 114, 255, 0.22);
+        }
+
+
+
+    </style>
+
+
+    <script type="text/javascript">
+
+        var echartsD = echarts.init(document.getElementById('mmap'));
+        optionD = {
+            //backgroundColor: '#c53838',
+            title: {
+                text: '全国销售情况',
+                left: '36%',
+                textStyle: {
+                    color: '#fff'
+                }
+            },
+            tooltip : {
+                trigger: 'item'
+            },
+            legend: {
+                orient: 'vertical',
+                y: 'bottom',
+                x:'left     ',
+                data:['sales'],
+                textStyle: {
+                    color: '#fff'
+                }
+            },
+            geo: {
+                map: 'china',
+                label: {
+                    emphasis: {
+                        show: false
+                    }
+                },
+                roam: true,
+                left: '14%',
+                zoom:1.2,
+                itemStyle: {
+                    normal: {
+                        areaColor: '#436aa7',
+                        borderColor: '#00ff4e'
+                    },
+                    emphasis: {
+                        areaColor: '#2a333d'
+                    }
+                }
+            },
+            series : [
+                {
+                    name: 'sales',
+                    type: 'scatter',
+                    coordinateSystem: 'geo',
+                    data: [],
+                    symbolSize: function (val) {
+                        return [5,5];
+                    },
+                    label: {
+                        normal: {
+                            formatter: '{b}',
+                            position: 'right',
+                            show: false
+                        },
+                        emphasis: {
+                            show: true
+                        }
+                    },
+                    itemStyle: {
+                        normal: {
+                            color: '#ddb926'
+                        }
+                    }
+                },
+                {
+                    name: 'Top 5',
+                    type: 'effectScatter',
+                    coordinateSystem: 'geo',
+                    data: {},
+//                    data: convertData(data.sort(function (a, b) {
+//                        return b.value - a.value;
+//                    }).slice(0, 3)),
+                    symbolSize: function (val) {
+                         return [5,5];
+                    },
+                    showEffectOn: 'render',
+                    rippleEffect: {
+                        scale:6,
+                        brushType: 'fill'
+                    },
+                    hoverAnimation: true,
+                    label: {
+                        normal: {
+                            formatter: '{b}',
+                            position: 'right',
+                            show: true
+                        }
+                    },
+                    itemStyle: {
+                        normal: {
+                            color: '#f4e925',
+                            shadowBlur: 10,
+                            shadowColor: '#333'
+                        }
+                    },
+                    zlevel: 1
+                }
+            ]
+        };
+        echartsD.setOption(optionD);
+
+        var echartsC = echarts.init(document.getElementById('wrap-region-standings'));
+        optionC = {
+            grid: {
+                left: '12%',
+                right: '0%',
+                bottom: '4%',
+                containLabel: true
+            },
+
+            tooltip : {
+                trigger: 'axis',
+                axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                    type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                }
+            },
+            xAxis: {
+                axisLine:{
+                    lineStyle:{
+                        color:'#ddd'
+                    }
+                },
+                axisTick: {show: false},
+                type: 'category',
+                data: []
+            },
+            //#1786aa
+            yAxis: {
+                axisLine:{
+                    lineStyle:{
+                        color:'#ddd'
+                    }
+                },
+                splitLine: {show: false}
+            },
+            animationDurationUpdate: 1200,
+            series: [{
+                type: 'bar',
+                itemStyle: {
+                    normal: {
+                        color: '#ddd'
+                    }
+                },
+                silent: true,
+
+                barWidth: 20,
+                barGap: '-100%', // Make series be overlap
+                data: []
+            }, {
+                type: 'bar',
+                barWidth: 20,
+                z: 10,
+                color: ['#1786aa'],
+                data: []
+            }]
+        };
+        echartsC.setOption(optionC);
+
+        var echarts_sales_staff_distribution = echarts.init(document.getElementById('sales_staff_distribution'));
+        echarts_sales_staff_distribution.setOption({
+
+            title:{
+                show:true,
+                text:'营销人员分布',
+                right:'center',
+                textStyle:{
+                    color:'#EEE',
+                    fontSize:16,
+
+                },
+            },
+
+            tooltip : {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+
+            calculable : true,
+            series : [
+                {
+                    name:'营销人员分布',
+                    type:'pie',
+                    radius : '70%',
+                    center: ['50%', '60%'],
+                    color: ['#936dde','#6fb8e2','#6fe2bd','#c0e26f','#e26f6f'],
+                    data:[
+
+                    ]
+                }
+            ]
+        });
+        function initialize_sales_staff_distribution(){
+            $.get('getSales_staff_distribution',{}).done(function (data) {
+                echarts_sales_staff_distribution.setOption({
+                    series: [{
+                        data: data.data.ssdListMap
+                    }],
+                });
+            });
+        }
+
+        var echarts_HQ_staff_distribution = echarts.init(document.getElementById('HQ_staff_distribution'));
+        echarts_HQ_staff_distribution.setOption({
+
+            title:{
+                show:true,
+                text:'总部人员分布',
+                right:'center',
+                textStyle:{
+                    color:'#EEE',
+                    fontSize:16,
+
+                },
+            },
+
+            tooltip : {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+
+            calculable : true,
+            series : [
+                {
+                    name:'总部人员分布',
+                    type:'pie',
+                    radius : '70%',
+                    center: ['50%', '60%'],
+                    color: ['#936dde','#6fb8e2','#6fe2bd','#c0e26f','#e26f6f'],
+                    data:[
+
+                    ]
+                }
+            ]
+        });
+        function initialize_HQ_staff_distribution(){
+            $.get('getHQ_staff_distribution',{}).done(function (data) {
+                console.log(data);
+                echarts_HQ_staff_distribution.setOption({
+                    series: [{
+                        data: data.data.hqdListMap
+                    }],
+                });
+            });
+        }
+
+        var echarts_sales_brand = echarts.init(document.getElementById('sales_brand'));
+        option_sales_brand = {
+            tooltip: {
+                trigger: 'item',
+                formatter: "{a} <br/>{b}: {c} ({d}%)"
+            },
+            title:{
+                show:true,
+                text:'销售数据',
+                right:'center',
+                textStyle:{
+                    color:'#EEE',
+                    fontSize:16,
+
+                },
+            },
+            series: [
+
+                {
+                    name:'销售数据',
+                    type:'pie',
+                    radius: ['40%', '60%'],
+                    center: ['50%', '60%'],
+                    color: ['#936dde','#6fb8e2','#6fe2bd','#c0e26f','#e26f6f'],
+                    labelLine:{
+                        show:true,
+                        length:3
+                    },
+                    label: {
+                        normal: {
+                            formatter: "{b} \n{c}  {d}%",
+                            backgroundColor: '#eee',
+                            borderColor: '#aaa',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            rich: {
+                                a: {
+                                    color: '#999',
+                                    lineHeight: 22,
+                                    align: 'center'
+                                },
+
+                                hr: {
+                                    borderColor: '#aaa',
+                                    width: '100%',
+                                    borderWidth: 0.5,
+                                    height: 0
+                                },
+                                b: {
+                                    fontSize: 16,
+                                    lineHeight: 33
+                                },
+                                per: {
+                                    color: '#eee',
+                                    backgroundColor: '#334455',
+                                    padding: [2, 4],
+                                    borderRadius: 2
+                                }
+                            }
+                        }
+                    },
+
+                    data:[
+
+
+                    ]
+                }
+            ]
+        };
+        echarts_sales_brand.setOption(option_sales_brand);
+        function initialize_sales_brand(){
+            $.get('getSales_brand',{}).done(function (data) {
+                //console.log(data);
+                echarts_sales_brand.setOption({
+                    series: [{
+                        data: data.data.sbListMap
+                    }],
+                });
+            });
+        }
+
+
+        var echarts_purchase_brand = echarts.init(document.getElementById('purchase_brand'));
+        option_purchase_brand = {
+            tooltip: {
+                trigger: 'item',
+                formatter: "{a} <br/>{b}: {c} ({d}%)"
+            },
+            title:{
+                show:true,
+                text:'采购数据',
+                right:'center',
+                textStyle:{
+                    color:'#EEE',
+                    fontSize:16,
+
+                },
+            },
+            series: [
+
+                {
+                    name:'采购数据',
+                    type:'pie',
+                    radius: ['40%', '60%'],
+                    center: ['50%', '60%'],
+                    color: ['#936dde','#6fb8e2','#6fe2bd','#c0e26f','#e26f6f'],
+                    labelLine:{
+                        show:true,
+                        length:3
+                    },
+                    label: {
+                        normal: {
+                            formatter: "{b} \n{c}  {d}%",
+                            backgroundColor: '#eee',
+                            borderColor: '#aaa',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            rich: {
+                                a: {
+                                    color: '#999',
+                                    lineHeight: 22,
+                                    align: 'center'
+                                },
+
+                                hr: {
+                                    borderColor: '#aaa',
+                                    width: '100%',
+                                    borderWidth: 0.5,
+                                    height: 0
+                                },
+                                b: {
+                                    fontSize: 16,
+                                    lineHeight: 33
+                                },
+                                per: {
+                                    color: '#eee',
+                                    backgroundColor: '#334455',
+                                    padding: [2, 4],
+                                    borderRadius: 2
+                                }
+                            }
+                        }
+                    },
+
+                    data:[
+//                        {value:335, name:'直达'},
+//                        {value:310, name:'邮件营销'},
+//                        {value:234, name:'联盟广告'},
+//                        {value:135, name:'视频广告'}
+
+                    ]
+                }
+            ]
+        };
+        echarts_purchase_brand.setOption(option_purchase_brand);
+        function initialize_purchase_brand(){
+            $.get('getPurchase_brand',{}).done(function (data) {
+                echarts_purchase_brand.setOption({
+                    series: [{
+                        data: data.data.pbListMap
+                    }],
+                    legend:{
+                        //data:data.data.name
+                    }
+                });
+            });
+        }
+
+        var echart_sdecember_sales = echarts.init(document.getElementById('december_sales'));
+        option_sdecember_sales = {
+            tooltip: {
+                trigger: 'axis'
+            },
+            grid: {
+                top: '3%',
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: [{
+                type: 'category',
+                boundaryGap: false,
+                data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+            }],
+            yAxis: [{
+                type: 'value'
+            }],
+            textStyle: {
+                color: '#838FA1'
+            },
+            series: [{
+                name: '邮件营销',
+                type: 'line',
+                stack: '总量',
+                areaStyle: { normal: {} },
+                data: [120, 132, 101, 134, 90],
+                itemStyle: {
+                    normal: {
+                        color: '#1cabdb',
+                        borderColor: '#1cabdb',
+                        borderWidth: '2',
+                        borderType: 'solid',
+                        opacity: '1'
+                    }
+                }
+            }]
+        };
+        echart_sdecember_sales.setOption(option_sdecember_sales);
+
+
+        setInterval("initialize_map(),initialize_region_performance(),initialize_year_sales_count(),initialize_year_sales_performance(),initialize_gross_sales_performance(),initialize_gross_sales_count()",10000)
+
+        //初始化大屏数据
+        $(function(){
+            initialize_gross_sales_count();
+            initialize_gross_sales_performance();
+            initialize_year_sales_performance();
+            initialize_year_sales_count();
+            initialize_date();
+            initialize_region_performance();
+            initialize_map();
+            initialize_purchase_brand();
+            initialize_sales_brand();
+            initialize_sales_staff_distribution();
+            initialize_HQ_staff_distribution();
+
+        });
+
+        //总销量 数量
+        function initialize_gross_sales_count(){
+
+            $.get("getGross_sales_count",{},function(data){
+                if (data.code = 200){
+                    //alert(data.data);
+                    $("#gross_sales_count").text(data.data)
+                }
+            })
+        }
+        // 总业绩 钱
+        function initialize_gross_sales_performance(){
+            $.get("getGross_sales_performance",{},function(data){
+                if (data.code = 200){
+                    //alert(data.data);
+                    $("#gross_sales_performance").text(data.data)
+                }
+            })
+        }
+
+
+        //2018年业绩 钱
+        function initialize_year_sales_performance(){
+            $.get("getYear_sales_performance",{},function(data){
+                if (data.code = 200){
+                    //alert(data.data);
+                    $("#year_sales_performance").text(data.data)
+                }
+            })
+        }
+        //2018销量  数量
+        function initialize_year_sales_count(){
+            $.get("getYear_sales_count",{},function(data){
+                if (data.code = 200){
+                    //alert(data.data);
+                    $("#year_sales_count").text(data.data)
+                }
+            })
+        }
+
+        function initialize_date(){
+            var myDate = new Date();
+            //获取当前年 yyyy
+            var nowYear = myDate.getFullYear();
+            $(".nowYear").text(nowYear);
+
+        }
+
+        function initialize_region_performance(obj){
+            $.get('getRegion_performance',{"obj":2018}).done(function (data) {
+                var DlistMap = data.data.listMap;
+                var DtargetVal = data.data.targetVal;
+                if (data.code = 200){
+                    echartsC.setOption({
+                        xAxis:{
+                            data: [''+DlistMap[0].大区+'', ''+DlistMap[1].大区+'', ''+DlistMap[2].大区+'', ''+DlistMap[3].大区+'', ''+DlistMap[4].大区+'']
+                        },
+
+                        series: [{
+                            data: [DtargetVal, DtargetVal, DtargetVal, DtargetVal, DtargetVal]
+                        },
+                         {
+                            data: [DlistMap[0].sum, DlistMap[1].sum, DlistMap[2].sum, DlistMap[3].sum, DlistMap[4].sum]
+                         }
+                        ]
+                    });
+                }
+
+            });
+        }
+        /**
+         * 初始化地图
+         * @private
+         */
+        function initialize_map(){
+            $.get('getInitialize_map',{}).done(function (data) {
+                //console.log(data);
+                echartsD.setOption({
+                    series: [{
+                        data: data.data
+                    },{
+                        data: data.data
+                    }]
+                });
+            });
+        }
+
+
+
+    </script>
+</head>
+
+
+<body data-type="widgets">
+    <script th:src="@{/assets/js/theme.js}" ></script>
+
+        <!-- 内容区域 -->
+        <div class="tpl-content-wrapper" style="background: url('/assets/img/beijing/beijing03-01.jpg')" >
+            <div class="row-content am-cf">
+                <div class="am-g">
+                    <div class="am-u-sm-3">
+                        <div class="widget widget-primary am-cf labelDiv">
+                            <div class="widget-statistic-header">
+                                总 销 量 (台)
+                            </div>
+                            <div class="widget-statistic-body">
+                                <div class="widget-statistic-value">
+                                    &nbsp;&nbsp;&nbsp;   <span id="gross_sales_count">&#45;&#45;&#45;&#45;</span>
+                                </div>
+
+                                <span class="widget-statistic-icon am-icon-credit-card-alt"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="am-u-sm-3">
+                        <div class="widget widget-primary am-cf">
+                            <div class="widget-statistic-header">
+                                总 业 绩 (元)
+                            </div>
+                            <div class="widget-statistic-body">
+                                <div class="widget-statistic-value">
+                                    ￥<span id="gross_sales_performance">&#45;&#45;&#45;&#45;</span>
+                                </div>
+
+                                <span class="widget-statistic-icon am-icon-credit-card-alt"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="am-u-sm-3">
+                        <div class="widget widget-purple am-cf">
+                            <div class="widget-statistic-header">
+                                <span class="nowYear"></span> 总 销 量(台)
+                            </div>
+                            <div class="widget-statistic-body">
+                                <div class="widget-statistic-value">
+                                    &nbsp;&nbsp;&nbsp;<span id="year_sales_count">&#45;&#45;&#45;&#45;</span>
+                                </div>
+
+                                <span class="widget-statistic-icon am-icon-support"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="am-u-sm-3">
+                        <div class="widget widget-purple am-cf">
+                            <div class="widget-statistic-header">
+                                <span class="nowYear"></span> 总 业 绩(元)
+                            </div>
+                            <div class="widget-statistic-body">
+                                <div class="widget-statistic-value">
+                                    ￥<span id="year_sales_performance">&#45;&#45;&#45;&#45;</span>
+                                </div>
+
+                               <span class="widget-statistic-icon am-icon-support"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row  am-cf">
+                    <div class="am-g">
+                        <div class="am-u-lg-3">
+                            <div class="widget am-cf" style="background: url('/assets/img/order04.png');background-size:100% 100%;background-repeat:no-repeat">
+                                <div class="widget-head am-cf">
+                                    <div class="widget-title am-fl">销售人员分布</div>
+                                    <div class="widget-function am-fr">
+                                        <a href="javascript:;" class="am-icon-cog"></a>
+                                    </div>
+                                </div>
+                                <div class="widget-body  widget-body-lg am-fr">
+                                    <div class="am-scrollable-horizontal ">
+
+                                        <div id="sales_staff_distribution" style="height: 200px"></div>
+                                        <div id="HQ_staff_distribution" style="height: 200px"></div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="widget am-cf">
+                                <div class="widget-head am-cf">
+                                    <div class="widget-title am-fl">折线面基统计</div>
+                                    <div class="widget-function am-fr">
+                                        <a href="javascript:;" class="am-icon-cog"></a>
+                                    </div>
+                                </div>
+                                <div class="widget-body  widget-body-lg am-fr">
+                                    <div class="am-scrollable-horizontal ">
+                                        <div id="december_sales" style="height: 200px"></div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="am-u-lg-6">
+                            <div class="am-u-lg-7">
+
+                                <div id = "mmap" class="mapWidget" style="height: 580px;"></div>
+
+
+                                <div id="wrap-region-standings" style="height: 210px; width: 800px; " >
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="am-u-lg-3">
+                            <div class="widget am-cf"  style="background: url('/assets/img/order04.png');background-size:100% 100%;background-repeat:no-repeat">
+                                <div class="widget-head am-cf">
+                                    <div class="widget-title am-fl">品牌信息</div>
+                                    <div class="widget-function am-fr">
+                                        <a href="javascript:;" class="am-icon-cog"></a>
+                                    </div>
+                                </div>
+                                <div class="widget-body  widget-body-lg am-fr">
+                                    <div class="am-scrollable-horizontal ">
+                                        <div id="sales_brand" style="height: 200px;"></div>
+                                        <div id="purchase_brand" style="height: 200px"></div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="widget am-cf">
+                                <div class="widget-head am-cf">
+                                    <div class="widget-title am-fl">滚动条表格</div>
+                                    <div class="widget-function am-fr">
+                                        <a href="javascript:;" class="am-icon-cog"></a>
+                                    </div>
+                                </div>
+                                <div class="widget-body  widget-body-lg am-fr">
+                                    <div class="am-scrollable-horizontal ">
+                                        <table width="100%" class="am-table am-table-compact tpl-table-black " id="example-r">
+                                            <thead>
+                                            <tr>
+                                                <th>文章标题</th>
+                                                <th>作者</th>
+                                                <th>操作</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr class="gradeX">
+                                                <td>新加坡大数据初创公司 Latize 获 150 万美元风险融资</td>
+                                                <td>张鹏飞</td>
+
+                                                <td>
+                                                    <div class="tpl-table-black-operation">
+                                                        <a href="javascript:;">
+                                                            <i class="am-icon-pencil"></i> 编辑
+                                                        </a>
+                                                        <a href="javascript:;" class="tpl-table-black-operation-del">
+                                                            <i class="am-icon-trash"></i> 删除
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                            <tr class="gradeX">
+                                                <td>关于创新管理，我想和你当面聊聊。</td>
+                                                <td>王宽师</td>
+
+                                                <td>
+                                                    <div class="tpl-table-black-operation">
+                                                        <a href="javascript:;">
+                                                            <i class="am-icon-pencil"></i> 编辑
+                                                        </a>
+                                                        <a href="javascript:;" class="tpl-table-black-operation-del">
+                                                            <i class="am-icon-trash"></i> 删除
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+
+                                            <tr class="even gradeC">
+                                                <td>挑战星巴克，Blue Bottle Coffee 又要开始 D 轮融资了</td>
+                                                <td>罢了</td>
+
+                                                <td>
+                                                    <div class="tpl-table-black-operation">
+                                                        <a href="javascript:;">
+                                                            <i class="am-icon-pencil"></i> 编辑
+                                                        </a>
+                                                        <a href="javascript:;" class="tpl-table-black-operation-del">
+                                                            <i class="am-icon-trash"></i> 删除
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <!-- more data -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <script th:src="@{/assets/js/amazeui.min.js}"></script>
+    <script th:src="@{/assets/js/amazeui.datatables.min.js}" ></script>
+    <script th:src="@{/assets/js/dataTables.responsive.min.js}"></script>
+
+
+</body>
+
+</html>

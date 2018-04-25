@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.xxf.mapper.DataScreenMapper" >
+
+
+    <select id="getGross_sales_count" resultType="java.lang.Integer">
+        /*合同非废弃、单据类别为融资租赁合同*/
+        select COUNT(1)
+            from FM_ConAcc a
+            where isnull(a.FIsDrop,0)!=1
+            and a.FDocCate = '101'
+    </select>
+
+    <select id="getGross_sales_performance" resultType="java.lang.Double">
+          select
+            sum((cast(a.Fnum as int) * a.FMYHKE + a.FFee)) + 1767172084  'sum'
+            from FinLease_Contract a
+            join FM_ConAcc b on a.FContractID = b.ID
+            where isnull(b.FIsDrop,0)!= 1
+            and isnull(a.WFState,0) != 3
+            and YEAR(b.FContractTime) >= 2017;
+    </select>
+
+
+    <select id="getYear_sales_count" resultType="java.lang.Integer">
+      select COUNT(1)
+        from FM_ConAcc a
+        where isnull(a.FIsDrop,0)!=1
+        and a.FDocCate = '101'
+        and year(a.FContractTime) > 2017
+
+    </select>
+
+    <select id="getYear_sales_performance" resultType="java.lang.Double">
+        select
+            sum((cast(a.Fnum as int) * a.FMYHKE + a.FFee)) 'sum'
+            from FinLease_Contract a
+            join FM_ConAcc b on a.FContractID = b.ID
+            where isnull(b.FIsDrop,0)!= 1
+            and isnull(a.WFState,0) != 3
+            and YEAR(b.FContractTime) >= 2018;
+    </select>
+
+
+    <select id="region_performance" resultType="map">
+
+          select a.大区
+            ,SUM(a.分红比例) 'sum'
+            from (
+            select
+            b.FContractTime
+            ,a.FContract
+            ,x.Name '业务员'
+            ,c.FDividendRatio '分红比例'
+            ,f.FPlateNum '车牌'
+            ,case when d.Name = '苏州上海办事处' then '上海营销一部' when d.Name = '湘潭营销一部' then '湖南营销一部' else d.Name end  '部'
+            ,case when d.Name = '苏州上海办事处' then '上海' when d.Name = '湘潭营销一部' then '湖南' else left(hh.Name,2) end '城市'
+            ,case when d.Name = '苏州上海办事处' then '苏沪省区' when d.Name = '湘潭营销一部' then '湘赣省区' else jh.Name end '省级'
+            ,case when d.Name = '苏州上海办事处' then '长三角战区' when d.Name = '湘潭营销一部' then '华南战区'  else j.Name end '大区'
+            from FinLease_Contract a
+            join FM_ConAcc b on a.FContractID = b.ID
+            join FinLease_Contract_FClerkList c on a.ID = c.FinLease_Contract_ID
+            join lbOrganization d on c.FOrga = d.ID
+            join Fcar f on a.FCar = f.ID
+            join Entity_YJSJB h ON b.ID = h.FConAcc
+            left join Entity_YJSJB e on b.ID = e.FConAcc
+            left join tUser x on x.ID = c.FYWYMD
+            left join lbOrganization g on d.FID = g.ID
+            left join lbOrganization hh on g.FID = hh.ID
+            left join lbOrganization jh on hh.FID = jh.ID
+            left join lbOrganization j on jh.FID = j.ID
+            where isnull(b.FIsDrop,0)!=1
+            and e.FQuoType in (1,2)
+            and isnull(a.WFState,0) != 3
+            and c.FDividendRatio != 0
+            and case when d.Name = '苏州上海办事处' then '上海' else LEFT(d.Name,2) end != '淘汽'
+            and d.Name not like '%营销部%'
+            and CONVERT(varchar(4),b.FContractTime,120) >= #{s_year}
+
+            union all
+
+            select
+            b.FContractTime
+            ,a.FContract
+            ,x.Name '业务员'
+            ,c.FDividendRatio '分红比例'
+            ,f.FPlateNum '车牌'
+            ,d.Name '部'
+            ,left(g.Name,2) '城市'
+            ,hh.Name '省级'
+            ,jh.Name '大区'
+            from FinLease_Contract a
+            join FM_ConAcc b on a.FContractID = b.ID
+            join FinLease_Contract_FClerkList c on a.ID = c.FinLease_Contract_ID
+            join lbOrganization d on c.FOrga = d.ID
+            join Fcar f on a.FCar = f.ID
+            join Entity_YJSJB h ON b.ID = h.FConAcc
+            left join Entity_YJSJB e on b.ID = e.FConAcc
+            left join tUser x on x.ID = c.FYWYMD
+            left join lbOrganization g on d.FID = g.ID
+            left join lbOrganization hh on g.FID = hh.ID
+            left join lbOrganization jh on hh.FID = jh.ID
+            where isnull(b.FIsDrop,0)!=1
+            and e.FQuoType in (1,2)
+            and isnull(a.WFState,0) != 3
+            and c.FDividendRatio != 0
+            and case when d.Name = '苏州上海办事处' then '上海' else LEFT(d.Name,2) end != '淘汽'
+            and d.Name like '%营销部%'
+            and CONVERT(varchar(4),b.FContractTime,120) >= #{s_year}
+            ) a
+            where a.大区 like '%战区%'
+            group by a.大区
+            order by SUM(a.分红比例) desc
+    </select>
+
+    <select id="getNewDealCity" resultType="string">
+        select distinct
+        left(y.FName,2) 'area'
+        from FinLease_Contract a
+        join FM_ConAcc b on a.FContractID = b.ID
+        join Fcar f on a.FCar = f.ID
+        left join Area y on y.ID = f.FArea
+        where a.FContract in
+        (
+        select a.FContract from
+        (
+        select a.FContract,ROW_NUMBER() over(order by b.FContractTime desc) rw
+        from FinLease_Contract a
+        join FM_ConAcc b on a.FContractID = b.ID
+        where isnull(b.FIsDrop,0)!= 1
+        and isnull(a.WFState,0) != 3
+        and YEAR(b.FContractTime) >= '2018'
+        and a.FAgentDep != '593'
+        ) a
+        where a.rw  &lt; 11
+        )
+    </select>
+
+    <select id="getPurchaseBrand" resultType="map">
+      select
+        top 5
+        a.FBrand 'name'
+        ,COUNT(1) 'value'
+        from Fcar a
+        where a.FUseStatus = 1 and a.FCarPreStatus != '138'
+        group by a.FBrand
+        order by COUNT(1) desc
+    </select>
+
+
+    <select id="getSalesBrand" resultType="map">
+        /*品牌英雄榜TOP5*/
+        select
+            top 5
+            f.FBrand 'name'
+            ,COUNT(1) 'value'
+            from FinLease_Contract a
+            join FM_ConAcc b on a.FContractID = b.ID
+            join Fcar f on a.FCar = f.ID
+            where isnull(b.FIsDrop,0)!= 1
+            and isnull(a.WFState,0) != 3
+            and YEAR(b.FContractTime) >= 2017
+            group by f.FBrand
+            order by COUNT(1) desc
+    </select>
+
+
+    <select id="getSalesStaffDistribution" resultType="map">
+        select
+            case when year(a.FBirthday) >= 2000 then '00后'
+                 when year(a.FBirthday) >= 1990 then '90后'
+                 when year(a.FBirthday) >= 1980 then '80后'
+                 when year(a.FBirthday) >= 1970 then '70后'
+                 end 'name'
+            ,count(1) 'value'
+            from T_BD_Person a  --人员表
+            left join T_ORG_PositionMember c on c.FPersonID = a.fid  --人员岗位对应表
+            left join T_ORG_Position d on c.FPositionID = d.FID  --岗位表
+            left join T_HR_JobLevel h on d.FJobLevelID = h.fID  --职层表
+            left join T_HR_PERSONPOSITION j on j.fpersonid = a.fid  --入离职日期表
+            left join T_ORG_Admin k on k.fid = d.FAdminOrgUnitID  --架构表
+            /*在职*/
+            where j.fleftdate is null
+            /*融资租赁事业部--营销部*/
+            and k.FDisplayName_L2 like '%喜相逢_股东大会_总裁_常务副总裁_融资性租赁事业部%'
+            group by case when year(a.FBirthday) >= 2000 then '00后'
+                  when year(a.FBirthday) >= 1990 then '90后'
+                  when year(a.FBirthday) >= 1980 then '80后'
+                  when year(a.FBirthday) >= 1970 then '70后'
+                  end
+    </select>
+
+    <select id="getHQDistribution" resultType="map">
+      /*排除营销部、风控*/
+        select
+        case when year(a.FBirthday) >= 2000 then '00后'
+             when year(a.FBirthday) >= 1990 then '90后'
+             when year(a.FBirthday) >= 1980 then '80后'
+             when year(a.FBirthday) >= 1970 then '70后'
+             when year(a.FBirthday) >= 1960 then '60后'
+             when year(a.FBirthday) >= 1950 then '50后'
+             else ''
+             end 'name'
+        ,count(1) 'value'
+        from T_BD_Person a  --人员表
+        left join T_ORG_PositionMember c on c.FPersonID = a.fid  --人员岗位对应表
+        left join T_ORG_Position d on c.FPositionID = d.FID  --岗位表
+        left join T_HR_JobLevel h on d.FJobLevelID = h.fID  --职层表
+        left join T_HR_PERSONPOSITION j on j.fpersonid = a.fid  --入离职日期表
+        left join T_ORG_Admin k on k.fid = d.FAdminOrgUnitID  --架构表
+        /*在职*/
+        where j.fleftdate is null
+        /*融资租赁事业部--营销部*/
+        and k.FDisplayName_L2 not like '%喜相逢_股东大会_总裁_常务副总裁_融资性租赁事业部%'
+        and k.FDisplayName_L2 not like '%喜相逢_股东大会_总裁_常务副总裁_福建喜盾资产管理有限公司%'
+        and a.FBirthday is not null
+        group by case when year(a.FBirthday) >= 2000 then '00后'
+              when year(a.FBirthday) >= 1990 then '90后'
+              when year(a.FBirthday) >= 1980 then '80后'
+              when year(a.FBirthday) >= 1970 then '70后'
+              when year(a.FBirthday) >= 1960 then '60后'
+              when year(a.FBirthday) >= 1950 then '50后'
+              else ''
+              end
+
+
+    </select>
+
+</mapper>
