@@ -20,7 +20,21 @@
     <script th:src="@{/assets/js/jquery.min.js}"></script>
 
     <script type="text/javascript">
+       function accountLogin(){
 
+           var account = $("#account").val();
+
+           var pwd = $("#pwd").val();
+           
+           $.post("admin/account_login",{"account":account,"pwd":pwd},function (data) {
+               if(data.code==200){
+                   window.location.href = "admin/index";
+               }else{
+                   alert(data.msg);
+                   return;
+               }
+           });
+        }
 
     </script>
 </head>
@@ -52,12 +66,12 @@
 
                 <form class="am-form tpl-form-line-form" action="/admin/account_login">
                     <div class="am-form-group">
-                        <input type="text" class="tpl-form-input" id="user-name" placeholder="请输入账号">
+                        <input type="text" class="tpl-form-input" id="account" name="account" placeholder="请输入账号">
 
                     </div>
 
                     <div class="am-form-group">
-                        <input type="password" class="tpl-form-input" id="user-name" placeholder="请输入密码">
+                        <input type="password" class="tpl-form-input" id="pwd" name="pwd" placeholder="请输入密码">
 
                     </div>
                     <div class="am-form-group tpl-login-remember-me">
@@ -69,14 +83,9 @@
 
                     </div>
 
-
-
-
-
-
                     <div class="am-form-group">
 
-                        <button type="submit" class="am-btn am-btn-primary  am-btn-block tpl-btn-bg-color-success  tpl-login-btn" >提交</button>
+                        <button type="button" class="am-btn am-btn-primary  am-btn-block tpl-btn-bg-color-success  tpl-login-btn" onclick="accountLogin()" >提交</button>
 
                     </div>
                 </form>

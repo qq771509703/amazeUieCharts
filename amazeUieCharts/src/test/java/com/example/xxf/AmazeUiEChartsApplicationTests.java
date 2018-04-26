@@ -47,7 +47,6 @@ public class AmazeUiEChartsApplicationTests {
 		mockMvc = MockMvcBuilders.standaloneSetup(new DataScreenController()).build();
 	}
 
-
 	@Test
 	public void contextLoads()throws Exception {
 		List<Map<String,Object>> listMap = dataScreenService.getSalesStaffDistribution();

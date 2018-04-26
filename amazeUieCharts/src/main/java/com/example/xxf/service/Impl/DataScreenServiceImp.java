@@ -2,6 +2,7 @@ package com.example.xxf.service.Impl;
 
 import com.example.xxf.annotation.DBSource;
 import com.example.xxf.mapper.DataScreenMapper;
+import com.example.xxf.mapper.TuserMapper;
 import com.example.xxf.service.DataScreenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

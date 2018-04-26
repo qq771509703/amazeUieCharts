@@ -5,12 +5,21 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.PrintWriter;
 
 
 public class MyInterceptor implements HandlerInterceptor {
     @Override
-    public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) throws Exception {
-       // System.out.println(">>>MyInterceptor1------>在请求处理之前进行调用 Controller方法调用之前");
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) throws Exception {
+        Object name = request.getSession().getAttribute("name");
+        String uri = request.getRequestURI();
+        String url = "/login";
+        if (uri.indexOf("admin/index")!=-1) {
+                if (name == null) {
+                    response.sendRedirect(url);
+                    return false;
+            }
+        }
         return true;
     }
 
