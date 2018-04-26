@@ -48,10 +48,12 @@ public class LoginServiceImpl implements LoginService {
     public  List<TBaseDataAnalyzeMenu> getAccountMenu(Tuser user) {
         List<TBaseDataAnalyzeMenu> menus = null;
         try{
+            //根据用户（Tuser）获取到角色（TBaseDataAnalyzeAccountRole）
             TBaseDataAnalyzeAccountRoleExample Roleexample = new TBaseDataAnalyzeAccountRoleExample();
             Roleexample.createCriteria().andCAccountEqualTo(user.getUserid()+"");
             List<TBaseDataAnalyzeAccountRole> roles = tBaseDataAnalyzeAccountRoleMapper.selectByExample(Roleexample);
             if (roles!=null && !roles.isEmpty()){
+                //根据用户（Tuser）的角色（TBaseDataAnalyzeAccountRole）获取到角色权限（TBaseDataAnalyzeMenuAcl）
                 TBaseDataAnalyzeMenuAclExample Aclexample1 = new TBaseDataAnalyzeMenuAclExample();
                 Aclexample1.createCriteria().andCCodeEqualTo(roles.get(0).getcRolecode());
                 List<TBaseDataAnalyzeMenuAcl> menuAcls = tBaseDataAnalyzeMenuAclMapper.selectByExample(Aclexample1);
@@ -61,6 +63,7 @@ public class LoginServiceImpl implements LoginService {
                     menuAcl = menuAcls.get(i);
                     menuCodes.add(Integer.parseInt(menuAcl.getcMenuid()+""));
                 }
+                //根据角色权限（TBaseDataAnalyzeMenuAcl）的menuid获取到菜单（TBaseDataAnalyzeMenu）
                 TBaseDataAnalyzeMenuExample menuExample = new TBaseDataAnalyzeMenuExample();
                 menuExample.createCriteria().andIdIn(menuCodes);
                 menus = tBaseDataAnalyzeMenuMapper.selectByExample(menuExample);
