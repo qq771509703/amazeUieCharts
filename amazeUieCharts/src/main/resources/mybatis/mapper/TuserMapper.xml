@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.xxf.mapper.TuserMapper" >
+  <resultMap id="BaseResultMap" type="com.example.xxf.bean.Tuser" >
+    <id column="ID" property="id" jdbcType="NUMERIC" />
+    <result column="UserID" property="userid" jdbcType="VARCHAR" />
+    <result column="Password" property="password" jdbcType="VARCHAR" />
+    <result column="Name" property="name" jdbcType="VARCHAR" />
+    <result column="Grade" property="grade" jdbcType="NUMERIC" />
+    <result column="LastLogin" property="lastlogin" jdbcType="TIMESTAMP" />
+    <result column="Logins" property="logins" jdbcType="NUMERIC" />
+    <result column="ChgPwdTime" property="chgpwdtime" jdbcType="TIMESTAMP" />
+    <result column="ChgPwdLimit" property="chgpwdlimit" jdbcType="NUMERIC" />
+    <result column="Status" property="status" jdbcType="NUMERIC" />
+    <result column="IPLimit" property="iplimit" jdbcType="VARCHAR" />
+    <result column="CertNo" property="certno" jdbcType="VARCHAR" />
+    <result column="OrgID" property="orgid" jdbcType="NUMERIC" />
+    <result column="UserAttribute" property="userattribute" jdbcType="INTEGER" />
+    <result column="Femployed" property="femployed" jdbcType="TIMESTAMP" />
+    <result column="Farea" property="farea" jdbcType="NUMERIC" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.example.xxf.bean.Tuser" extends="BaseResultMap" >
+    <result column="Photo" property="photo" jdbcType="LONGVARBINARY" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    ID, UserID, Password, Name, Grade, LastLogin, Logins, ChgPwdTime, ChgPwdLimit, Status, 
+    IPLimit, CertNo, OrgID, UserAttribute, Femployed, Farea
+  </sql>
+  <sql id="Blob_Column_List" >
+    Photo
+  </sql>
+  <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs" parameterType="com.example.xxf.bean.TuserExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from tUser
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.example.xxf.bean.TuserExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from tUser
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from tUser
+    where ID = #{id,jdbcType=NUMERIC}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from tUser
+    where ID = #{id,jdbcType=NUMERIC}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.example.xxf.bean.TuserExample" >
+    delete from tUser
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.example.xxf.bean.Tuser" >
+    insert into tUser (ID, UserID, Password, 
+      Name, Grade, LastLogin, 
+      Logins, ChgPwdTime, ChgPwdLimit, 
+      Status, IPLimit, CertNo, 
+      OrgID, UserAttribute, Femployed, 
+      Farea, Photo)
+    values (#{id,jdbcType=NUMERIC}, #{userid,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{name,jdbcType=VARCHAR}, #{grade,jdbcType=NUMERIC}, #{lastlogin,jdbcType=TIMESTAMP}, 
+      #{logins,jdbcType=NUMERIC}, #{chgpwdtime,jdbcType=TIMESTAMP}, #{chgpwdlimit,jdbcType=NUMERIC}, 
+      #{status,jdbcType=NUMERIC}, #{iplimit,jdbcType=VARCHAR}, #{certno,jdbcType=VARCHAR}, 
+      #{orgid,jdbcType=NUMERIC}, #{userattribute,jdbcType=INTEGER}, #{femployed,jdbcType=TIMESTAMP}, 
+      #{farea,jdbcType=NUMERIC}, #{photo,jdbcType=LONGVARBINARY})
+  </insert>
+  <insert id="insertSelective" parameterType="com.example.xxf.bean.Tuser" >
+    insert into tUser
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="userid != null" >
+        UserID,
+      </if>
+      <if test="password != null" >
+        Password,
+      </if>
+      <if test="name != null" >
+        Name,
+      </if>
+      <if test="grade != null" >
+        Grade,
+      </if>
+      <if test="lastlogin != null" >
+        LastLogin,
+      </if>
+      <if test="logins != null" >
+        Logins,
+      </if>
+      <if test="chgpwdtime != null" >
+        ChgPwdTime,
+      </if>
+      <if test="chgpwdlimit != null" >
+        ChgPwdLimit,
+      </if>
+      <if test="status != null" >
+        Status,
+      </if>
+      <if test="iplimit != null" >
+        IPLimit,
+      </if>
+      <if test="certno != null" >
+        CertNo,
+      </if>
+      <if test="orgid != null" >
+        OrgID,
+      </if>
+      <if test="userattribute != null" >
+        UserAttribute,
+      </if>
+      <if test="femployed != null" >
+        Femployed,
+      </if>
+      <if test="farea != null" >
+        Farea,
+      </if>
+      <if test="photo != null" >
+        Photo,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=NUMERIC},
+      </if>
+      <if test="userid != null" >
+        #{userid,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="grade != null" >
+        #{grade,jdbcType=NUMERIC},
+      </if>
+      <if test="lastlogin != null" >
+        #{lastlogin,jdbcType=TIMESTAMP},
+      </if>
+      <if test="logins != null" >
+        #{logins,jdbcType=NUMERIC},
+      </if>
+      <if test="chgpwdtime != null" >
+        #{chgpwdtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="chgpwdlimit != null" >
+        #{chgpwdlimit,jdbcType=NUMERIC},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=NUMERIC},
+      </if>
+      <if test="iplimit != null" >
+        #{iplimit,jdbcType=VARCHAR},
+      </if>
+      <if test="certno != null" >
+        #{certno,jdbcType=VARCHAR},
+      </if>
+      <if test="orgid != null" >
+        #{orgid,jdbcType=NUMERIC},
+      </if>
+      <if test="userattribute != null" >
+        #{userattribute,jdbcType=INTEGER},
+      </if>
+      <if test="femployed != null" >
+        #{femployed,jdbcType=TIMESTAMP},
+      </if>
+      <if test="farea != null" >
+        #{farea,jdbcType=NUMERIC},
+      </if>
+      <if test="photo != null" >
+        #{photo,jdbcType=LONGVARBINARY},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.example.xxf.bean.TuserExample" resultType="java.lang.Integer" >
+    select count(*) from tUser
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update tUser
+    <set >
+      <if test="record.id != null" >
+        ID = #{record.id,jdbcType=NUMERIC},
+      </if>
+      <if test="record.userid != null" >
+        UserID = #{record.userid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.password != null" >
+        Password = #{record.password,jdbcType=VARCHAR},
+      </if>
+      <if test="record.name != null" >
+        Name = #{record.name,jdbcType=VARCHAR},
+      </if>
+      <if test="record.grade != null" >
+        Grade = #{record.grade,jdbcType=NUMERIC},
+      </if>
+      <if test="record.lastlogin != null" >
+        LastLogin = #{record.lastlogin,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.logins != null" >
+        Logins = #{record.logins,jdbcType=NUMERIC},
+      </if>
+      <if test="record.chgpwdtime != null" >
+        ChgPwdTime = #{record.chgpwdtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.chgpwdlimit != null" >
+        ChgPwdLimit = #{record.chgpwdlimit,jdbcType=NUMERIC},
+      </if>
+      <if test="record.status != null" >
+        Status = #{record.status,jdbcType=NUMERIC},
+      </if>
+      <if test="record.iplimit != null" >
+        IPLimit = #{record.iplimit,jdbcType=VARCHAR},
+      </if>
+      <if test="record.certno != null" >
+        CertNo = #{record.certno,jdbcType=VARCHAR},
+      </if>
+      <if test="record.orgid != null" >
+        OrgID = #{record.orgid,jdbcType=NUMERIC},
+      </if>
+      <if test="record.userattribute != null" >
+        UserAttribute = #{record.userattribute,jdbcType=INTEGER},
+      </if>
+      <if test="record.femployed != null" >
+        Femployed = #{record.femployed,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.farea != null" >
+        Farea = #{record.farea,jdbcType=NUMERIC},
+      </if>
+      <if test="record.photo != null" >
+        Photo = #{record.photo,jdbcType=LONGVARBINARY},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map" >
+    update tUser
+    set ID = #{record.id,jdbcType=NUMERIC},
+      UserID = #{record.userid,jdbcType=VARCHAR},
+      Password = #{record.password,jdbcType=VARCHAR},
+      Name = #{record.name,jdbcType=VARCHAR},
+      Grade = #{record.grade,jdbcType=NUMERIC},
+      LastLogin = #{record.lastlogin,jdbcType=TIMESTAMP},
+      Logins = #{record.logins,jdbcType=NUMERIC},
+      ChgPwdTime = #{record.chgpwdtime,jdbcType=TIMESTAMP},
+      ChgPwdLimit = #{record.chgpwdlimit,jdbcType=NUMERIC},
+      Status = #{record.status,jdbcType=NUMERIC},
+      IPLimit = #{record.iplimit,jdbcType=VARCHAR},
+      CertNo = #{record.certno,jdbcType=VARCHAR},
+      OrgID = #{record.orgid,jdbcType=NUMERIC},
+      UserAttribute = #{record.userattribute,jdbcType=INTEGER},
+      Femployed = #{record.femployed,jdbcType=TIMESTAMP},
+      Farea = #{record.farea,jdbcType=NUMERIC},
+      Photo = #{record.photo,jdbcType=LONGVARBINARY}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update tUser
+    set ID = #{record.id,jdbcType=NUMERIC},
+      UserID = #{record.userid,jdbcType=VARCHAR},
+      Password = #{record.password,jdbcType=VARCHAR},
+      Name = #{record.name,jdbcType=VARCHAR},
+      Grade = #{record.grade,jdbcType=NUMERIC},
+      LastLogin = #{record.lastlogin,jdbcType=TIMESTAMP},
+      Logins = #{record.logins,jdbcType=NUMERIC},
+      ChgPwdTime = #{record.chgpwdtime,jdbcType=TIMESTAMP},
+      ChgPwdLimit = #{record.chgpwdlimit,jdbcType=NUMERIC},
+      Status = #{record.status,jdbcType=NUMERIC},
+      IPLimit = #{record.iplimit,jdbcType=VARCHAR},
+      CertNo = #{record.certno,jdbcType=VARCHAR},
+      OrgID = #{record.orgid,jdbcType=NUMERIC},
+      UserAttribute = #{record.userattribute,jdbcType=INTEGER},
+      Femployed = #{record.femployed,jdbcType=TIMESTAMP},
+      Farea = #{record.farea,jdbcType=NUMERIC}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.example.xxf.bean.Tuser" >
+    update tUser
+    <set >
+      <if test="userid != null" >
+        UserID = #{userid,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        Password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        Name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="grade != null" >
+        Grade = #{grade,jdbcType=NUMERIC},
+      </if>
+      <if test="lastlogin != null" >
+        LastLogin = #{lastlogin,jdbcType=TIMESTAMP},
+      </if>
+      <if test="logins != null" >
+        Logins = #{logins,jdbcType=NUMERIC},
+      </if>
+      <if test="chgpwdtime != null" >
+        ChgPwdTime = #{chgpwdtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="chgpwdlimit != null" >
+        ChgPwdLimit = #{chgpwdlimit,jdbcType=NUMERIC},
+      </if>
+      <if test="status != null" >
+        Status = #{status,jdbcType=NUMERIC},
+      </if>
+      <if test="iplimit != null" >
+        IPLimit = #{iplimit,jdbcType=VARCHAR},
+      </if>
+      <if test="certno != null" >
+        CertNo = #{certno,jdbcType=VARCHAR},
+      </if>
+      <if test="orgid != null" >
+        OrgID = #{orgid,jdbcType=NUMERIC},
+      </if>
+      <if test="userattribute != null" >
+        UserAttribute = #{userattribute,jdbcType=INTEGER},
+      </if>
+      <if test="femployed != null" >
+        Femployed = #{femployed,jdbcType=TIMESTAMP},
+      </if>
+      <if test="farea != null" >
+        Farea = #{farea,jdbcType=NUMERIC},
+      </if>
+      <if test="photo != null" >
+        Photo = #{photo,jdbcType=LONGVARBINARY},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=NUMERIC}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.example.xxf.bean.Tuser" >
+    update tUser
+    set UserID = #{userid,jdbcType=VARCHAR},
+      Password = #{password,jdbcType=VARCHAR},
+      Name = #{name,jdbcType=VARCHAR},
+      Grade = #{grade,jdbcType=NUMERIC},
+      LastLogin = #{lastlogin,jdbcType=TIMESTAMP},
+      Logins = #{logins,jdbcType=NUMERIC},
+      ChgPwdTime = #{chgpwdtime,jdbcType=TIMESTAMP},
+      ChgPwdLimit = #{chgpwdlimit,jdbcType=NUMERIC},
+      Status = #{status,jdbcType=NUMERIC},
+      IPLimit = #{iplimit,jdbcType=VARCHAR},
+      CertNo = #{certno,jdbcType=VARCHAR},
+      OrgID = #{orgid,jdbcType=NUMERIC},
+      UserAttribute = #{userattribute,jdbcType=INTEGER},
+      Femployed = #{femployed,jdbcType=TIMESTAMP},
+      Farea = #{farea,jdbcType=NUMERIC},
+      Photo = #{photo,jdbcType=LONGVARBINARY}
+    where ID = #{id,jdbcType=NUMERIC}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.example.xxf.bean.Tuser" >
+    update tUser
+    set UserID = #{userid,jdbcType=VARCHAR},
+      Password = #{password,jdbcType=VARCHAR},
+      Name = #{name,jdbcType=VARCHAR},
+      Grade = #{grade,jdbcType=NUMERIC},
+      LastLogin = #{lastlogin,jdbcType=TIMESTAMP},
+      Logins = #{logins,jdbcType=NUMERIC},
+      ChgPwdTime = #{chgpwdtime,jdbcType=TIMESTAMP},
+      ChgPwdLimit = #{chgpwdlimit,jdbcType=NUMERIC},
+      Status = #{status,jdbcType=NUMERIC},
+      IPLimit = #{iplimit,jdbcType=VARCHAR},
+      CertNo = #{certno,jdbcType=VARCHAR},
+      OrgID = #{orgid,jdbcType=NUMERIC},
+      UserAttribute = #{userattribute,jdbcType=INTEGER},
+      Femployed = #{femployed,jdbcType=TIMESTAMP},
+      Farea = #{farea,jdbcType=NUMERIC}
+    where ID = #{id,jdbcType=NUMERIC}
+  </update>
+</mapper>

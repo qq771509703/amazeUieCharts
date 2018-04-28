@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.xxf.mapper.TBaseDataAnalyzeMenuMapper" >
+  <resultMap id="BaseResultMap" type="com.example.xxf.bean.TBaseDataAnalyzeMenu" >
+    <id column="ID" property="id" jdbcType="INTEGER" />
+    <result column="C_ICON" property="cIcon" jdbcType="VARCHAR" />
+    <result column="C_TITLE" property="cTitle" jdbcType="VARCHAR" />
+    <result column="C_URL" property="cUrl" jdbcType="VARCHAR" />
+    <result column="C_PARENTID" property="cParentid" jdbcType="INTEGER" />
+    <result column="C_LEVEL" property="cLevel" jdbcType="INTEGER" />
+    <result column="C_USEABLE" property="cUseable" jdbcType="INTEGER" />
+    <result column="C_MODELNAME" property="cModelname" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    ID, C_ICON, C_TITLE, C_URL, C_PARENTID, C_LEVEL, C_USEABLE, C_MODELNAME
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.example.xxf.bean.TBaseDataAnalyzeMenuExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from t_base_data_analyze_menu
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_base_data_analyze_menu
+    where ID = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_base_data_analyze_menu
+    where ID = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.example.xxf.bean.TBaseDataAnalyzeMenuExample" >
+    delete from t_base_data_analyze_menu
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.example.xxf.bean.TBaseDataAnalyzeMenu" >
+    insert into t_base_data_analyze_menu (ID, C_ICON, C_TITLE, 
+      C_URL, C_PARENTID, C_LEVEL, 
+      C_USEABLE, C_MODELNAME)
+    values (#{id,jdbcType=INTEGER}, #{cIcon,jdbcType=VARCHAR}, #{cTitle,jdbcType=VARCHAR}, 
+      #{cUrl,jdbcType=VARCHAR}, #{cParentid,jdbcType=INTEGER}, #{cLevel,jdbcType=INTEGER}, 
+      #{cUseable,jdbcType=INTEGER}, #{cModelname,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.example.xxf.bean.TBaseDataAnalyzeMenu" >
+    insert into t_base_data_analyze_menu
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="cIcon != null" >
+        C_ICON,
+      </if>
+      <if test="cTitle != null" >
+        C_TITLE,
+      </if>
+      <if test="cUrl != null" >
+        C_URL,
+      </if>
+      <if test="cParentid != null" >
+        C_PARENTID,
+      </if>
+      <if test="cLevel != null" >
+        C_LEVEL,
+      </if>
+      <if test="cUseable != null" >
+        C_USEABLE,
+      </if>
+      <if test="cModelname != null" >
+        C_MODELNAME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="cIcon != null" >
+        #{cIcon,jdbcType=VARCHAR},
+      </if>
+      <if test="cTitle != null" >
+        #{cTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="cUrl != null" >
+        #{cUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="cParentid != null" >
+        #{cParentid,jdbcType=INTEGER},
+      </if>
+      <if test="cLevel != null" >
+        #{cLevel,jdbcType=INTEGER},
+      </if>
+      <if test="cUseable != null" >
+        #{cUseable,jdbcType=INTEGER},
+      </if>
+      <if test="cModelname != null" >
+        #{cModelname,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.example.xxf.bean.TBaseDataAnalyzeMenuExample" resultType="java.lang.Integer" >
+    select count(*) from t_base_data_analyze_menu
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update t_base_data_analyze_menu
+    <set >
+      <if test="record.id != null" >
+        ID = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.cIcon != null" >
+        C_ICON = #{record.cIcon,jdbcType=VARCHAR},
+      </if>
+      <if test="record.cTitle != null" >
+        C_TITLE = #{record.cTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="record.cUrl != null" >
+        C_URL = #{record.cUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="record.cParentid != null" >
+        C_PARENTID = #{record.cParentid,jdbcType=INTEGER},
+      </if>
+      <if test="record.cLevel != null" >
+        C_LEVEL = #{record.cLevel,jdbcType=INTEGER},
+      </if>
+      <if test="record.cUseable != null" >
+        C_USEABLE = #{record.cUseable,jdbcType=INTEGER},
+      </if>
+      <if test="record.cModelname != null" >
+        C_MODELNAME = #{record.cModelname,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update t_base_data_analyze_menu
+    set ID = #{record.id,jdbcType=INTEGER},
+      C_ICON = #{record.cIcon,jdbcType=VARCHAR},
+      C_TITLE = #{record.cTitle,jdbcType=VARCHAR},
+      C_URL = #{record.cUrl,jdbcType=VARCHAR},
+      C_PARENTID = #{record.cParentid,jdbcType=INTEGER},
+      C_LEVEL = #{record.cLevel,jdbcType=INTEGER},
+      C_USEABLE = #{record.cUseable,jdbcType=INTEGER},
+      C_MODELNAME = #{record.cModelname,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.example.xxf.bean.TBaseDataAnalyzeMenu" >
+    update t_base_data_analyze_menu
+    <set >
+      <if test="cIcon != null" >
+        C_ICON = #{cIcon,jdbcType=VARCHAR},
+      </if>
+      <if test="cTitle != null" >
+        C_TITLE = #{cTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="cUrl != null" >
+        C_URL = #{cUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="cParentid != null" >
+        C_PARENTID = #{cParentid,jdbcType=INTEGER},
+      </if>
+      <if test="cLevel != null" >
+        C_LEVEL = #{cLevel,jdbcType=INTEGER},
+      </if>
+      <if test="cUseable != null" >
+        C_USEABLE = #{cUseable,jdbcType=INTEGER},
+      </if>
+      <if test="cModelname != null" >
+        C_MODELNAME = #{cModelname,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.example.xxf.bean.TBaseDataAnalyzeMenu" >
+    update t_base_data_analyze_menu
+    set C_ICON = #{cIcon,jdbcType=VARCHAR},
+      C_TITLE = #{cTitle,jdbcType=VARCHAR},
+      C_URL = #{cUrl,jdbcType=VARCHAR},
+      C_PARENTID = #{cParentid,jdbcType=INTEGER},
+      C_LEVEL = #{cLevel,jdbcType=INTEGER},
+      C_USEABLE = #{cUseable,jdbcType=INTEGER},
+      C_MODELNAME = #{cModelname,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

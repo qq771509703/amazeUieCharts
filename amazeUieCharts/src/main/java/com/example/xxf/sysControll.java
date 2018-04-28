@@ -65,6 +65,7 @@ public class sysControll {
     public String home(){
         return "admin/home2";
     }
+
     @RequestMapping("/chart")
     public String chart(){
         return "admin/chart";
