@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import javax.sql.DataSource;
@@ -72,6 +73,7 @@ public class DataSourceConfig {
         bean.setDataSource(dynamicDataSource);
         bean.setMapperLocations(new PathMatchingResourcePatternResolver()
                 .getResources("classpath*:mybatis/mapper/*.xml"));
+        bean.setConfigLocation(new ClassPathResource("mybatis/mybatis-config.xml"));
         return bean.getObject();
 
     }

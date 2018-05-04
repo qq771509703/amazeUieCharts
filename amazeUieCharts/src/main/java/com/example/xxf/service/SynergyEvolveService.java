@@ -29,4 +29,6 @@ public interface SynergyEvolveService {
      * @return
      */
     List<Map<String,Object>> getSynergyEvolveTable(Map<String,Object> param);
+
+    long getSynergyEvolveTableCount(Map <String,Object> param);
 }

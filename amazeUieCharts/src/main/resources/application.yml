@@ -11,10 +11,10 @@ spring:
 #      username: root
 #      password: root
 
-mybatis:
-     #type-aliases-package: com.cockpit.record.bean
-     mapper-locations: classpath:mybatis/mapper/*.xml
-     config-location: classpath:mybatis/mybatis-config.xml
+#mybatis:
+#     #type-aliases-package: com.cockpit.record.bean
+#     mapper-locations: classpath:mybatis/mapper/*.xml
+#     config-location: classpath:mybatis/mybatis-config.xml
 logging:
   pattern:
     console: "%d - %msg%n"

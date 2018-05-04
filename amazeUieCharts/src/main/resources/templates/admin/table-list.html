@@ -19,6 +19,7 @@
     <link rel="stylesheet" th:href="@{/assets/css/app.css}">
     <link rel="stylesheet" th:href="@{/assets/css/amazeui.page.css}">
     <script th:src="@{/assets/js/jquery.min.js}"></script>
+    <script th:src="@{/assets/js/template-web.js}"></script>
 
     <style type="text/css">
 
@@ -98,30 +99,95 @@
 
             $.post("initializeSelectMenu",param,function(data){
                 console.log(data)
-//                $("#sAndUGPS_span").text(data.data.sAndUGPS.yddwzGPS);
-//                $("#fpjcjqxwm_span").text(data.data.sAndUGPS.fpjcjqxwm);
-//                $("#yspwjsyx_span").text(data.data.sAndUGPS.yspwmsyx);
-//                $("#zpqqwsp_span").text(data.data.sAndUGPS.zpqqwsp);
-//                $("#ztcl_span").text(data.data.sAndUGPS.ztcl);
-
-                var listMap = data.data;
-
-
+                $("#sAndUGPS_span").text(data.data.sAndUGPS.yddwzGPS);
+                $("#fpjcjqxwm_span").text(data.data.sAndUGPS.fpjcjqxwm);
+                $("#yspwjsyx_span").text(data.data.sAndUGPS.yspwmsyx);
+                $("#zpqqwsp_span").text(data.data.sAndUGPS.zpqqwsp);
+                $("#ztcl_span").text(data.data.sAndUGPS.ztcl);
+                pluginBtn();
 
 
             });
 
-//            $.ajax({
-//                type:"POST",
-//                url:"initializeSelectMenu",
-//                dataType:"json",
-//                contentType:"application/json",
-//                data:JSON.stringify(param),
-//                success:function(data){
-//                    console.log(data);
-//                }
-//            });
+        }
 
+        function pluginBtn(obj){
+
+            var thisObj=$(obj);
+                var b = thisObj.children();
+                var pluginVal = b.attr("id");
+               // console.log(thisObj)
+
+            var area = $("#selected-area").val();
+            if (area!=null){
+                area = area.toString()
+            }
+
+            var brand = $("#selected-brand").val();
+            if (brand!=null){
+                brand = brand.toString()
+            }
+
+            var carType = $("#selected-carType").val();
+            if (carType!=null){
+                carType = carType.toString()
+            }
+
+            var phyStatus = $("#selected-phyStatus").val();
+            if (phyStatus!=null){
+                phyStatus = phyStatus.toString()
+            }
+
+            var owner = $("#selected-owner").val();
+            if (owner!=null){
+                owner = owner.toString()
+            }
+
+            var arriveWay = $("#selected-arriveWay").val();
+            if (arriveWay!=null){
+                arriveWay = arriveWay.toString()
+            }
+
+            var param = {"area":area,"brand":brand,"carType":carType,"phyStatus":phyStatus,"owner":owner,"arriveWay":arriveWay,"pluginVal":pluginVal}
+            $.post("getSynergyEvolveTable",param,function(data){
+                var listMap = data.data;
+
+            });
+        }
+        function search_export(){
+            var area = $("#selected-area").val();
+            if (area!=null){
+                area = area.toString()
+            }
+
+            var brand = $("#selected-brand").val();
+            if (brand!=null){
+                brand = brand.toString()
+            }
+
+            var carType = $("#selected-carType").val();
+            if (carType!=null){
+                carType = carType.toString()
+            }
+
+            var phyStatus = $("#selected-phyStatus").val();
+            if (phyStatus!=null){
+                phyStatus = phyStatus.toString()
+            }
+
+            var owner = $("#selected-owner").val();
+            if (owner!=null){
+                owner = owner.toString()
+            }
+
+            var arriveWay = $("#selected-arriveWay").val();
+            if (arriveWay!=null){
+                arriveWay = arriveWay.toString()
+            }
+            var param = {"area":area,"brand":brand,"carType":carType,"phyStatus":phyStatus,"owner":owner,"arriveWay":arriveWay}
+
+            console.log(param);
+            window.location.href = "exportExcel?area="+area+"&brand="+brand+"&carType="+carType+"&phyStatus="+phyStatus+"&owner="+owner+"&arriveWay="+arriveWay;
 
         }
     </script>
@@ -214,6 +280,7 @@
                                 <option value="在途车辆">4S店未上牌</option>
                             </select>
                                 <button type="button"  class="am-btn am-btn-default am-round" onclick="search_select()">查 询</button>
+                                <button type="button"  class="am-btn am-btn-default am-round" onclick="search_export()">导 出</button>
                         </div>
 
                     </div>
@@ -250,11 +317,11 @@
                                     <div class="am-form-group">
                                         <div class="am-btn-toolbar">
                                             <div class=" ">
-                                                <button type="button" class="am-btn am-btn-primary s_button"></span>已到店未安装GPS：<span id="sAndUGPS_span"></span></button>
-                                                <button type="button" class="am-btn am-btn-secondary s_button"></span>发票寄出，交强险未买：<span id="fpjcjqxwm_span"></span></button>
-                                                <button type="button" class="am-btn am-btn-success s_button"></span>已上牌，未交商业险：<span id="yspwjsyx_span"></span></button>
-                                                <button type="button" class="am-btn am-btn-warning s_button"></span>证票齐全，未上牌：<span id="zpqqwsp_span"></span></button>
-                                                <button type="button" class="am-btn am-btn-warning s_button"></span>在途车辆：<span id="ztcl_span"></span></button>
+                                                <button type="button" class="am-btn am-btn-primary s_button" id="sAndUGPS_btn" onclick="pluginBtn(this)">已到店未安装GPS：<span id="sAndUGPS_span"></span></button>
+                                                <button type="button" class="am-btn am-btn-secondary s_button" id="fpjcjqxwm_btn" onclick="pluginBtn(this)">发票寄出，交强险未买：<span id="fpjcjqxwm_span"></span></button>
+                                                <button type="button" class="am-btn am-btn-success s_button" id="yspwjsyx_btn" onclick="pluginBtn(this)">已上牌，未交商业险：<span id="yspwjsyx_span"></span></button>
+                                                <button type="button" class="am-btn am-btn-warning s_button" id="zpqqwsp_btn" onclick="pluginBtn(this)">证票齐全，未上牌：<span id="zpqqwsp_span"></span></button>
+                                                <button type="button" class="am-btn am-btn-warning s_button" id="ztcl_btn" onclick="pluginBtn(this)">在途车辆：<span id="ztcl_span"></span></button>
                                             </div>
                                         </div>
                                     </div>

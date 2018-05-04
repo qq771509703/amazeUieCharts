@@ -70,4 +70,15 @@ public class SynergyEvolveServiceImpl implements SynergyEvolveService {
         }
         return list;
     }
+
+    @Override
+    public long getSynergyEvolveTableCount(Map<String, Object> param) {
+        long count = 0;
+        try{
+            count = synergyEvolveMapper.getSynergyEvolveTableCount(param);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return count;
+    }
 }

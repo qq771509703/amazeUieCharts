@@ -2,6 +2,7 @@ package com.example.xxf;
 
 import com.example.xxf.controller.DataScreenController;
 import com.example.xxf.mapper.DataScreenMapper;
+import com.example.xxf.mapper.SynergyEvolveMapper;
 import com.example.xxf.service.AreaCoordService;
 import com.example.xxf.service.DataScreenService;
 import net.minidev.json.JSONObject;
@@ -37,6 +38,8 @@ public class AmazeUiEChartsApplicationTests {
 	@Autowired
 	AreaCoordService areaCoordService;
 
+	SynergyEvolveMapper synergyEvolveMapper;
+
 
 	private MockMvc mockMvc;
 	@Autowired
@@ -49,11 +52,13 @@ public class AmazeUiEChartsApplicationTests {
 
 	@Test
 	public void contextLoads()throws Exception {
-		List<Map<String,Object>> listMap = dataScreenService.getSalesStaffDistribution();
-		System.out.println(listMap);
-		System.out.print("");
-		listMap=dataScreenService.getPurchaseBrand();
-		System.out.println(listMap);
+//		List<Map<String,Object>> listMap = dataScreenService.getSalesStaffDistribution();
+//		System.out.println(listMap);
+//		System.out.print("");
+//		listMap=dataScreenService.getPurchaseBrand();
+//		System.out.println(listMap);
+
+		// synergyEvolveMapper.getSynergyEvolveTableCount();
 
 
 
