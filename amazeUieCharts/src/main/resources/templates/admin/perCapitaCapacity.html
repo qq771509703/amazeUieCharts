@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>人均产能度表</title>
+    <meta name="description" content="">
+    <meta name="keywords" content="index">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="icon" type="image/png" href="assets/i/favicon.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/i/app-icon72x72@2x.png">
+    <meta name="apple-mobile-web-app-title" content="Amaze UI" />
+    <script th:src="@{/assets/js/echarts.min.js}"></script>
+    <link rel="stylesheet" th:href="@{/assets/css/amazeui.min.css}" />
+    <link rel="stylesheet" th:href="@{/assets/layui/css/layui.css}" />
+    <link rel="stylesheet" th:href="@{/assets/css/amazeui.datatables.min.css}" />
+    <link rel="stylesheet" th:href="@{/assets/css/app.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/amazeui.page.css}">
+    <script th:src="@{/assets/js/jquery.min.js}"></script>
+    <script th:src="@{/assets/layui/layui.js}"></script>
+
+
+    <style type="text/css">
+        .widget-body {
+            overflow-x: scroll
+        }
+
+        /* .widget-body th:nth-child(5){
+      display: none
+  } */
+
+        .widget-body td,
+        .widget-body th,
+        .widget-body tr {
+            min-width: 145px;
+            text-align: center
+        }
+
+        .widget-body td:nth-child(8), .widget-body th:nth-child(8), .widget-body tr:nth-child(8) {
+      min-width: 238px;
+  }
+
+        .tpl-table-list-select {
+            text-align: left;
+        }
+
+        .am-selected {
+            width: 120px;
+        }
+
+        .filtrateText {
+            color: floralwhite;
+        }
+
+        .row-content {
+            padding: 10px;
+        }
+
+        .widget {
+            height: 780px;
+        }
+
+        .s_button {
+            padding-right: 5px;
+        }
+
+        .theme-black .tpl-form-line-form input[type=number],
+        .theme-black .tpl-form-line-form input[type=search],
+        .theme-black .tpl-form-line-form input[type=text],
+        .theme-black .tpl-form-line-form input[type=password],
+        .theme-black .tpl-form-line-form input[type=datetime],
+        .theme-black .tpl-form-line-form input[type=datetime-local],
+        .theme-black .tpl-form-line-form input[type=date],
+        .theme-black .tpl-form-line-form input[type=month],
+        .theme-black .tpl-form-line-form input[type=time],
+        .theme-black .tpl-form-line-form input[type=week],
+        .theme-black .tpl-form-line-form input[type=email],
+        .theme-black .tpl-form-line-form input[type=url],
+        .theme-black .tpl-form-line-form input[type=tel],
+        .theme-black .tpl-form-line-form input[type=color],
+        .theme-black .tpl-form-line-form select,
+        .theme-black .tpl-form-line-form textarea,
+        .theme-black .am-form-field {
+            display: block;
+            width: 100%;
+            padding: 6px 12px;
+            line-height: 1.42857;
+            color: rgb(0, 0, 0);
+            background-color: rgba(34, 34, 34, 0.15);
+            background-image: none;
+            border: 1px solid #000000;
+        }
+
+        .am-u-sm-2 {
+            width: 15.666% !important;
+        }
+    </style>
+
+
+
+    <script type="text/javascript">
+        var page;
+        var countPP = 0;
+        var lock = false;//锁作为全局变量
+        $(function () {
+            //            var $selected = $('#selected-area');
+            //            $selected.on('change', function() {
+            //                var v = $("#selected-area").val();
+            //
+            //            });
+
+
+
+
+
+        });
+
+    </script>
+
+</head>
+
+<body data-type="widgets">
+    <script th:src="@{/assets/js/theme.js}"></script>
+    <!-- 内容区域 -->
+    <div class="tpl-content-wrapper">
+        <div class="container-fluid am-cf">
+            <div class="row">
+                <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
+                    <div class="page-header-heading">
+                        <span class="am-icon-home page-header-heading-icon"></span>人均产能表
+                        <div>
+                            <input value="" type="text" id="s_department">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <table class="layui-hide" id="test"></table>
+        <div id="test1"></div>
+
+    </div>
+    <script type="text/javascript">
+
+        var s_department = $("#s_department").val();
+        layui.use(['form','layer','table','laypage'], function(){
+            var colss = [ {field:'department', width:80, title: '部门'}];
+            var table = layui.table;
+
+            table.render({
+                elem: '#test'
+                ,url:'getPerCapitaCapacityList'
+                ,where: {department: s_department}
+//                ,page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
+//                    layout: ['limit', 'count', 'prev', 'page', 'next', 'skip'] //自定义分页布局
+//                    //,curr: 5 //设定初始在第 5 页
+//                    ,groups: 1 //只显示 1 个连续页码
+//                    ,first: false //不显示首页
+//                    ,last: false //不显示尾页
+//                    ,jump: function(obj, first) {
+//                    //obj包含了当前分页的所有参数，比如：
+//                    console.log(obj.curr); //得到当前页，以便向服务端请求对应页的数据。
+//                    console.log(obj.limit); //得到每页显示的条数
+//                    console.log(first);
+//                    if(!first){
+//                        //do something
+//                    }
+//                }
+//
+//                }
+                ,page: true
+                ,limit: 15 //默认采用10条
+                ,loading: true
+                ,cols: [colss]
+
+                ,request: {
+                    //pageName: 'pageNum' //页码的参数名称，默认：page
+                    limitName: 'pageSize' //每页数据量的参数名，默认：limit
+                }
+                ,response: {
+                    statusName: 'code' //数据状态的字段名称，默认：code
+                    ,statusCode: 200 //成功的状态码，默认：0
+                    ,msgName: 'message' //状态信息的字段名称，默认：msg
+                    ,countName: 'count' //数据总数的字段名称，默认：count
+                    ,dataName: 'data' //数据列表的字段名称，默认：data
+                }
+
+
+
+            });
+
+        });
+    </script>
+
+    <script th:src="@{/assets/js/amazeui.min.js}"></script>
+    <script th:src="@{/assets/js/amazeui.datatables.min.js}"></script>
+    <script th:src="@{/assets/js/dataTables.responsive.min.js}"></script>
+    <script th:src="@{/assets/js/amazeui.page.js}"></script>
+</body>
+
+
+</html>

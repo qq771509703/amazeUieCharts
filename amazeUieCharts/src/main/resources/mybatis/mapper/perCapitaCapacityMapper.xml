@@ -1,0 +1,1212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.xxf.mapper.PerCapitaCapacityMapper" >
+
+    <select id="getPerCapitaCapacityList" resultType="com.example.xxf.bean.perCapitaCapacity">
+
+
+
+	SELECT
+			*
+			FROM(
+		    SELECT  ROW_NUMBER() OVER(ORDER BY a.department desc) AS rowid,*
+		    from
+		    (
+        select * from (
+        select
+        a.department
+        ,sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.target_sale else 0 end) 'target_sale'
+        ,sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.target_salemoney else 0 end) 'target_salemoney'
+        ,sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 and a.FQuoType = 1 and a.yesterday = 1
+        then a.FDividendRatio else 0 end) 'new_car_increment'
+        ,sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 and a.FQuoType = 1 then a.FDividendRatio else 0 end) 'new_car_total'
+        ,sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 and a.FQuoType = 2 and a.yesterday = 1
+        then a.FDividendRatio else 0 end) 'old_car_increment'
+        ,sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 and a.FQuoType = 2 then a.FDividendRatio else 0 end) 'old_car_total'
+        ,sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.FDividendRatio else 0 end) 'total'
+        ,sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.money else 0 end) 'total_money'
+        ,sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.man_count else 0 end) 'man_count'
+        ,case when sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.man_count else 0 end) = 0 then null
+        else sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.FDividendRatio else 0 end) /
+        sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.man_count else 0 end)
+        end 'sale_capacity'
+        ,case when sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.man_count else 0 end) = 0 then null
+        else sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.money else 0 end) /
+        sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.man_count else 0 end)
+        end 'sale_money_capacity'
+        ,ROW_NUMBER() over(order by (case when sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.man_count else 0 end) = 0 then null
+        else sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.FDividendRatio else 0 end) /
+        sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.man_count else 0 end)
+        end) desc) 'rank'
+        ,SUM(a.FDividendRatio) 'total_all'
+        from (
+        select
+        a.FAgent
+        ,a.FContract
+        ,f.FPlateNum
+        ,b.FContractTime
+        ,case when ISNUMERIC(a.Fnum) > 0 then (a.Fnum * a.FMYHKE + a.FFee) * c.FDividendRatio else null end 'money'
+        ,d.Name 'department'
+        ,x.Name 'saleman'
+        ,isnull(c.FDividendRatio,0) 'FDividendRatio'
+        ,e.FQuoType
+
+        ,case when DAY(GETDATE()) = '1'
+        and YEAR(b.FContractTime) = YEAR(GETDATE()) and MONTH(b.FContractTime)= MONTH(getdate()) - 1
+        and DAY(b.FContractTime) = DAY(DATEADD(DAY,-1,GETDATE())) then '1'
+        when DAY(GETDATE()) != '1'
+        and YEAR(b.FContractTime) = YEAR(getdate()) and MONTH(b.FContractTime)= MONTH(getdate())
+        and DAY(b.FContractTime) = DAY(DATEADD(DAY,-1,GETDATE()))
+        then '1'
+        else '0' end 'yesterday'
+        /*新人转正前两天的代交业绩不纳入统计*/
+        ,case when a.FContract in ('HL2018040013','CQ2018040014','SJZ2018040007','ZZ2018040005','WZ2018040009','WZ2018040013','NJ2018050002') then '1'
+        when zz.FAddTime is not null and datediff(d,b.FContractTime,zz.FAddTime) > 1 then '0' else '1' end 'newman'
+
+        /*跨天补单*/
+        ,case when DATEDIFF(D,b.FSignDate ,b.FContractTime) > 0 then '1' else '0' end 'ktbd'
+        ,isnull(y.MB,0)/cast(bb.co as float) 'target_sale'
+        ,isnull(y.MBYJJE,0)/cast(bb.co as float) 'target_salemoney'
+        ,isnull(y.人头数,0)/cast(bb.co as float) 'man_count'
+        ,zz.FAddTime
+        ,case when isnull(yb.FPost,0) not in ('7','1') then '1' else '0' end 'FPost'
+
+        from FinLease_Contract a
+        /*合同台账*/
+        JOIN FM_ConAcc b ON a.FContractID = b.ID
+        /*业务员名单列表*/
+        JOIN FinLease_Contract_FClerkList c ON a.ID = c.FinLease_Contract_ID
+        /*业务员所属部门*/
+        JOIN lbOrganization d ON c.FOrga = d.ID
+        /*业绩数据表，判断新车和二手车报价*/
+        JOIN Entity_YJSJB e ON b.ID = e.FConAcc
+        /*车辆台账*/
+        join Fcar f on a.FCar = f.ID
+        /*业务员名字*/
+        left join tUser x on x.ID = c.FYWYMD
+
+        /*各部业务员当月花名册数据*/
+        left join ( select a.FUser ,a.FDept,a.FPost,a.FMonth from
+        (
+        /*按照业务员、部门、统计年月根据新增时间降序排列，取最新数据；目的是排除重复录入数据*/
+        select b.FUser,b.FDept,a.FPost,a.FMonth ,ROW_NUMBER() over(partition by b.FUser ,b.FDept,a.FMonth order by a.FAddTime desc) rw
+        from Entity_MaketDeptStaff_FAtDept a
+        join Entity_MaketDeptStaff b on a.Entity_MaketDeptStaff_ID = b.ID
+        where a.FMonth = CONVERT(varchar(7),dateadd(d,-1,GETDATE()),120)
+        ) a
+        where a.rw = 1
+        ) yy
+        on yy.FUser = x.ID
+        /*671苏州上海办事处统计为上海营销一部663；769湘潭营销一部统计为湖南营销一部669*/
+        and yy.FDept = cast(case when c.FOrga = '671' then '663' when c.FOrga = '769' then '669' else c.FOrga end as int)
+
+        /*各部门目标台数，目标金额，人头数*/
+        left join ( select a.FDept
+        ,b.Name
+        ,SUM(isnull(cast(aa.MB as int),0)) MB
+        ,SUM(isnull(aa.MBYJJE,0)) MBYJJE
+        ,SUM(isnull(aa.AtDays,0)/30*isnull(aa.FCoefficient,0)) '人头数'
+        from (
+        select a.FUser ,a.FDept,a.FPost,a.FMonth ,a.Entity_MaketDeptStaff_ID,a.FCoefficient,a.AtDays,a.MB,a.MBYJJE
+        from (
+        select b.FUser,b.FDept,a.FPost,a.FMonth ,a.Entity_MaketDeptStaff_ID,a.FCoefficient,
+        /*在部天数最大为30天*/
+        case when a.AtDays = 31 then 30 else a.AtDays end 'AtDays',a.MB,a.MBYJJE
+        /*按照业务员、部门、统计年月根据新增时间降序排列，取最新数据；目的是排除重复录入数据*/
+        ,ROW_NUMBER() over(partition by b.FUser ,b.FDept,a.FMonth order by a.FAddTime desc) rw
+        from Entity_MaketDeptStaff_FAtDept a
+        join Entity_MaketDeptStaff b on a.Entity_MaketDeptStaff_ID = b.ID
+        where a.FMonth = CONVERT(varchar(7),dateadd(d,-1,GETDATE()),120)
+        ) a
+        where a.rw = 1
+        ) aa
+        join Entity_MaketDeptStaff a on aa.Entity_MaketDeptStaff_ID = a.ID
+        join lbOrganization b on a.FDept = b.ID
+        join tUser c on a.FUser = c.ID
+        where aa.FMonth = CONVERT(varchar(7),dateadd(d,-1,GETDATE()),120)
+        /*去除经理和新人业绩*/
+        and isnull(aa.FPost,0) not in ('7','1')
+        group by a.FDept,b.Name
+        ) y
+        on y.FDept = yy.FDept
+
+        /*花名册*/
+        left join Entity_YXBMGWXSB yb on yy.FPost = yb.ID
+
+        /*每个部门当月合同数量*/
+        left join ( select y.FDept,COUNT(1) co
+        from FinLease_Contract a
+        JOIN FM_ConAcc b ON a.FContractID = b.ID
+        JOIN FinLease_Contract_FClerkList c ON a.ID = c.FinLease_Contract_ID
+        JOIN lbOrganization d ON c.FOrga = d.ID
+        JOIN Entity_YJSJB e ON b.ID = e.FConAcc
+        join Fcar f on a.FCar = f.ID
+        left join tUser x on x.ID = c.FYWYMD
+        left join (
+        select a.FUser ,a.FDept,a.FPost,a.FMonth
+        from (
+        select b.FUser ,b.FDept,a.FPost,a.FMonth
+        ,ROW_NUMBER() over(partition by b.FUser ,b.FDept,a.FMonth order by a.FAddTime desc) rw
+        from Entity_MaketDeptStaff_FAtDept a join Entity_MaketDeptStaff b on a.Entity_MaketDeptStaff_ID = b.ID
+        where a.FMonth = CONVERT(varchar(7),dateadd(d,-1,GETDATE()),120)
+        ) a
+        where a.rw = 1
+        ) yy
+        on yy.FUser = x.ID
+        and yy.FDept = cast(case when c.FOrga = '671' then '663' when c.FOrga = '769' then '669'  else c.FOrga end as int)
+        left join (
+        select a.FDept,b.Name
+        ,SUM(isnull(cast(aa.MB as int),0)) MB
+        ,SUM(isnull(aa.MBYJJE,0)) MBYJJE
+        ,SUM(isnull(aa.AtDays,0)/30*isnull(aa.FCoefficient,0)) '人头数'
+        from (
+        select a.FUser ,a.FDept,a.FPost,a.FMonth ,a.Entity_MaketDeptStaff_ID,a.FCoefficient,a.AtDays,a.MB,a.MBYJJE
+        from (
+        select b.FUser ,b.FDept,a.FPost,a.FMonth ,a.Entity_MaketDeptStaff_ID,a.FCoefficient
+        ,case when a.AtDays = 31 then 30 else a.AtDays end 'AtDays',a.MB,a.MBYJJE
+        ,ROW_NUMBER() over(partition by b.FUser ,b.FDept,a.FMonth order by a.FAddTime desc) rw
+        from Entity_MaketDeptStaff_FAtDept a join Entity_MaketDeptStaff b on a.Entity_MaketDeptStaff_ID = b.ID
+        where a.FMonth = CONVERT(varchar(7),dateadd(d,-1,GETDATE()),120)
+        ) a
+        where a.rw = 1
+        ) aa
+        join Entity_MaketDeptStaff a on aa.Entity_MaketDeptStaff_ID = a.ID
+        join lbOrganization b on a.FDept = b.ID
+        join tUser c on a.FUser = c.ID
+        where aa.FMonth = CONVERT(varchar(7),dateadd(d,-1,GETDATE()),120) and isnull(aa.FPost,0) not in ('7','1')
+        group by a.FDept,b.Name
+        ) y
+        on y.FDept = yy.FDept
+        left join Entity_YXBMGWXSB yb on yy.FPost = yb.ID
+        left join (
+        select a.*
+        from (
+        select *
+        from (
+        select b.FUser ,b.FDept,a.FPost,a.FMonth
+        ,ROW_NUMBER() over(partition by b.FUser ,b.FDept order by a.FAddTime desc) rw ,a.FAddTime
+        from Entity_MaketDeptStaff_FAtDept a join Entity_MaketDeptStaff b on a.Entity_MaketDeptStaff_ID = b.ID
+        ) a
+        where a.rw = 1 and a.FPost != '1'
+        ) a
+        join (
+        select *
+        from (
+        select b.FUser ,b.FDept,a.FPost,a.FMonth
+        ,ROW_NUMBER() over(partition by b.FUser ,b.FDept order by a.FAddTime desc) rw ,a.FAddTime
+        from Entity_MaketDeptStaff_FAtDept a join Entity_MaketDeptStaff b on a.Entity_MaketDeptStaff_ID = b.ID
+        ) a
+        where a.rw = 2 and a.FPost = '1'
+        ) b on a.FUser = b.FUser and a.FDept = b.FDept
+        ) zz
+        on yy.FUser = zz.FUser and yy.FDept = zz.FDept
+        /*换车换方案--判断非废弃合同*/
+        left join (
+        select a.id
+        ,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车'
+        else '跨月换车' end '换车类型'
+        from FinLease_Contract a
+        left join FM_ConAcc b on a.FContractID = b.ID
+        left join FinLease_Contract c on a.FContract_Old = c.ID
+        where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+        and a.FContract_Old is not null
+        ) hh on a.ID = hh.ID
+        /*换车换方案--判断废弃合同*/
+        left join (
+        select a.id
+        ,a.FContract_Old  'old_ID'
+        ,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车'
+        else '跨月换车' end '换车类型'
+        from FinLease_Contract a
+        left join FM_ConAcc b on a.FContractID = b.ID
+        left join FinLease_Contract c on a.FContract_Old = c.ID
+        where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+        and a.FContract_Old is not null
+        ) hf on a.ID = hf.old_ID
+
+        where
+        (  /*废弃，终止的合同，是跨月换车的原合同*/
+        (b.FIsDrop = 1 and a.WFState = 1 and hf.old_ID is not null and hf.换车类型 = '跨月换车')
+        or
+        /*非废弃，非终止，非换车的合同*/
+        (isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and isnull(a.Fhc,0) != 1)
+        or
+        /*非废弃，非终止，当月换车的新合同*/
+        (isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and a.Fhc = 1 and hh.ID is not null and hh.换车类型 = '当月换车')
+        or
+        /*SX_2017010002换车换方案未能有效管理旧合同*/
+        a.ID = '4290'
+        )
+        /*剔除不算业绩的换车换方案*/
+        and a.ID not in ('6169','8194','10591')
+        /*排除经理和新人*/
+        and isnull(yb.FPost,0) not in ('7','1')
+        /*当月*/
+        and yy.FMonth = CONVERT(varchar(7),dateadd(d,-1,GETDATE()),120)
+        /*排除淘汽*/
+        and a.FAgent != '2131'
+        /*本月业绩*/
+        and case when DAY(GETDATE()) = '1'
+        and YEAR(b.FContractTime) = YEAR(GETDATE()) and MONTH(b.FContractTime)= MONTH(getdate()) - 1
+        then '1'
+        when DAY(GETDATE()) != '1'
+        and YEAR(b.FContractTime) = YEAR(getdate()) and MONTH(b.FContractTime)= MONTH(getdate())
+        and day(b.FContractTime) &lt;= day(getdate()) - 1
+        then '1'
+        else '0' end = '1'
+        /*新人代交判断*/
+        and case when a.FContract in ('HL2018040013','CQ2018040014','SJZ2018040007','ZZ2018040005','WZ2018040009','WZ2018040013','NJ2018050002')
+        then '1'
+        when zz.FAddTime is not null and datediff(d,b.FContractTime,zz.FAddTime) > 1 then '0' else '1' end = '1'
+        group by y.FDept
+        ) bb
+        on bb.FDept = yy.FDept
+
+        /*新人转正时间，新人第一次变成顾问后的更新时间*/
+        left join (
+        select a.*
+        from (
+        select *
+        from (
+        select b.FUser ,b.FDept,a.FPost,a.FMonth
+        ,ROW_NUMBER() over(partition by b.FUser ,b.FDept order by a.FAddTime desc) rw ,a.FAddTime
+        from Entity_MaketDeptStaff_FAtDept a join Entity_MaketDeptStaff b on a.Entity_MaketDeptStaff_ID = b.ID
+        ) a
+        where a.rw = 1 and a.FPost != '1'
+        ) a
+        join (
+        select *
+        from (
+        select b.FUser ,b.FDept,a.FPost,a.FMonth
+        ,ROW_NUMBER() over(partition by b.FUser ,b.FDept order by a.FAddTime desc) rw ,a.FAddTime
+        from Entity_MaketDeptStaff_FAtDept a join Entity_MaketDeptStaff b on a.Entity_MaketDeptStaff_ID = b.ID
+        ) a
+        where a.rw = 2 and a.FPost = '1'
+        ) b
+        on a.FUser = b.FUser and a.FDept = b.FDept
+        ) zz
+        on yy.FUser = zz.FUser and yy.FDept = zz.FDept
+
+        /*换车换方案--判断非废弃合同*/
+        left join (
+        select a.id
+        ,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车' else '跨月换车' end '换车类型'
+        from FinLease_Contract a
+        left join FM_ConAcc b on a.FContractID = b.ID
+        left join FinLease_Contract c on a.FContract_Old = c.ID
+        where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+        and a.FContract_Old is not null
+        ) hh on a.ID = hh.ID
+        /*换车换方案--判断废弃合同*/
+        left join (
+        select a.id
+        ,a.FContract_Old  'old_ID'
+        ,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车' else '跨月换车' end '换车类型'
+        from FinLease_Contract a
+        left join FM_ConAcc b on a.FContractID = b.ID
+        left join FinLease_Contract c on a.FContract_Old = c.ID
+        where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+        and a.FContract_Old is not null
+        ) hf on a.ID = hf.old_ID
+
+        where
+        (  /*废弃，终止的合同，是跨月换车的原合同*/
+        (b.FIsDrop = 1 and a.WFState = 1 and hf.old_ID is not null and hf.换车类型 = '跨月换车')
+        or
+        /*非废弃，非终止，非换车的合同*/
+        (isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and isnull(a.Fhc,0) != 1)
+        or
+        /*非废弃，非终止，当月换车的新合同*/
+        (isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and a.Fhc = 1 and hh.ID is not null and hh.换车类型 = '当月换车')
+        or
+        /*SX_2017010002换车换方案未能有效管理旧合同*/
+        a.ID = '4290'
+        )
+        /*剔除不算业绩的换车换方案*/
+        and a.ID not in ('6169','8194','10591')
+        and d.Name not like '%营销部%'
+        and d.Name != '淘汽互联网子公司'
+        /*当月数据*/
+        and case when DAY(GETDATE()) = '1'
+        and YEAR(b.FContractTime) = YEAR(GETDATE()) and MONTH(b.FContractTime)= MONTH(getdate()) - 1
+        then '1'
+        when DAY(GETDATE()) != '1'
+        and YEAR(b.FContractTime) = YEAR(getdate()) and MONTH(b.FContractTime)= MONTH(getdate()) and day(b.FContractTime) &lt;= day(getdate()) - 1
+        then '1'
+        else '0' end = '1'
+
+        /*传入参数*/
+        <if test="department != null and department != ''">
+            and d.Name LIKE '%'+#{department}+'%'
+        </if>
+
+        ) a
+        group by a.department
+        )a
+        )a
+        ) AS sys_roles
+		WHERE ROWID BETWEEN #{startRow} and #{endRow}
+
+    </select>
+
+    <select id="getPerCapitaCapacityDetailList" resultType="com.example.xxf.bean.perCapitaCapacityDetail">
+      SELECT
+			*
+			FROM(
+		    SELECT  ROW_NUMBER() OVER(ORDER BY a.department desc) AS rowid,*
+		    from
+		    (
+
+        select
+        d.Name 'department'
+        ,x.Name 'saleman'
+        ,a.FContract
+        ,f.FPlateNum
+        ,b.FContractTime
+        ,case e.FQuoType when '1' then '新车' when '2' then '二手车' end 'FQuoType'
+        ,isnull(c.FDividendRatio,0) 'FDividendRatio'
+        ,case when ISNUMERIC(a.Fnum) > 0 then (a.Fnum * a.FMYHKE + a.FFee) * c.FDividendRatio else null end 'money'
+        from FinLease_Contract a
+        /*合同台账*/
+        JOIN FM_ConAcc b ON a.FContractID = b.ID
+        /*业务员名单列表*/
+        JOIN FinLease_Contract_FClerkList c ON a.ID = c.FinLease_Contract_ID
+        /*业务员所属部门*/
+        JOIN lbOrganization d ON c.FOrga = d.ID
+        /*业绩数据表，判断新车和二手车报价*/
+        JOIN Entity_YJSJB e ON b.ID = e.FConAcc
+        /*车辆台账*/
+        join Fcar f on a.FCar = f.ID
+        /*业务员名字*/
+        left join tUser x on x.ID = c.FYWYMD
+        /*换车换方案--判断非废弃合同*/
+        left join (
+        select a.id
+        ,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车' else '跨月换车' end '换车类型'
+        from FinLease_Contract a
+        left join FM_ConAcc b on a.FContractID = b.ID
+        left join FinLease_Contract c on a.FContract_Old = c.ID
+        where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+        and a.FContract_Old is not null
+        ) hh on a.ID = hh.ID
+        /*换车换方案--判断废弃合同*/
+        left join (
+        select a.id
+        ,a.FContract_Old  'old_ID'
+        ,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车' else '跨月换车' end '换车类型'
+        from FinLease_Contract a
+        left join FM_ConAcc b on a.FContractID = b.ID
+        left join FinLease_Contract c on a.FContract_Old = c.ID
+        where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+        and a.FContract_Old is not null
+        ) hf on a.ID = hf.old_ID
+
+        where
+        (  /*废弃，终止的合同，是跨月换车的原合同*/
+        (b.FIsDrop = 1 and a.WFState = 1 and hf.old_ID is not null and hf.换车类型 = '跨月换车')
+        or
+        /*非废弃，非终止，非换车的合同*/
+        (isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and isnull(a.Fhc,0) != 1)
+        or
+        /*非废弃，非终止，当月换车的新合同*/
+        (isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and a.Fhc = 1 and hh.ID is not null and hh.换车类型 = '当月换车')
+        or
+        /*SX_2017010002换车换方案未能有效管理旧合同*/
+        a.ID = '4290'
+        )
+        /*剔除不算业绩的换车换方案*/
+        and a.ID not in ('6169','8194','10591')
+        and d.Name not like '%营销部%'
+        and d.Name != '淘汽互联网子公司'
+        /*当月数据*/
+        and case when DAY(GETDATE()) = '1'
+        and YEAR(b.FContractTime) = YEAR(GETDATE()) and MONTH(b.FContractTime)= MONTH(getdate()) - 1
+        then '1'
+        when DAY(GETDATE()) != '1'
+        and YEAR(b.FContractTime) = YEAR(getdate()) and MONTH(b.FContractTime)= MONTH(getdate()) and day(b.FContractTime) &lt;= day(getdate()) - 1
+        then '1'
+        else '0' end = '1'
+
+        /*传入参数*/
+        <if test="department != null and department != ''">
+            and d.Name LIKE '%'+#{department}+'%'
+        </if>
+
+        )a
+        )AS sys_roles
+		WHERE ROWID BETWEEN #{startRow} and #{endRow}
+    </select>
+
+    <select id="getPerCapitaCapacityListCount" resultType="long">
+
+        select count(1) from (
+
+        select * from (
+        select
+        a.department
+        ,sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.target_sale else 0 end) 'target_sale'
+        ,sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.target_salemoney else 0 end)
+        'target_salemoney'
+        ,sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 and a.FQuoType = 1 and a.yesterday = 1
+        then a.FDividendRatio else 0 end) 'new_car_increment'
+        ,sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 and a.FQuoType = 1 then a.FDividendRatio else 0
+        end) 'new_car_total'
+        ,sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 and a.FQuoType = 2 and a.yesterday = 1
+        then a.FDividendRatio else 0 end) 'old_car_increment'
+        ,sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 and a.FQuoType = 2 then a.FDividendRatio else 0
+        end) 'old_car_total'
+        ,sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.FDividendRatio else 0 end) 'total'
+        ,sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.money else 0 end) 'total_money'
+        ,sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.man_count else 0 end) 'man_count'
+        ,case when sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.man_count else 0 end) = 0 then
+        null
+        else sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.FDividendRatio else 0 end) /
+        sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.man_count else 0 end)
+        end 'sale_capacity'
+        ,case when sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.man_count else 0 end) = 0 then
+        null
+        else sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.money else 0 end) /
+        sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.man_count else 0 end)
+        end 'sale_money_capacity'
+        ,ROW_NUMBER() over(order by (case when sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then
+        a.man_count else 0 end) = 0 then null
+        else sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.FDividendRatio else 0 end) /
+        sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.man_count else 0 end)
+        end) desc) 'rank'
+        ,SUM(a.FDividendRatio) 'total_all'
+        from (
+        select
+        a.FAgent
+        ,a.FContract
+        ,f.FPlateNum
+        ,b.FContractTime --'合同创建时间'
+        ,case when ISNUMERIC(a.Fnum) > 0 then (a.Fnum * a.FMYHKE + a.FFee) * c.FDividendRatio else null end
+        'money'
+        ,d.Name 'department'
+        ,x.Name 'saleman'
+        ,isnull(c.FDividendRatio,0) 'FDividendRatio'
+        ,e.FQuoType
+        /*每月一号计算上月数据*/
+        ,case when DAY(GETDATE()) = '1'
+        and YEAR(b.FContractTime) = YEAR(GETDATE()) and MONTH(b.FContractTime)= MONTH(getdate()) - 1
+        and DAY(b.FContractTime) = DAY(DATEADD(DAY,-1,GETDATE())) then '1'
+        when DAY(GETDATE()) != '1'
+        and YEAR(b.FContractTime) = YEAR(getdate()) and MONTH(b.FContractTime)= MONTH(getdate())
+        and DAY(b.FContractTime) = DAY(DATEADD(DAY,-1,GETDATE()))
+        then '1'
+        else '0' end 'yesterday'
+        /*新人转正前两天的代交业绩不纳入统计*/
+        ,case when a.FContract in
+        ('HL2018040013','CQ2018040014','SJZ2018040007','ZZ2018040005','WZ2018040009','WZ2018040013','NJ2018050002') then
+        '1'
+        when zz.FAddTime is not null and datediff(d,b.FContractTime,zz.FAddTime) > 1 then '0' else '1' end
+        'newman'
+
+        /*跨天补单*/
+        ,case when DATEDIFF(D,b.FSignDate ,b.FContractTime) > 0 then '1' else '0' end 'ktbd'
+        ,isnull(y.MB,0)/cast(bb.co as float) 'target_sale'
+        ,isnull(y.MBYJJE,0)/cast(bb.co as float) 'target_salemoney'
+        ,isnull(y.人头数,0)/cast(bb.co as float) 'man_count'
+        ,zz.FAddTime
+        ,case when isnull(yb.FPost,0) not in ('7','1') then '1' else '0' end 'FPost'
+
+        from FinLease_Contract a
+        /*合同台账*/
+        JOIN FM_ConAcc b ON a.FContractID = b.ID
+        /*业务员名单列表*/
+        JOIN FinLease_Contract_FClerkList c ON a.ID = c.FinLease_Contract_ID
+        /*业务员所属部门*/
+        JOIN lbOrganization d ON c.FOrga = d.ID
+        /*业绩数据表，判断新车和二手车报价*/
+        JOIN Entity_YJSJB e ON b.ID = e.FConAcc
+        /*车辆台账*/
+        join Fcar f on a.FCar = f.ID
+        /*业务员名字*/
+        left join tUser x on x.ID = c.FYWYMD
+
+        /*各部业务员当月花名册数据*/
+        left join ( select a.FUser ,a.FDept,a.FPost,a.FMonth from
+        (
+        /*按照业务员、部门、统计年月根据新增时间降序排列，取最新数据；目的是排除重复录入数据*/
+        select b.FUser,b.FDept,a.FPost,a.FMonth ,ROW_NUMBER() over(partition by b.FUser ,b.FDept,a.FMonth order by
+        a.FAddTime desc) rw
+        from Entity_MaketDeptStaff_FAtDept a
+        join Entity_MaketDeptStaff b on a.Entity_MaketDeptStaff_ID = b.ID
+        where a.FMonth = CONVERT(varchar(7),dateadd(d,-1,GETDATE()),120)
+        ) a
+        where a.rw = 1
+        ) yy
+        on yy.FUser = x.ID
+        /*671苏州上海办事处统计为上海营销一部663；769湘潭营销一部统计为湖南营销一部669*/
+        and yy.FDept = cast(case when c.FOrga = '671' then '663' when c.FOrga = '769' then '669' else c.FOrga end as
+        int)
+
+        /*各部门目标台数，目标金额，人头数*/
+        left join ( select a.FDept
+        ,b.Name
+        ,SUM(isnull(cast(aa.MB as int),0)) MB
+        ,SUM(isnull(aa.MBYJJE,0)) MBYJJE
+        ,SUM(isnull(aa.AtDays,0)/30*isnull(aa.FCoefficient,0)) '人头数'
+        from (
+        select a.FUser ,a.FDept,a.FPost,a.FMonth ,a.Entity_MaketDeptStaff_ID,a.FCoefficient,a.AtDays,a.MB,a.MBYJJE
+        from (
+        select b.FUser,b.FDept,a.FPost,a.FMonth ,a.Entity_MaketDeptStaff_ID,a.FCoefficient,
+        /*在部天数最大为30天*/
+        case when a.AtDays = 31 then 30 else a.AtDays end 'AtDays',a.MB,a.MBYJJE
+        /*按照业务员、部门、统计年月根据新增时间降序排列，取最新数据；目的是排除重复录入数据*/
+        ,ROW_NUMBER() over(partition by b.FUser ,b.FDept,a.FMonth order by a.FAddTime desc) rw
+        from Entity_MaketDeptStaff_FAtDept a
+        join Entity_MaketDeptStaff b on a.Entity_MaketDeptStaff_ID = b.ID
+        where a.FMonth = CONVERT(varchar(7),dateadd(d,-1,GETDATE()),120)
+        ) a
+        where a.rw = 1
+        ) aa
+        join Entity_MaketDeptStaff a on aa.Entity_MaketDeptStaff_ID = a.ID
+        join lbOrganization b on a.FDept = b.ID
+        join tUser c on a.FUser = c.ID
+        where aa.FMonth = CONVERT(varchar(7),dateadd(d,-1,GETDATE()),120)
+        /*去除经理和新人业绩*/
+        and isnull(aa.FPost,0) not in ('7','1')
+        group by a.FDept,b.Name
+        ) y
+        on y.FDept = yy.FDept
+
+        /*花名册*/
+        left join Entity_YXBMGWXSB yb on yy.FPost = yb.ID
+
+        /*每个部门当月合同数量*/
+        left join ( select y.FDept,COUNT(1) co
+        from FinLease_Contract a
+        JOIN FM_ConAcc b ON a.FContractID = b.ID
+        JOIN FinLease_Contract_FClerkList c ON a.ID = c.FinLease_Contract_ID
+        JOIN lbOrganization d ON c.FOrga = d.ID
+        JOIN Entity_YJSJB e ON b.ID = e.FConAcc
+        join Fcar f on a.FCar = f.ID
+        left join tUser x on x.ID = c.FYWYMD
+        left join (
+        select a.FUser ,a.FDept,a.FPost,a.FMonth
+        from (
+        select b.FUser ,b.FDept,a.FPost,a.FMonth
+        ,ROW_NUMBER() over(partition by b.FUser ,b.FDept,a.FMonth order by a.FAddTime desc) rw
+        from Entity_MaketDeptStaff_FAtDept a join Entity_MaketDeptStaff b on a.Entity_MaketDeptStaff_ID = b.ID
+        where a.FMonth = CONVERT(varchar(7),dateadd(d,-1,GETDATE()),120)
+        ) a
+        where a.rw = 1
+        ) yy
+        on yy.FUser = x.ID
+        and yy.FDept = cast(case when c.FOrga = '671' then '663' when c.FOrga = '769' then '669' else c.FOrga end as
+        int)
+        left join (
+        select a.FDept,b.Name
+        ,SUM(isnull(cast(aa.MB as int),0)) MB
+        ,SUM(isnull(aa.MBYJJE,0)) MBYJJE
+        ,SUM(isnull(aa.AtDays,0)/30*isnull(aa.FCoefficient,0)) '人头数'
+        from (
+        select a.FUser ,a.FDept,a.FPost,a.FMonth ,a.Entity_MaketDeptStaff_ID,a.FCoefficient,a.AtDays,a.MB,a.MBYJJE
+        from (
+        select b.FUser ,b.FDept,a.FPost,a.FMonth ,a.Entity_MaketDeptStaff_ID,a.FCoefficient
+        ,case when a.AtDays = 31 then 30 else a.AtDays end 'AtDays',a.MB,a.MBYJJE
+        ,ROW_NUMBER() over(partition by b.FUser ,b.FDept,a.FMonth order by a.FAddTime desc) rw
+        from Entity_MaketDeptStaff_FAtDept a join Entity_MaketDeptStaff b on a.Entity_MaketDeptStaff_ID = b.ID
+        where a.FMonth = CONVERT(varchar(7),dateadd(d,-1,GETDATE()),120)
+        ) a
+        where a.rw = 1
+        ) aa
+        join Entity_MaketDeptStaff a on aa.Entity_MaketDeptStaff_ID = a.ID
+        join lbOrganization b on a.FDept = b.ID
+        join tUser c on a.FUser = c.ID
+        where aa.FMonth = CONVERT(varchar(7),dateadd(d,-1,GETDATE()),120) and isnull(aa.FPost,0) not in ('7','1')
+        group by a.FDept,b.Name
+        ) y
+        on y.FDept = yy.FDept
+        left join Entity_YXBMGWXSB yb on yy.FPost = yb.ID
+        left join (
+        select a.*
+        from (
+        select *
+        from (
+        select b.FUser ,b.FDept,a.FPost,a.FMonth
+        ,ROW_NUMBER() over(partition by b.FUser ,b.FDept order by a.FAddTime desc) rw ,a.FAddTime
+        from Entity_MaketDeptStaff_FAtDept a join Entity_MaketDeptStaff b on a.Entity_MaketDeptStaff_ID = b.ID
+        ) a
+        where a.rw = 1 and a.FPost != '1'
+        ) a
+        join (
+        select *
+        from (
+        select b.FUser ,b.FDept,a.FPost,a.FMonth
+        ,ROW_NUMBER() over(partition by b.FUser ,b.FDept order by a.FAddTime desc) rw ,a.FAddTime
+        from Entity_MaketDeptStaff_FAtDept a join Entity_MaketDeptStaff b on a.Entity_MaketDeptStaff_ID = b.ID
+        ) a
+        where a.rw = 2 and a.FPost = '1'
+        ) b on a.FUser = b.FUser and a.FDept = b.FDept
+        ) zz
+        on yy.FUser = zz.FUser and yy.FDept = zz.FDept
+        /*换车换方案--判断非废弃合同*/
+        left join (
+        select a.id
+        ,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车'
+        else '跨月换车' end '换车类型'
+        from FinLease_Contract a
+        left join FM_ConAcc b on a.FContractID = b.ID
+        left join FinLease_Contract c on a.FContract_Old = c.ID
+        where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+        and a.FContract_Old is not null
+        ) hh on a.ID = hh.ID
+        /*换车换方案--判断废弃合同*/
+        left join (
+        select a.id
+        ,a.FContract_Old 'old_ID'
+        ,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车'
+        else '跨月换车' end '换车类型'
+        from FinLease_Contract a
+        left join FM_ConAcc b on a.FContractID = b.ID
+        left join FinLease_Contract c on a.FContract_Old = c.ID
+        where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+        and a.FContract_Old is not null
+        ) hf on a.ID = hf.old_ID
+
+        where
+        ( /*废弃，终止的合同，是跨月换车的原合同*/
+        (b.FIsDrop = 1 and a.WFState = 1 and hf.old_ID is not null and hf.换车类型 = '跨月换车')
+        or
+        /*非废弃，非终止，非换车的合同*/
+        (isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and isnull(a.Fhc,0) != 1)
+        or
+        /*非废弃，非终止，当月换车的新合同*/
+        (isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and a.Fhc = 1 and hh.ID is not null and hh.换车类型 = '当月换车')
+        or
+        /*SX_2017010002换车换方案未能有效管理旧合同*/
+        a.ID = '4290'
+        )
+        /*剔除不算业绩的换车换方案*/
+        and a.ID not in ('6169','8194','10591')
+        /*排除经理和新人*/
+        and isnull(yb.FPost,0) not in ('7','1')
+        /*当月*/
+        and yy.FMonth = CONVERT(varchar(7),dateadd(d,-1,GETDATE()),120)
+        /*排除淘汽*/
+        and a.FAgent != '2131'
+        /*本月业绩*/
+        and case when DAY(GETDATE()) = '1'
+        and YEAR(b.FContractTime) = YEAR(GETDATE()) and MONTH(b.FContractTime)= MONTH(getdate()) - 1
+        then '1'
+        when DAY(GETDATE()) != '1'
+        and YEAR(b.FContractTime) = YEAR(getdate()) and MONTH(b.FContractTime)= MONTH(getdate())
+        and day(b.FContractTime) &lt;= day(getdate()) - 1
+        then '1'
+        else '0' end = '1'
+        /*新人代交判断*/
+        and case when a.FContract in
+        ('HL2018040013','CQ2018040014','SJZ2018040007','ZZ2018040005','WZ2018040009','WZ2018040013','NJ2018050002')
+        then '1'
+        when zz.FAddTime is not null and datediff(d,b.FContractTime,zz.FAddTime) > 1 then '0' else '1' end = '1'
+        group by y.FDept
+        ) bb
+        on bb.FDept = yy.FDept
+
+        /*新人转正时间，新人第一次变成顾问后的更新时间*/
+        left join (
+        select a.*
+        from (
+        select *
+        from (
+        select b.FUser ,b.FDept,a.FPost,a.FMonth
+        ,ROW_NUMBER() over(partition by b.FUser ,b.FDept order by a.FAddTime desc) rw ,a.FAddTime
+        from Entity_MaketDeptStaff_FAtDept a join Entity_MaketDeptStaff b on a.Entity_MaketDeptStaff_ID = b.ID
+        ) a
+        where a.rw = 1 and a.FPost != '1'
+        ) a
+        join (
+        select *
+        from (
+        select b.FUser ,b.FDept,a.FPost,a.FMonth
+        ,ROW_NUMBER() over(partition by b.FUser ,b.FDept order by a.FAddTime desc) rw ,a.FAddTime
+        from Entity_MaketDeptStaff_FAtDept a join Entity_MaketDeptStaff b on a.Entity_MaketDeptStaff_ID = b.ID
+        ) a
+        where a.rw = 2 and a.FPost = '1'
+        ) b
+        on a.FUser = b.FUser and a.FDept = b.FDept
+        ) zz
+        on yy.FUser = zz.FUser and yy.FDept = zz.FDept
+
+        /*换车换方案--判断非废弃合同*/
+        left join (
+        select a.id
+        ,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车' else
+        '跨月换车' end '换车类型'
+        from FinLease_Contract a
+        left join FM_ConAcc b on a.FContractID = b.ID
+        left join FinLease_Contract c on a.FContract_Old = c.ID
+        where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+        and a.FContract_Old is not null
+        ) hh on a.ID = hh.ID
+        /*换车换方案--判断废弃合同*/
+        left join (
+        select a.id
+        ,a.FContract_Old 'old_ID'
+        ,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车' else
+        '跨月换车' end '换车类型'
+        from FinLease_Contract a
+        left join FM_ConAcc b on a.FContractID = b.ID
+        left join FinLease_Contract c on a.FContract_Old = c.ID
+        where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+        and a.FContract_Old is not null
+        ) hf on a.ID = hf.old_ID
+
+        where
+        ( /*废弃，终止的合同，是跨月换车的原合同*/
+        (b.FIsDrop = 1 and a.WFState = 1 and hf.old_ID is not null and hf.换车类型 = '跨月换车')
+        or
+        /*非废弃，非终止，非换车的合同*/
+        (isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and isnull(a.Fhc,0) != 1)
+        or
+        /*非废弃，非终止，当月换车的新合同*/
+        (isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and a.Fhc = 1 and hh.ID is not null and hh.换车类型 = '当月换车')
+        or
+        /*SX_2017010002换车换方案未能有效管理旧合同*/
+        a.ID = '4290'
+        )
+        /*剔除不算业绩的换车换方案*/
+        and a.ID not in ('6169','8194','10591')
+        and d.Name not like '%营销部%'
+        and d.Name != '淘汽互联网子公司'
+        /*当月数据*/
+        and case when DAY(GETDATE()) = '1'
+        and YEAR(b.FContractTime) = YEAR(GETDATE()) and MONTH(b.FContractTime)= MONTH(getdate()) - 1
+        then '1'
+        when DAY(GETDATE()) != '1'
+        and YEAR(b.FContractTime) = YEAR(getdate()) and MONTH(b.FContractTime)= MONTH(getdate()) and
+        day(b.FContractTime) &lt;= day(getdate()) - 1
+        then '1'
+        else '0' end = '1'
+
+        /*传入参数*/
+        <if test="department!='' and department!=null">
+            and d.Name LIKE '%'+#{department}+'%'
+        </if>
+        ) a
+        group by a.department
+        )a
+        )c
+    </select>
+
+    <select id="getPerCapitaCapacityDetailListCount" resultType="long">
+	select count(1) from (
+
+        select
+        d.Name 'department'
+        ,x.Name 'saleman'
+        ,a.FContract
+        ,f.FPlateNum
+        ,b.FContractTime
+        ,case e.FQuoType when '1' then '新车' when '2' then '二手车' end 'FQuoType'
+        ,isnull(c.FDividendRatio,0) 'FDividendRatio'
+        ,case when ISNUMERIC(a.Fnum) > 0 then (a.Fnum * a.FMYHKE + a.FFee) * c.FDividendRatio else null end 'money'
+        from FinLease_Contract a
+        /*合同台账*/
+        JOIN FM_ConAcc b ON a.FContractID = b.ID
+        /*业务员名单列表*/
+        JOIN FinLease_Contract_FClerkList c ON a.ID = c.FinLease_Contract_ID
+        /*业务员所属部门*/
+        JOIN lbOrganization d ON c.FOrga = d.ID
+        /*业绩数据表，判断新车和二手车报价*/
+        JOIN Entity_YJSJB e ON b.ID = e.FConAcc
+        /*车辆台账*/
+        join Fcar f on a.FCar = f.ID
+        /*业务员名字*/
+        left join tUser x on x.ID = c.FYWYMD
+        /*换车换方案--判断非废弃合同*/
+        left join (
+        select a.id
+        ,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车' else '跨月换车' end '换车类型'
+        from FinLease_Contract a
+        left join FM_ConAcc b on a.FContractID = b.ID
+        left join FinLease_Contract c on a.FContract_Old = c.ID
+        where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+        and a.FContract_Old is not null
+        ) hh on a.ID = hh.ID
+        /*换车换方案--判断废弃合同*/
+        left join (
+        select a.id
+        ,a.FContract_Old  'old_ID'
+        ,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车' else '跨月换车' end '换车类型'
+        from FinLease_Contract a
+        left join FM_ConAcc b on a.FContractID = b.ID
+        left join FinLease_Contract c on a.FContract_Old = c.ID
+        where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+        and a.FContract_Old is not null
+        ) hf on a.ID = hf.old_ID
+
+        where
+        (  /*废弃，终止的合同，是跨月换车的原合同*/
+        (b.FIsDrop = 1 and a.WFState = 1 and hf.old_ID is not null and hf.换车类型 = '跨月换车')
+        or
+        /*非废弃，非终止，非换车的合同*/
+        (isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and isnull(a.Fhc,0) != 1)
+        or
+        /*非废弃，非终止，当月换车的新合同*/
+        (isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and a.Fhc = 1 and hh.ID is not null and hh.换车类型 = '当月换车')
+        or
+        /*SX_2017010002换车换方案未能有效管理旧合同*/
+        a.ID = '4290'
+        )
+        /*剔除不算业绩的换车换方案*/
+        and a.ID not in ('6169','8194','10591')
+        and d.Name not like '%营销部%'
+        and d.Name != '淘汽互联网子公司'
+        /*当月数据*/
+        and case when DAY(GETDATE()) = '1'
+        and YEAR(b.FContractTime) = YEAR(GETDATE()) and MONTH(b.FContractTime)= MONTH(getdate()) - 1
+        then '1'
+        when DAY(GETDATE()) != '1'
+        and YEAR(b.FContractTime) = YEAR(getdate()) and MONTH(b.FContractTime)= MONTH(getdate()) and day(b.FContractTime) &lt;= day(getdate()) - 1
+        then '1'
+        else '0' end = '1'
+        /*传入参数*/
+        <if test="department!='' and department!=null">
+            and d.Name LIKE '%'+#{department}+'%'
+        </if>
+        )c
+    </select>
+
+    <select id="getPerCapitaCapacityListTOExcal" resultType="java.util.LinkedHashMap">
+
+
+        select * from (
+        select
+        a.department
+        ,sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.target_sale else 0 end) 'target_sale'
+        ,sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.target_salemoney else 0 end) 'target_salemoney'
+        ,sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 and a.FQuoType = 1 and a.yesterday = 1
+        then a.FDividendRatio else 0 end) 'new_car_increment'
+        ,sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 and a.FQuoType = 1 then a.FDividendRatio else 0 end) 'new_car_total'
+        ,sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 and a.FQuoType = 2 and a.yesterday = 1
+        then a.FDividendRatio else 0 end) 'old_car_increment'
+        ,sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 and a.FQuoType = 2 then a.FDividendRatio else 0 end) 'old_car_total'
+        ,sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.FDividendRatio else 0 end) 'total'
+        ,sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.money else 0 end) 'total_money'
+        ,sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.man_count else 0 end) 'man_count'
+        ,case when sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.man_count else 0 end) = 0 then null
+        else sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.FDividendRatio else 0 end) /
+        sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.man_count else 0 end)
+        end 'sale_capacity'
+        ,case when sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.man_count else 0 end) = 0 then null
+        else sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.money else 0 end) /
+        sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.man_count else 0 end)
+        end 'sale_money_capacity'
+        ,ROW_NUMBER() over(order by (case when sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.man_count else 0 end) = 0 then null
+        else sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.FDividendRatio else 0 end) /
+        sum(case when a.FAgent != 2131 and a.newman = 1 and a.FPost = 1 then a.man_count else 0 end)
+        end) desc) 'rank'
+        ,SUM(a.FDividendRatio) 'total_all'
+        from (
+        select
+        a.FAgent
+        ,a.FContract
+        ,f.FPlateNum
+        ,b.FContractTime
+        ,case when ISNUMERIC(a.Fnum) > 0 then (a.Fnum * a.FMYHKE + a.FFee) * c.FDividendRatio else null end 'money'
+        ,d.Name 'department'
+        ,x.Name 'saleman'
+        ,isnull(c.FDividendRatio,0) 'FDividendRatio'
+        ,e.FQuoType
+
+        ,case when DAY(GETDATE()) = '1'
+        and YEAR(b.FContractTime) = YEAR(GETDATE()) and MONTH(b.FContractTime)= MONTH(getdate()) - 1
+        and DAY(b.FContractTime) = DAY(DATEADD(DAY,-1,GETDATE())) then '1'
+        when DAY(GETDATE()) != '1'
+        and YEAR(b.FContractTime) = YEAR(getdate()) and MONTH(b.FContractTime)= MONTH(getdate())
+        and DAY(b.FContractTime) = DAY(DATEADD(DAY,-1,GETDATE()))
+        then '1'
+        else '0' end 'yesterday'
+        /*新人转正前两天的代交业绩不纳入统计*/
+        ,case when a.FContract in ('HL2018040013','CQ2018040014','SJZ2018040007','ZZ2018040005','WZ2018040009','WZ2018040013','NJ2018050002') then '1'
+        when zz.FAddTime is not null and datediff(d,b.FContractTime,zz.FAddTime) > 1 then '0' else '1' end 'newman'
+
+        /*跨天补单*/
+        ,case when DATEDIFF(D,b.FSignDate ,b.FContractTime) > 0 then '1' else '0' end 'ktbd'
+        ,isnull(y.MB,0)/cast(bb.co as float) 'target_sale'
+        ,isnull(y.MBYJJE,0)/cast(bb.co as float) 'target_salemoney'
+        ,isnull(y.人头数,0)/cast(bb.co as float) 'man_count'
+        ,zz.FAddTime
+        ,case when isnull(yb.FPost,0) not in ('7','1') then '1' else '0' end 'FPost'
+
+        from FinLease_Contract a
+        /*合同台账*/
+        JOIN FM_ConAcc b ON a.FContractID = b.ID
+        /*业务员名单列表*/
+        JOIN FinLease_Contract_FClerkList c ON a.ID = c.FinLease_Contract_ID
+        /*业务员所属部门*/
+        JOIN lbOrganization d ON c.FOrga = d.ID
+        /*业绩数据表，判断新车和二手车报价*/
+        JOIN Entity_YJSJB e ON b.ID = e.FConAcc
+        /*车辆台账*/
+        join Fcar f on a.FCar = f.ID
+        /*业务员名字*/
+        left join tUser x on x.ID = c.FYWYMD
+
+        /*各部业务员当月花名册数据*/
+        left join ( select a.FUser ,a.FDept,a.FPost,a.FMonth from
+        (
+        /*按照业务员、部门、统计年月根据新增时间降序排列，取最新数据；目的是排除重复录入数据*/
+        select b.FUser,b.FDept,a.FPost,a.FMonth ,ROW_NUMBER() over(partition by b.FUser ,b.FDept,a.FMonth order by a.FAddTime desc) rw
+        from Entity_MaketDeptStaff_FAtDept a
+        join Entity_MaketDeptStaff b on a.Entity_MaketDeptStaff_ID = b.ID
+        where a.FMonth = CONVERT(varchar(7),dateadd(d,-1,GETDATE()),120)
+        ) a
+        where a.rw = 1
+        ) yy
+        on yy.FUser = x.ID
+        /*671苏州上海办事处统计为上海营销一部663；769湘潭营销一部统计为湖南营销一部669*/
+        and yy.FDept = cast(case when c.FOrga = '671' then '663' when c.FOrga = '769' then '669' else c.FOrga end as int)
+
+        /*各部门目标台数，目标金额，人头数*/
+        left join ( select a.FDept
+        ,b.Name
+        ,SUM(isnull(cast(aa.MB as int),0)) MB
+        ,SUM(isnull(aa.MBYJJE,0)) MBYJJE
+        ,SUM(isnull(aa.AtDays,0)/30*isnull(aa.FCoefficient,0)) '人头数'
+        from (
+        select a.FUser ,a.FDept,a.FPost,a.FMonth ,a.Entity_MaketDeptStaff_ID,a.FCoefficient,a.AtDays,a.MB,a.MBYJJE
+        from (
+        select b.FUser,b.FDept,a.FPost,a.FMonth ,a.Entity_MaketDeptStaff_ID,a.FCoefficient,
+        /*在部天数最大为30天*/
+        case when a.AtDays = 31 then 30 else a.AtDays end 'AtDays',a.MB,a.MBYJJE
+        /*按照业务员、部门、统计年月根据新增时间降序排列，取最新数据；目的是排除重复录入数据*/
+        ,ROW_NUMBER() over(partition by b.FUser ,b.FDept,a.FMonth order by a.FAddTime desc) rw
+        from Entity_MaketDeptStaff_FAtDept a
+        join Entity_MaketDeptStaff b on a.Entity_MaketDeptStaff_ID = b.ID
+        where a.FMonth = CONVERT(varchar(7),dateadd(d,-1,GETDATE()),120)
+        ) a
+        where a.rw = 1
+        ) aa
+        join Entity_MaketDeptStaff a on aa.Entity_MaketDeptStaff_ID = a.ID
+        join lbOrganization b on a.FDept = b.ID
+        join tUser c on a.FUser = c.ID
+        where aa.FMonth = CONVERT(varchar(7),dateadd(d,-1,GETDATE()),120)
+        /*去除经理和新人业绩*/
+        and isnull(aa.FPost,0) not in ('7','1')
+        group by a.FDept,b.Name
+        ) y
+        on y.FDept = yy.FDept
+
+        /*花名册*/
+        left join Entity_YXBMGWXSB yb on yy.FPost = yb.ID
+
+        /*每个部门当月合同数量*/
+        left join ( select y.FDept,COUNT(1) co
+        from FinLease_Contract a
+        JOIN FM_ConAcc b ON a.FContractID = b.ID
+        JOIN FinLease_Contract_FClerkList c ON a.ID = c.FinLease_Contract_ID
+        JOIN lbOrganization d ON c.FOrga = d.ID
+        JOIN Entity_YJSJB e ON b.ID = e.FConAcc
+        join Fcar f on a.FCar = f.ID
+        left join tUser x on x.ID = c.FYWYMD
+        left join (
+        select a.FUser ,a.FDept,a.FPost,a.FMonth
+        from (
+        select b.FUser ,b.FDept,a.FPost,a.FMonth
+        ,ROW_NUMBER() over(partition by b.FUser ,b.FDept,a.FMonth order by a.FAddTime desc) rw
+        from Entity_MaketDeptStaff_FAtDept a join Entity_MaketDeptStaff b on a.Entity_MaketDeptStaff_ID = b.ID
+        where a.FMonth = CONVERT(varchar(7),dateadd(d,-1,GETDATE()),120)
+        ) a
+        where a.rw = 1
+        ) yy
+        on yy.FUser = x.ID
+        and yy.FDept = cast(case when c.FOrga = '671' then '663' when c.FOrga = '769' then '669'  else c.FOrga end as int)
+        left join (
+        select a.FDept,b.Name
+        ,SUM(isnull(cast(aa.MB as int),0)) MB
+        ,SUM(isnull(aa.MBYJJE,0)) MBYJJE
+        ,SUM(isnull(aa.AtDays,0)/30*isnull(aa.FCoefficient,0)) '人头数'
+        from (
+        select a.FUser ,a.FDept,a.FPost,a.FMonth ,a.Entity_MaketDeptStaff_ID,a.FCoefficient,a.AtDays,a.MB,a.MBYJJE
+        from (
+        select b.FUser ,b.FDept,a.FPost,a.FMonth ,a.Entity_MaketDeptStaff_ID,a.FCoefficient
+        ,case when a.AtDays = 31 then 30 else a.AtDays end 'AtDays',a.MB,a.MBYJJE
+        ,ROW_NUMBER() over(partition by b.FUser ,b.FDept,a.FMonth order by a.FAddTime desc) rw
+        from Entity_MaketDeptStaff_FAtDept a join Entity_MaketDeptStaff b on a.Entity_MaketDeptStaff_ID = b.ID
+        where a.FMonth = CONVERT(varchar(7),dateadd(d,-1,GETDATE()),120)
+        ) a
+        where a.rw = 1
+        ) aa
+        join Entity_MaketDeptStaff a on aa.Entity_MaketDeptStaff_ID = a.ID
+        join lbOrganization b on a.FDept = b.ID
+        join tUser c on a.FUser = c.ID
+        where aa.FMonth = CONVERT(varchar(7),dateadd(d,-1,GETDATE()),120) and isnull(aa.FPost,0) not in ('7','1')
+        group by a.FDept,b.Name
+        ) y
+        on y.FDept = yy.FDept
+        left join Entity_YXBMGWXSB yb on yy.FPost = yb.ID
+        left join (
+        select a.*
+        from (
+        select *
+        from (
+        select b.FUser ,b.FDept,a.FPost,a.FMonth
+        ,ROW_NUMBER() over(partition by b.FUser ,b.FDept order by a.FAddTime desc) rw ,a.FAddTime
+        from Entity_MaketDeptStaff_FAtDept a join Entity_MaketDeptStaff b on a.Entity_MaketDeptStaff_ID = b.ID
+        ) a
+        where a.rw = 1 and a.FPost != '1'
+        ) a
+        join (
+        select *
+        from (
+        select b.FUser ,b.FDept,a.FPost,a.FMonth
+        ,ROW_NUMBER() over(partition by b.FUser ,b.FDept order by a.FAddTime desc) rw ,a.FAddTime
+        from Entity_MaketDeptStaff_FAtDept a join Entity_MaketDeptStaff b on a.Entity_MaketDeptStaff_ID = b.ID
+        ) a
+        where a.rw = 2 and a.FPost = '1'
+        ) b on a.FUser = b.FUser and a.FDept = b.FDept
+        ) zz
+        on yy.FUser = zz.FUser and yy.FDept = zz.FDept
+        /*换车换方案--判断非废弃合同*/
+        left join (
+        select a.id
+        ,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车'
+        else '跨月换车' end '换车类型'
+        from FinLease_Contract a
+        left join FM_ConAcc b on a.FContractID = b.ID
+        left join FinLease_Contract c on a.FContract_Old = c.ID
+        where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+        and a.FContract_Old is not null
+        ) hh on a.ID = hh.ID
+        /*换车换方案--判断废弃合同*/
+        left join (
+        select a.id
+        ,a.FContract_Old  'old_ID'
+        ,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车'
+        else '跨月换车' end '换车类型'
+        from FinLease_Contract a
+        left join FM_ConAcc b on a.FContractID = b.ID
+        left join FinLease_Contract c on a.FContract_Old = c.ID
+        where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+        and a.FContract_Old is not null
+        ) hf on a.ID = hf.old_ID
+
+        where
+        (  /*废弃，终止的合同，是跨月换车的原合同*/
+        (b.FIsDrop = 1 and a.WFState = 1 and hf.old_ID is not null and hf.换车类型 = '跨月换车')
+        or
+        /*非废弃，非终止，非换车的合同*/
+        (isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and isnull(a.Fhc,0) != 1)
+        or
+        /*非废弃，非终止，当月换车的新合同*/
+        (isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and a.Fhc = 1 and hh.ID is not null and hh.换车类型 = '当月换车')
+        or
+        /*SX_2017010002换车换方案未能有效管理旧合同*/
+        a.ID = '4290'
+        )
+        /*剔除不算业绩的换车换方案*/
+        and a.ID not in ('6169','8194','10591')
+        /*排除经理和新人*/
+        and isnull(yb.FPost,0) not in ('7','1')
+        /*当月*/
+        and yy.FMonth = CONVERT(varchar(7),dateadd(d,-1,GETDATE()),120)
+        /*排除淘汽*/
+        and a.FAgent != '2131'
+        /*本月业绩*/
+        and case when DAY(GETDATE()) = '1'
+        and YEAR(b.FContractTime) = YEAR(GETDATE()) and MONTH(b.FContractTime)= MONTH(getdate()) - 1
+        then '1'
+        when DAY(GETDATE()) != '1'
+        and YEAR(b.FContractTime) = YEAR(getdate()) and MONTH(b.FContractTime)= MONTH(getdate())
+        and day(b.FContractTime) &lt;= day(getdate()) - 1
+        then '1'
+        else '0' end = '1'
+        /*新人代交判断*/
+        and case when a.FContract in ('HL2018040013','CQ2018040014','SJZ2018040007','ZZ2018040005','WZ2018040009','WZ2018040013','NJ2018050002')
+        then '1'
+        when zz.FAddTime is not null and datediff(d,b.FContractTime,zz.FAddTime) > 1 then '0' else '1' end = '1'
+        group by y.FDept
+        ) bb
+        on bb.FDept = yy.FDept
+
+        /*新人转正时间，新人第一次变成顾问后的更新时间*/
+        left join (
+        select a.*
+        from (
+        select *
+        from (
+        select b.FUser ,b.FDept,a.FPost,a.FMonth
+        ,ROW_NUMBER() over(partition by b.FUser ,b.FDept order by a.FAddTime desc) rw ,a.FAddTime
+        from Entity_MaketDeptStaff_FAtDept a join Entity_MaketDeptStaff b on a.Entity_MaketDeptStaff_ID = b.ID
+        ) a
+        where a.rw = 1 and a.FPost != '1'
+        ) a
+        join (
+        select *
+        from (
+        select b.FUser ,b.FDept,a.FPost,a.FMonth
+        ,ROW_NUMBER() over(partition by b.FUser ,b.FDept order by a.FAddTime desc) rw ,a.FAddTime
+        from Entity_MaketDeptStaff_FAtDept a join Entity_MaketDeptStaff b on a.Entity_MaketDeptStaff_ID = b.ID
+        ) a
+        where a.rw = 2 and a.FPost = '1'
+        ) b
+        on a.FUser = b.FUser and a.FDept = b.FDept
+        ) zz
+        on yy.FUser = zz.FUser and yy.FDept = zz.FDept
+
+        /*换车换方案--判断非废弃合同*/
+        left join (
+        select a.id
+        ,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车' else '跨月换车' end '换车类型'
+        from FinLease_Contract a
+        left join FM_ConAcc b on a.FContractID = b.ID
+        left join FinLease_Contract c on a.FContract_Old = c.ID
+        where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+        and a.FContract_Old is not null
+        ) hh on a.ID = hh.ID
+        /*换车换方案--判断废弃合同*/
+        left join (
+        select a.id
+        ,a.FContract_Old  'old_ID'
+        ,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车' else '跨月换车' end '换车类型'
+        from FinLease_Contract a
+        left join FM_ConAcc b on a.FContractID = b.ID
+        left join FinLease_Contract c on a.FContract_Old = c.ID
+        where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+        and a.FContract_Old is not null
+        ) hf on a.ID = hf.old_ID
+
+        where
+        (  /*废弃，终止的合同，是跨月换车的原合同*/
+        (b.FIsDrop = 1 and a.WFState = 1 and hf.old_ID is not null and hf.换车类型 = '跨月换车')
+        or
+        /*非废弃，非终止，非换车的合同*/
+        (isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and isnull(a.Fhc,0) != 1)
+        or
+        /*非废弃，非终止，当月换车的新合同*/
+        (isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and a.Fhc = 1 and hh.ID is not null and hh.换车类型 = '当月换车')
+        or
+        /*SX_2017010002换车换方案未能有效管理旧合同*/
+        a.ID = '4290'
+        )
+        /*剔除不算业绩的换车换方案*/
+        and a.ID not in ('6169','8194','10591')
+        and d.Name not like '%营销部%'
+        and d.Name != '淘汽互联网子公司'
+        /*当月数据*/
+        and case when DAY(GETDATE()) = '1'
+        and YEAR(b.FContractTime) = YEAR(GETDATE()) and MONTH(b.FContractTime)= MONTH(getdate()) - 1
+        then '1'
+        when DAY(GETDATE()) != '1'
+        and YEAR(b.FContractTime) = YEAR(getdate()) and MONTH(b.FContractTime)= MONTH(getdate()) and day(b.FContractTime) &lt;= day(getdate()) - 1
+        then '1'
+        else '0' end = '1'
+
+        /*传入参数*/
+        <if test="department != null and department != ''">
+            and d.Name LIKE '%'+#{department}+'%'
+        </if>
+
+        ) a
+        group by a.department
+        )a
+
+
+    </select>
+
+
+</mapper>

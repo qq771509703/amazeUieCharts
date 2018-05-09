@@ -1,5 +1,6 @@
 package com.example.xxf.controller;
 
+import com.example.xxf.Util.StringUtil;
 import com.example.xxf.bean.synergyEvolvePlug;
 import com.example.xxf.service.SynergyEvolveService;
 import com.example.xxf.vo.ResponseVo;
@@ -86,6 +87,10 @@ public class SynergyEvolveController {
         synergyEvolvePlug sAndUGPS = synergyEvolveService.getAtShopAndUninstalledGPS(map);
         returnMap.put("sAndUGPS",sAndUGPS);
 
+        long count = synergyEvolveService.getSynergyEvolveTableCount(map);
+
+        returnMap.put("count",count);
+
 
 //        map.put("startRow",0);
 //        map.put("endRow",10);
@@ -101,7 +106,7 @@ public class SynergyEvolveController {
     @RequestMapping("/getSynergyEvolveTable")
     @ResponseBody
     public ResponseVo getSynergyEvolveTable(String area,String brand,String carType,String phyStatus,String owner,
-                                            String arriveWay,String pluginVal
+                                            String arriveWay,String pluginVal,int page
                                                     ){
         ResponseVo vo = new ResponseVo();
         Map<String,Object> map = new HashMap<>();
@@ -141,12 +146,19 @@ public class SynergyEvolveController {
         map.put("arriveWayList",arriveWayList);
 
         map.put("pluginVal",pluginVal);
-        map.put("startRow",0);
-        map.put("endRow",10);
-        List<Map<String,Object>> listMap = synergyEvolveService.getSynergyEvolveTable(map);
-        long count = synergyEvolveService.getSynergyEvolveTableCount(map);
+
+        int start = (page-1)*15+1;
+        int end = page*15;
+
+        map.put("startRow",start);
+        map.put("endRow",end);
+        List<LinkedHashMap<String,Object>> listMap = synergyEvolveService.getSynergyEvolveTable(map);
 
         returnMap.put("SETListMap",listMap);
+
+        long count = synergyEvolveService.getSynergyEvolveTableCount(map);
+
+        returnMap.put("count",count);
 
         vo.setData(returnMap);
         return  vo;
@@ -166,22 +178,22 @@ public class SynergyEvolveController {
         List<String>  phyStatusList = null;
         List<String>  ownerList = null;
         List<String>  arriveWayList = null;
-        if (area!="" && !area.equals("null")){
+        if (StringUtil.hasValue(area)){
             areaList = Arrays.asList(area.split(","));
         }
-        if (brand!=""  && !area.equals("null")){
+        if (StringUtil.hasValue(brand)){
             brandList = Arrays.asList(brand.split(","));
         }
-        if (carType!=""  && !area.equals("null")){
+        if (StringUtil.hasValue(carType)){
             carTypeList = Arrays.asList(carType.split(","));
         }
-        if (phyStatus!=""  && !area.equals("null")){
+        if (StringUtil.hasValue(phyStatus)){
             phyStatusList = Arrays.asList(phyStatus.split(","));
         }
-        if (owner!=""  && !area.equals("null")){
+        if (StringUtil.hasValue(owner)){
             ownerList = Arrays.asList(owner.split(","));
         }
-        if (arriveWay!=""  && !area.equals("null") ){
+        if (StringUtil.hasValue(arriveWay) ){
             arriveWayList = Arrays.asList(arriveWay.split(","));
         }
 
@@ -194,14 +206,14 @@ public class SynergyEvolveController {
 
         map.put("pluginVal",pluginVal);
         map.put("startRow",0);
-        map.put("endRow",10);
-        List<Map<String,Object>> listMap = synergyEvolveService.getSynergyEvolveTable(map);
+        map.put("endRow",5000);
+        List<LinkedHashMap<String,Object>> listMap = synergyEvolveService.getSynergyEvolveTable(map);
 
         exportExcel(listMap,"2","2",request,response);
     }
 
 
-    public void exportExcel(List<Map<String, Object>> listMap, String s_type, String s_month, HttpServletRequest request, HttpServletResponse response){
+    public void exportExcel(List<LinkedHashMap<String, Object>> listMap, String s_type, String s_month, HttpServletRequest request, HttpServletResponse response){
         //创建HSSFWorkbook对象(excel的文档对象)
         HSSFWorkbook wb = new HSSFWorkbook();
         //建立新的sheet对象（excel的表单）
@@ -233,6 +245,7 @@ public class SynergyEvolveController {
             if (map!=null) {
                 Iterator<Map.Entry<String, Object>> it = map.entrySet().iterator();
                 int c = 0;
+                int d = 0;
                 while (it.hasNext()) {
                     Map.Entry<String, Object> entry = it.next();
                     key = entry.getKey();
@@ -242,11 +255,11 @@ public class SynergyEvolveController {
 //                        System.out.println("c----->"+c);
                         row2.createCell(c).setCellValue(key);
                         c = c+1;
-                    }else{
-//                        System.out.println("val----->"+val);
-                        hRow.createCell(c).setCellValue(val==null?"":val.toString());
-                        c = c+1;
                     }
+                        System.out.println("val----->"+val);
+                        hRow.createCell(d).setCellValue(val==null?"":val.toString());
+                        d = d+1;
+
                 }
             }
         }

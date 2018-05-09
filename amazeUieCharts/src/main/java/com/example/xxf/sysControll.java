@@ -66,10 +66,16 @@ public class sysControll {
         return "admin/home2";
     }
 
+    @RequestMapping("/perCapitaCapacity")
+    public String perCapitaCapacity(){
+        return "admin/perCapitaCapacity";
+    }
+
     @RequestMapping("/chart")
     public String chart(){
         return "admin/chart";
     }
+
     @RequestMapping("/monthly_finance_plan")
     @ResponseBody
     public int[] monthly_finance_plan(){

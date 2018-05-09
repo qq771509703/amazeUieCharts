@@ -4,6 +4,7 @@ import com.example.xxf.bean.synergyEvolvePlug;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +36,7 @@ public interface SynergyEvolveMapper {
     synergyEvolvePlug getAtShopAndUninstalledGPS(Map <String,Object > param);
 
 
-    List<Map<String,Object>> getSynergyEvolveTable(Map <String,Object> param);
+    List<LinkedHashMap<String,Object>> getSynergyEvolveTable(Map <String,Object> param);
 
     long getSynergyEvolveTableCount(Map <String,Object> param);
 

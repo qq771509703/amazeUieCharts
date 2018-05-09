@@ -13,36 +13,77 @@
     <link rel="icon" type="image/png" href="assets/i/favicon.png">
     <link rel="apple-touch-icon-precomposed" href="assets/i/app-icon72x72@2x.png">
     <meta name="apple-mobile-web-app-title" content="Amaze UI" />
-    <script th:src="@{/assets/js/echarts.min.js}" ></script>
+    <script th:src="@{/assets/js/echarts.min.js}"></script>
     <link rel="stylesheet" th:href="@{/assets/css/amazeui.min.css}" />
-    <link rel="stylesheet" th:href="@{/assets/css/amazeui.datatables.min.css}"  />
+    <link rel="stylesheet" th:href="@{/assets/css/amazeui.datatables.min.css}" />
     <link rel="stylesheet" th:href="@{/assets/css/app.css}">
     <link rel="stylesheet" th:href="@{/assets/css/amazeui.page.css}">
     <script th:src="@{/assets/js/jquery.min.js}"></script>
-    <script th:src="@{/assets/js/template-web.js}"></script>
+    <!--<script th:src="@{/assets/js/template-web.js}"></script>-->
+
+    <!--<script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>-->
 
     <style type="text/css">
+        .widget-body {
+            overflow-x: scroll
+        }
+
+        /* .widget-body th:nth-child(5){
+      display: none
+  } */
+
+        .widget-body td,
+        .widget-body th,
+        .widget-body tr {
+            min-width: 145px;
+            text-align: center
+        }
+
+        .widget-body td:nth-child(8), .widget-body th:nth-child(8), .widget-body tr:nth-child(8) {
+      min-width: 238px;
+  }
 
         .tpl-table-list-select {
-             text-align: left;
+            text-align: left;
         }
 
         .am-selected {
             width: 120px;
         }
-        .filtrateText{
+
+        .filtrateText {
             color: floralwhite;
         }
+
         .row-content {
             padding: 10px;
         }
+
         .widget {
             height: 780px;
         }
-        .s_button{
+
+        .s_button {
             padding-right: 5px;
         }
-        .theme-black .tpl-form-line-form input[type=number], .theme-black .tpl-form-line-form input[type=search], .theme-black .tpl-form-line-form input[type=text], .theme-black .tpl-form-line-form input[type=password], .theme-black .tpl-form-line-form input[type=datetime], .theme-black .tpl-form-line-form input[type=datetime-local], .theme-black .tpl-form-line-form input[type=date], .theme-black .tpl-form-line-form input[type=month], .theme-black .tpl-form-line-form input[type=time], .theme-black .tpl-form-line-form input[type=week], .theme-black .tpl-form-line-form input[type=email], .theme-black .tpl-form-line-form input[type=url], .theme-black .tpl-form-line-form input[type=tel], .theme-black .tpl-form-line-form input[type=color], .theme-black .tpl-form-line-form select, .theme-black .tpl-form-line-form textarea, .theme-black .am-form-field {
+
+        .theme-black .tpl-form-line-form input[type=number],
+        .theme-black .tpl-form-line-form input[type=search],
+        .theme-black .tpl-form-line-form input[type=text],
+        .theme-black .tpl-form-line-form input[type=password],
+        .theme-black .tpl-form-line-form input[type=datetime],
+        .theme-black .tpl-form-line-form input[type=datetime-local],
+        .theme-black .tpl-form-line-form input[type=date],
+        .theme-black .tpl-form-line-form input[type=month],
+        .theme-black .tpl-form-line-form input[type=time],
+        .theme-black .tpl-form-line-form input[type=week],
+        .theme-black .tpl-form-line-form input[type=email],
+        .theme-black .tpl-form-line-form input[type=url],
+        .theme-black .tpl-form-line-form input[type=tel],
+        .theme-black .tpl-form-line-form input[type=color],
+        .theme-black .tpl-form-line-form select,
+        .theme-black .tpl-form-line-form textarea,
+        .theme-black .am-form-field {
             display: block;
             width: 100%;
             padding: 6px 12px;
@@ -53,390 +94,474 @@
             border: 1px solid #000000;
         }
 
+        .am-u-sm-2 {
+            width: 15.666% !important;
+        }
     </style>
+
+
+
     <script type="text/javascript">
+        var page;
+        var countPP = 0;
+        var lock = false;//锁作为全局变量
+        $(function () {
+            //            var $selected = $('#selected-area');
+            //            $selected.on('change', function() {
+            //                var v = $("#selected-area").val();
+            //
+            //            });
+            search_select();
 
-        $(function() {
-            var $selected = $('#selected-area');
-            $selected.on('change', function() {
-                var v = $("#selected-area").val();
 
-            });
+            // page = window.location.search.match(/page=(\d+)/);
+
+
+
+
+            //            $("#page").page({
+            //                pages:10,
+            //                curr:page?page[1]:1,
+            //                jump:function(context, first) {
+            //                    // alert(first);
+            //                    var pluginVal =  $("#exprotTable").attr("title");
+            //                    s_fn(pluginVal,context.option.curr);
+            //                    // pluginBtn(null,context.option.curr)
+            //                    page = (context.option.curr);
+            //                }
+            //            })
+
         });
 
-        function search_select(){
+
+        function search_select(obj) {
+            console.log("search_select");
             var area = $("#selected-area").val();
-            if (area!=null){
+            if (area != null) {
                 area = area.toString()
             }
 
             var brand = $("#selected-brand").val();
-            if (brand!=null){
+            if (brand != null) {
                 brand = brand.toString()
             }
 
             var carType = $("#selected-carType").val();
-            if (carType!=null){
+            if (carType != null) {
                 carType = carType.toString()
             }
 
             var phyStatus = $("#selected-phyStatus").val();
-            if (phyStatus!=null){
+            if (phyStatus != null) {
                 phyStatus = phyStatus.toString()
             }
 
             var owner = $("#selected-owner").val();
-            if (owner!=null){
+            if (owner != null) {
                 owner = owner.toString()
             }
 
             var arriveWay = $("#selected-arriveWay").val();
-            if (arriveWay!=null){
+            if (arriveWay != null) {
                 arriveWay = arriveWay.toString()
             }
 
-            var param = {"area":area,"brand":brand,"carType":carType,"phyStatus":phyStatus,"owner":owner,"arriveWay":arriveWay}
+            var param = { "area": area, "brand": brand, "carType": carType, "phyStatus": phyStatus, "owner": owner, "arriveWay": arriveWay }
 
-            $.post("initializeSelectMenu",param,function(data){
-                console.log(data)
+            var $btn = $(obj)
+            $btn.button('loading');
+            $.post("initializeSelectMenu", param, function (data) {
+
+
+
+
+                //console.log(data)
                 $("#sAndUGPS_span").text(data.data.sAndUGPS.yddwzGPS);
                 $("#fpjcjqxwm_span").text(data.data.sAndUGPS.fpjcjqxwm);
                 $("#yspwjsyx_span").text(data.data.sAndUGPS.yspwmsyx);
                 $("#zpqqwsp_span").text(data.data.sAndUGPS.zpqqwsp);
                 $("#ztcl_span").text(data.data.sAndUGPS.ztcl);
-                pluginBtn();
+                s_fn("", 1);
+                var countP = data.data.count;
+                initPage(countP, 1);
+                $btn.button('reset');
+                $("#exprotTable").attr("title", '');
+            });
 
+        }
+        //        $(".s_button").click(function(){
+        //            var thisObj=$(this);
+        //            var b = thisObj.children();
+        //            var pluginVal = b.attr("id");
+        //            console.log(pluginVal);
+        //        });
+
+        function s_fn(pluginVal, page) {
+            var area = $("#selected-area").val();
+            if (area != null) {
+                area = area.toString()
+            }
+
+            var brand = $("#selected-brand").val();
+            if (brand != null) {
+                brand = brand.toString()
+            }
+
+            var carType = $("#selected-carType").val();
+            if (carType != null) {
+                carType = carType.toString()
+            }
+
+            var phyStatus = $("#selected-phyStatus").val();
+            if (phyStatus != null) {
+                phyStatus = phyStatus.toString()
+            }
+
+            var owner = $("#selected-owner").val();
+            if (owner != null) {
+                owner = owner.toString()
+            }
+
+            var arriveWay = $("#selected-arriveWay").val();
+            if (arriveWay != null) {
+                arriveWay = arriveWay.toString()
+            }
+
+            var param = { "area": area, "brand": brand, "carType": carType, "phyStatus": phyStatus, "owner": owner, "arriveWay": arriveWay, "pluginVal": pluginVal, "page": page }
+            $.post("getSynergyEvolveTable", param, function (data) {
+
+                countPP = data.data.count;
+                lock = true;
+                var listMap = data.data.SETListMap;
+                $("thead tr th").remove();
+                $("tbody tr").remove();
+                var mapListmap = data.data;
+                for (var key in mapListmap) {
+                    //console.log(key);
+                    // console.log(mapListmap[key]);
+                    var listMap = mapListmap[key];
+                    var titleMap = listMap[0];
+                    for (var titleKey in titleMap) {
+                        if (titleKey != 'rowid') {
+                            var thead = "<th>" + titleKey + "</th>";
+                            $("thead tr").append(thead);
+                        }
+                    }
+                    for (var i = 0; i < listMap.length; i++) {
+                        var listMapV = listMap[i]
+                        //                        console.log(value);
+                        var html = "<tr class='gradeX'>" + "</td><td>" + listMapV.区域 +
+                            "</td><td>" + listMapV.车辆归属 +
+                            "</td><td>" + listMapV.采购单号 +
+                            "</td><td>" + listMapV.车架号 +
+                            "</td><td>" + listMapV.车牌号 +
+                            "</td><td>" + isStr(listMapV.采购跟进单) +
+                            "</td><td>" + listMapV.车型 +
+                            "</td><td>" + listMapV.规格 +
+                            "</td><td>" + listMapV.颜色 +
+                            "</td><td>" + isStr(listMapV.付款结束) +
+                            "</td><td>" + isStr(listMapV.预计发车) +
+                            "</td><td>" + isStr(listMapV.发票寄出) +
+                            "</td><td>" + isStr(listMapV.合格证寄出) +
+                            "</td><td>" + isStr(listMapV.商业险购买) +
+                            "</td><td>" + isStr(listMapV.交强险购买) +
+                            "</td><td>" + isStr(listMapV.到4S店) +
+                            "</td><td>" + isStr(listMapV.到店日期) +
+                            "</td><td>" + isStr(listMapV.到票日期) +
+                            "</td><td>" + isStr(listMapV.到证日期) +
+                            "</td><td>" + isStr(listMapV.GPS安装) +
+                            "</td><td>" + isStr(listMapV.上牌日期) +
+                            "</td><td>" + listMapV.车辆标识 +
+                            "</td><td>" + listMapV.到店方式 +
+                            "</td><td>" + listMapV.采购合同号 +
+                            "</td><td>" + listMapV.付款单号 +
+                            "</td><td>" + listMapV.指导价
+                        $("tbody").append(html);
+
+
+                    }
+                }
 
             });
 
         }
 
-        function pluginBtn(obj){
 
-            var thisObj=$(obj);
-                var b = thisObj.children();
-                var pluginVal = b.attr("id");
-               // console.log(thisObj)
+        function pluginBtn(obj) {
 
-            var area = $("#selected-area").val();
-            if (area!=null){
-                area = area.toString()
+            var thisObj = $(obj);
+            var b = thisObj.children();
+            var pluginVal = b.attr("id");
+            $("#exprotTable").attr("title", pluginVal);
+            lock = false;
+            s_fn(pluginVal, 1);
+
+            while (!lock) {
+                break;
             }
-
-            var brand = $("#selected-brand").val();
-            if (brand!=null){
-                brand = brand.toString()
-            }
-
-            var carType = $("#selected-carType").val();
-            if (carType!=null){
-                carType = carType.toString()
-            }
-
-            var phyStatus = $("#selected-phyStatus").val();
-            if (phyStatus!=null){
-                phyStatus = phyStatus.toString()
-            }
-
-            var owner = $("#selected-owner").val();
-            if (owner!=null){
-                owner = owner.toString()
-            }
-
-            var arriveWay = $("#selected-arriveWay").val();
-            if (arriveWay!=null){
-                arriveWay = arriveWay.toString()
-            }
-
-            var param = {"area":area,"brand":brand,"carType":carType,"phyStatus":phyStatus,"owner":owner,"arriveWay":arriveWay,"pluginVal":pluginVal}
-            $.post("getSynergyEvolveTable",param,function(data){
-                var listMap = data.data;
-
-            });
+            lock = true;
+            initPage(countPP, 1);
         }
-        function search_export(){
+        function search_export() {
             var area = $("#selected-area").val();
-            if (area!=null){
+            if (area != null) {
                 area = area.toString()
             }
 
             var brand = $("#selected-brand").val();
-            if (brand!=null){
+            if (brand != null) {
                 brand = brand.toString()
             }
 
             var carType = $("#selected-carType").val();
-            if (carType!=null){
+            if (carType != null) {
                 carType = carType.toString()
             }
 
             var phyStatus = $("#selected-phyStatus").val();
-            if (phyStatus!=null){
+            if (phyStatus != null) {
                 phyStatus = phyStatus.toString()
             }
 
             var owner = $("#selected-owner").val();
-            if (owner!=null){
+            if (owner != null) {
                 owner = owner.toString()
             }
 
             var arriveWay = $("#selected-arriveWay").val();
-            if (arriveWay!=null){
+            if (arriveWay != null) {
                 arriveWay = arriveWay.toString()
             }
-            var param = {"area":area,"brand":brand,"carType":carType,"phyStatus":phyStatus,"owner":owner,"arriveWay":arriveWay}
+            var param = { "area": area, "brand": brand, "carType": carType, "phyStatus": phyStatus, "owner": owner, "arriveWay": arriveWay }
 
-            console.log(param);
-            window.location.href = "exportExcel?area="+area+"&brand="+brand+"&carType="+carType+"&phyStatus="+phyStatus+"&owner="+owner+"&arriveWay="+arriveWay;
 
+            var pluginVal = $("#exprotTable").attr("title");
+            window.location.href = "exportExcel?area=" + area + "&brand=" + brand + "&carType=" + carType + "&phyStatus=" + phyStatus + "&owner=" + owner + "&arriveWay=" + arriveWay + "&pluginVal=" + pluginVal;
+
+        }
+
+        function isStr(str) {
+            if (str == null || str == 'null') {
+
+                return '';
+            }
+
+            return str;
+        }
+
+        function initPage(count, newPage) {
+            var nums = 15; //每页出现的数量
+            var pages = Math.ceil(count / nums); //得到总页数
+
+            var $page = $("#page").page({
+                pages: pages, //页数
+                curr: 1, //当前页
+                type: 'default', //主题
+                groups: 5, //连续显示分页数
+                prev: '<', //若不显示，设置false即可
+                next: '>', //若不显示，设置false即可
+                first: "首页",
+                last: "尾页", //false则不显示
+                before: function (context, next) { //加载前触发，如果没有执行next()则中断加载
+                    console.log('开始加载...');
+
+                    context.time = (new Date()).getTime(); //只是演示，并没有什么卵用，可以保存一些数据到上下文中
+                    next();
+                },
+                render: function (context, $el, index) { //渲染[context：对this的引用，$el：当前元素，index：当前索引]
+                    //逻辑处理
+                    if (index == 'last') { //虽然上面设置了last的文字为尾页，但是经过render处理，结果变为最后一页
+                        $el.find('a').html('最后一页');
+                        return $el; //如果有返回值则使用返回值渲染
+                    }
+                    return false; //没有返回值则按默认处理
+                },
+                after: function (context, next) { //加载完成后触发
+                    var time = (new Date()).getTime(); //没有什么卵用的演示
+                    console.log('分页组件加载完毕，耗时：' + (time - context.time) + 'ms');
+                    next();
+                },
+                /*
+                 * 触发分页后的回调，如果首次加载时后端已处理好分页数据则需要在after中判断终止或在jump中判断first是否为假
+                 */
+                jump: function (context, first) {
+                    if (!first) {
+                        var pluginVal = $("#exprotTable").attr("title");
+                        s_fn(pluginVal, context.option.curr);
+                    }
+                    //                    // pluginBtn(null,context.option.curr)
+                    //page = (context.option.curr);
+                }
+            });
         }
     </script>
 
 </head>
 
 <body data-type="widgets">
-    <script th:src="@{/assets/js/theme.js}" ></script>
+    <script th:src="@{/assets/js/theme.js}"></script>
 
-        <!-- 内容区域 -->
-        <div class="tpl-content-wrapper">
+    <script id="t1" type="text/html">
+        <ul>
+     
+        </ul>
+       
+     </script>
 
-            <div class="container-fluid am-cf">
-                <div class="row">
-                    <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
-                        <div class="page-header-heading"><span class="am-icon-home page-header-heading-icon"></span>协同进度表</div>
+
+    <!-- 内容区域 -->
+    <div class="tpl-content-wrapper">
+
+        <div class="container-fluid am-cf">
+            <div class="row">
+                <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
+                    <div class="page-header-heading">
+                        <span class="am-icon-home page-header-heading-icon"></span>协同进度表</div>
+                </div>
+
+                <div class="am-u-sm-2">
+                    <span class="filtrateText">区域:</span>
+                    <div class="am-form-group tpl-table-list-select">
+
+                        <select multiple data-am-selected="{maxHeight: 300,btnWidth: '60%',searchBox: 1}" id="selected-area">
+                            <tr th:each="areas,stat : ${seleteArea}">
+                                <option th:value="${areas}" th:text="${areas}"></option>
+                            </tr>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="am-u-sm-2">
+                    <span class="filtrateText">品牌:</span>
+                    <div class="am-form-group tpl-table-list-select">
+                        <select multiple data-am-selected="{maxHeight: 300,btnWidth: '60%',searchBox: 1}" id="selected-brand">
+                            <tr th:each="brand,stat : ${seleteBrand}">
+                                <option th:value="${brand}" th:text="${brand}"></option>
+                            </tr>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="am-u-sm-2">
+                    <span class="filtrateText">车型:</span>
+                    <div class="am-form-group tpl-table-list-select">
+                        <select multiple data-am-selected="{maxHeight: 300,btnWidth: '60%',searchBox: 1}" id="selected-carType">
+                            <tr th:each="carType,stat : ${carTypelist}">
+                                <option th:value="${carType}" th:text="${carType}"></option>
+                            </tr>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="am-u-sm-2">
+                    <span class="filtrateText">标识:</span>
+                    <div class="am-form-group tpl-table-list-select">
+                        <select multiple data-am-selected="{maxHeight: 300,btnWidth: '60%',searchBox: 1}" id="selected-phyStatus">
+                            <option value="全部">所有类别</option>
+                            <option value="空">空</option>
+                            <option value="待售新车">待售新车</option>
+                            <option value="预售车">预售车</option>
+                            <option value="在途车辆">在途车辆</option>
+                            <option value="在库处理车辆">在库处理车辆</option>
+                            <option value="待付款新车">待付款新车</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="am-u-sm-2">
+                    <span class="filtrateText">车辆归属:</span>
+                    <div class="am-form-group tpl-table-list-select">
+                        <select multiple data-am-selected="{maxHeight: 300,btnWidth: '60%',searchBox: 1}" id="selected-owner">
+                            <option value="全部">所有类别</option>
+                            <option value="空">空</option>
+                            <option value="喜相逢">喜相逢</option>
+                            <option value="淘气">淘气</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="am-u-sm-2">
+                    <span class="filtrateText">到店方式:</span>
+                    <div class="am-form-group tpl-table-list-select">
+                        <select multiple data-am-selected="{maxHeight: 300,btnWidth: '60%',searchBox: 1}" id="selected-arriveWay">
+                            <option value="全部">所有类别</option>
+                            <option value="空">空</option>
+                            <option value="待售新车">门店</option>
+                            <option value="预售车">4S店并上牌</option>
+                            <option value="在途车辆">4S店未上牌</option>
+                        </select>
+                        <!-- <button type="button"  class="am-btn am-btn-default am-round" onclick="search_select()">查 询</button>
+                                <button type="button"  class="am-btn am-btn-default am-round" onclick="search_export()">导 出</button> -->
                     </div>
 
-                    <div class="am-u-sm-2">
-                        <span class="filtrateText">区域:</span>
+                </div>
+                <div>
+                    <button type="button" onclick="search_select(this)" style="width: 115px;margin-left: 27px; position: relative;left: -17px;margin-top: 8px"
+                        class="am-btn am-btn-primary btn-loading-example" data-am-loading="{spinner: 'circle-o-notch', loadingText: '加载中...'}">查 询</button>
+                    <button type="button" id="exprotTable" title="" onclick="search_export(this)" style="margin-top: 8px;width: 115px" class="am-btn am-btn-primary btn-loading-example"
+                        data-am-loading="{spinner: 'circle-o-notch', loadingText: '加载中...'}">导 出</button>
+                </div>
 
-
-                        <div class="am-form-group tpl-table-list-select">
-
-                            <select multiple data-am-selected="{maxHeight: 300,btnWidth: '60%',searchBox: 1}" id="selected-area">
-                                <tr th:each="areas,stat : ${seleteArea}">
-                                    <option th:value="${areas}" th:text="${areas}"></option>
-                                </tr>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="am-u-sm-2">
-                        <span class="filtrateText">品牌:</span>
-                        <div class="am-form-group tpl-table-list-select">
-                            <select multiple data-am-selected="{maxHeight: 300,btnWidth: '60%',searchBox: 1}" id="selected-brand">
-                                <tr th:each="brand,stat : ${seleteBrand}">
-                                    <option th:value="${brand}" th:text="${brand}"></option>
-                                </tr>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="am-u-sm-2">
-                        <span class="filtrateText">车型:</span>
-                        <div class="am-form-group tpl-table-list-select">
-                            <select multiple data-am-selected="{maxHeight: 300,btnWidth: '60%',searchBox: 1}" id="selected-carType">
-                                <tr th:each="carType,stat : ${carTypelist}">
-                                    <option th:value="${carType}" th:text="${carType}"></option>
-                                </tr>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="am-u-sm-2">
-                        <span class="filtrateText">标识:</span>
-                        <div class="am-form-group tpl-table-list-select">
-                            <select multiple data-am-selected="{maxHeight: 300,btnWidth: '60%',searchBox: 1}" id="selected-phyStatus">
-                                    <option value="全部">所有类别</option>
-                                    <option value="空">空</option>
-                                    <option value="待售新车">待售新车</option>
-                                    <option value="预售车">预售车</option>
-                                    <option value="在途车辆">在途车辆</option>
-                                    <option value="在库处理车辆">在库处理车辆</option>
-                                    <option value="待付款新车">待付款新车</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="am-u-sm-2">
-                        <span class="filtrateText">车辆归属:</span>
-                        <div class="am-form-group tpl-table-list-select">
-                            <select multiple data-am-selected="{maxHeight: 300,btnWidth: '60%',searchBox: 1}" id="selected-owner">
-                                <option value="全部">所有类别</option>
-                                <option value="空">空</option>
-                                <option value="喜相逢">喜相逢</option>
-                                <option value="淘气">淘气</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="am-u-sm-2">
-                        <span class="filtrateText">到店方式:</span>
-                        <div class="am-form-group tpl-table-list-select">
-                            <select multiple data-am-selected="{maxHeight: 300,btnWidth: '60%',searchBox: 1}" id="selected-arriveWay">
-                                <option value="全部">所有类别</option>
-                                <option value="空">空</option>
-                                <option value="待售新车">门店</option>
-                                <option value="预售车">4S店并上牌</option>
-                                <option value="在途车辆">4S店未上牌</option>
-                            </select>
-                                <button type="button"  class="am-btn am-btn-default am-round" onclick="search_select()">查 询</button>
-                                <button type="button"  class="am-btn am-btn-default am-round" onclick="search_export()">导 出</button>
-                        </div>
-
-                    </div>
-
-                    <div class="am-u-sm-2">
-
-                    </div>
-                   <!-- <div class="am-u-sm-2">
-                        <div class="am-input-group am-input-group-sm tpl-form-border-form cl-p">
-                            <input type="text" class="am-form-field ">
-                            <span class="am-input-group-btn">
-            <button class="am-btn  am-btn-default am-btn-success tpl-table-list-field am-icon-search" type="button"></button>
-          </span>
-                        </div>
-                    </div>-->
+                <div class="am-u-sm-2">
 
                 </div>
 
+
             </div>
 
-
-            <div class="row-content am-cf" >
-                <div class="row" >
-                    <div class="am-u-sm-12 am-u-md-12 am-u-lg-12" >
-                        <div class="widget am-cf">
-                            <!--<div class="widget-head am-cf">-->
-                                <!--<div class="widget-title  am-cf">文章列表</div>-->
+        </div>
 
 
-                            <!--</div>-->
-                            <div class="widget-body  am-fr">
+        <div class="row-content am-cf">
+            <div class="row">
+                <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
+                    <div class="widget am-cf">
 
-                                <div class="am-u-sm-12 am-u-md-12 ">
-                                    <div class="am-form-group">
-                                        <div class="am-btn-toolbar">
-                                            <div class=" ">
-                                                <button type="button" class="am-btn am-btn-primary s_button" id="sAndUGPS_btn" onclick="pluginBtn(this)">已到店未安装GPS：<span id="sAndUGPS_span"></span></button>
-                                                <button type="button" class="am-btn am-btn-secondary s_button" id="fpjcjqxwm_btn" onclick="pluginBtn(this)">发票寄出，交强险未买：<span id="fpjcjqxwm_span"></span></button>
-                                                <button type="button" class="am-btn am-btn-success s_button" id="yspwjsyx_btn" onclick="pluginBtn(this)">已上牌，未交商业险：<span id="yspwjsyx_span"></span></button>
-                                                <button type="button" class="am-btn am-btn-warning s_button" id="zpqqwsp_btn" onclick="pluginBtn(this)">证票齐全，未上牌：<span id="zpqqwsp_span"></span></button>
-                                                <button type="button" class="am-btn am-btn-warning s_button" id="ztcl_btn" onclick="pluginBtn(this)">在途车辆：<span id="ztcl_span"></span></button>
-                                            </div>
+                        <div class="widget-body  am-fr">
+
+                            <div class="am-u-sm-12 am-u-md-12 ">
+                                <div class="am-form-group">
+                                    <div class="am-btn-toolbar">
+                                        <div class=" ">
+                                            <button type="button" class="am-btn am-btn-primary s_button" id="sAndUGPS_btn" onclick="pluginBtn(this)">已到店未安装GPS：
+                                                <span id="sAndUGPS_span"></span>
+                                            </button>
+                                            <button type="button" class="am-btn am-btn-primary s_button" id="fpjcjqxwm_btn" onclick="pluginBtn(this)">发票寄出，交强险未买：
+                                                <span id="fpjcjqxwm_span"></span>
+                                            </button>
+                                            <button type="button" class="am-btn am-btn-primary s_button" id="yspwjsyx_btn" onclick="pluginBtn(this)">已上牌，未交商业险：
+                                                <span id="yspwjsyx_span"></span>
+                                            </button>
+                                            <button type="button" class="am-btn am-btn-primary s_button" id="zpqqwsp_btn" onclick="pluginBtn(this)">证票齐全，未上牌：
+                                                <span id="zpqqwsp_span"></span>
+                                            </button>
+                                            <button type="button" class="am-btn am-btn-primary s_button" id="ztcl_btn" onclick="pluginBtn(this)">在途车辆：
+                                                <span id="ztcl_span"></span>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="am-u-sm-12">
-                                    <table width="100%" class="am-table am-table-compact am-table-striped tpl-table-black " id="example-r">
-                                        <thead>
-                                            <tr>
-                                                <th>文章标题</th>
-                                                <th>作者</th>
-                                                <th>时间</th>
-                                                <th>操作</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr class="gradeX">
-                                                <td>Amaze UI 模式窗口</td>
-                                                <td>张鹏飞</td>
-                                                <td>2016-09-26</td>
-                                                <td>
-                                                    <div class="tpl-table-black-operation">
-                                                        <a href="javascript:;">
-                                                            <i class="am-icon-pencil"></i> 编辑
-                                                        </a>
-                                                        <a href="javascript:;" class="tpl-table-black-operation-del">
-                                                            <i class="am-icon-trash"></i> 删除
-                                                        </a>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <tr class="even gradeC">
-                                                <td>有适配微信小程序的计划吗</td>
-                                                <td>天纵之人</td>
-                                                <td>2016-09-26</td>
-                                                <td>
-                                                    <div class="tpl-table-black-operation">
-                                                        <a href="javascript:;">
-                                                            <i class="am-icon-pencil"></i> 编辑
-                                                        </a>
-                                                        <a href="javascript:;" class="tpl-table-black-operation-del">
-                                                            <i class="am-icon-trash"></i> 删除
-                                                        </a>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <tr class="gradeX">
-                                                <td>请问有没有amazeui 分享插件</td>
-                                                <td>王宽师</td>
-                                                <td>2016-09-26</td>
-                                                <td>
-                                                    <div class="tpl-table-black-operation">
-                                                        <a href="javascript:;">
-                                                            <i class="am-icon-pencil"></i> 编辑
-                                                        </a>
-                                                        <a href="javascript:;" class="tpl-table-black-operation-del">
-                                                            <i class="am-icon-trash"></i> 删除
-                                                        </a>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <tr class="even gradeC">
-                                                <td>关于input输入框的问题</td>
-                                                <td>着迷</td>
-                                                <td>2016-09-26</td>
-                                                <td>
-                                                    <div class="tpl-table-black-operation">
-                                                        <a href="javascript:;">
-                                                            <i class="am-icon-pencil"></i> 编辑
-                                                        </a>
-                                                        <a href="javascript:;" class="tpl-table-black-operation-del">
-                                                            <i class="am-icon-trash"></i> 删除
-                                                        </a>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <tr class="even gradeC">
-                                                <td>有没有发现官网上的下载包不好用</td>
-                                                <td>醉里挑灯看键</td>
-                                                <td>2016-09-26</td>
-                                                <td>
-                                                    <div class="tpl-table-black-operation">
-                                                        <a href="javascript:;">
-                                                            <i class="am-icon-pencil"></i> 编辑
-                                                        </a>
-                                                        <a href="javascript:;" class="tpl-table-black-operation-del">
-                                                            <i class="am-icon-trash"></i> 删除
-                                                        </a>
-                                                    </div>
-                                                </td>
-                                            </tr>
+                            </div>
+                            <div class="am-u-sm-12">
+                                <table width="100%" class="am-table am-table-compact am-table-striped tpl-table-black " id="example-r">
+                                    <thead>
+                                        <tr>
 
-                                            <tr class="even gradeC">
-                                                <td>我建议WEB版本文件引入问题</td>
-                                                <td>罢了</td>
-                                                <td>2016-09-26</td>
-                                                <td>
-                                                    <div class="tpl-table-black-operation">
-                                                        <a href="javascript:;">
-                                                            <i class="am-icon-pencil"></i> 编辑
-                                                        </a>
-                                                        <a href="javascript:;" class="tpl-table-black-operation-del">
-                                                            <i class="am-icon-trash"></i> 删除
-                                                        </a>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <!-- more data -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div class="am-u-lg-12 am-cf">
+                                        </tr>
+                                    </thead>
+                                    <tbody>
 
-                                    <div data-am-page="{pages:10,jump:'http://hersface.com/p/%page%'}">
-                                    </div>
+
+                                        <!-- more data -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="am-u-lg-12 am-cf">
+
+                                <div id="page">
                                 </div>
+                                <!--<div data-am-page="{pages:10,jump:'http://hersface.com/p/%page%'}">-->
+                                <!--</div>-->
                             </div>
                         </div>
                     </div>
@@ -445,12 +570,17 @@
         </div>
     </div>
     </div>
+    </div>
 
     <script th:src="@{/assets/js/amazeui.min.js}"></script>
-    <script th:src="@{/assets/js/amazeui.datatables.min.js}" ></script>
+    <script th:src="@{/assets/js/amazeui.datatables.min.js}"></script>
     <script th:src="@{/assets/js/dataTables.responsive.min.js}"></script>
     <script th:src="@{/assets/js/amazeui.page.js}"></script>
 
 </body>
+
+
+
+
 
 </html>

@@ -280,7 +280,7 @@
     </select>
 
 
-    <select id="getSynergyEvolveTable" resultType="java.util.Map" parameterType="java.util.Map">
+    <select id="getSynergyEvolveTable" resultType="java.util.LinkedHashMap" parameterType="java.util.Map">
 
         SELECT
         *
@@ -592,7 +592,7 @@
 
 
     <select id="getSynergyEvolveTableCount" resultType="java.lang.Long" parameterType="java.util.Map">
-   select count(1) from (
+    select count(1) from (
         select
         a.区域
         ,a.车辆归属
@@ -876,6 +876,7 @@
         </if>
         )
         t
+
     </select>
 
 </mapper>

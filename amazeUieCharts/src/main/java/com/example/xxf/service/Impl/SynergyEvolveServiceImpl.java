@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,8 +62,8 @@ public class SynergyEvolveServiceImpl implements SynergyEvolveService {
     }
 
     @Override
-    public List<Map<String, Object>> getSynergyEvolveTable(Map<String,Object> param) {
-        List<Map<String,Object>> list = null;
+    public List<LinkedHashMap<String, Object>> getSynergyEvolveTable(Map<String,Object> param) {
+        List<LinkedHashMap<String,Object>> list = null;
         try{
             list = synergyEvolveMapper.getSynergyEvolveTable(param);
         }catch (Exception e){

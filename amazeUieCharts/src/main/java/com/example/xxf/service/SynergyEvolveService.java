@@ -3,6 +3,7 @@ package com.example.xxf.service;
 import com.example.xxf.bean.synergyEvolvePlug;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +29,7 @@ public interface SynergyEvolveService {
      * @param param
      * @return
      */
-    List<Map<String,Object>> getSynergyEvolveTable(Map<String,Object> param);
+    List<LinkedHashMap<String,Object>> getSynergyEvolveTable(Map<String,Object> param);
 
     long getSynergyEvolveTableCount(Map <String,Object> param);
 }

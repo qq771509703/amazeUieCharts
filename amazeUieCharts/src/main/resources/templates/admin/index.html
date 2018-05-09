@@ -191,30 +191,30 @@
                         </li>-->
 
                         <!-- 退出 -->
-                        <li class="am-text-sm">
-                            <a href="javascript:;">
-                                <span class="am-icon-sign-out"></span> 退出
-                            </a>
-                        </li>
+                        <!--<li class="am-text-sm">-->
+                            <!--<a href="javascript:;">-->
+                                <!--<span class="am-icon-sign-out"></span> 退出-->
+                            <!--</a>-->
+                        <!--</li>-->
                     </ul>
                 </div>
             </div>
 
         </header>
         <!-- 风格切换 -->
-        <div class="tpl-skiner">
-            <div class="tpl-skiner-toggle am-icon-cog">
-            </div>
-            <div class="tpl-skiner-content">
-                <div class="tpl-skiner-content-title">
-                    选择主题
-                </div>
-                <div class="tpl-skiner-content-bar">
-                    <span class="skiner-color skiner-white" data-color="theme-white"></span>
-                    <span class="skiner-color skiner-black" data-color="theme-black"></span>
-                </div>
-            </div>
-        </div>
+        <!--<div class="tpl-skiner">-->
+            <!--<div class="tpl-skiner-toggle am-icon-cog">-->
+            <!--</div>-->
+            <!--<div class="tpl-skiner-content">-->
+                <!--<div class="tpl-skiner-content-title">-->
+                    <!--选择主题-->
+                <!--</div>-->
+                <!--<div class="tpl-skiner-content-bar">-->
+                    <!--<span class="skiner-color skiner-white" data-color="theme-white"></span>-->
+                    <!--<span class="skiner-color skiner-black" data-color="theme-black"></span>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
         <!-- 侧边导航栏 -->
         <div class="left-sidebar">
             <!-- 用户信息 -->
@@ -233,51 +233,59 @@
             <!-- 菜单 -->
             <ul class="sidebar-nav">
 
-                <tr th:each="menus,menusStat : ${session.menus}">
+                <!--<tr th:each="menus,menusStat : ${session.menus}">-->
 
-                    <li class="sidebar-nav-link">
-                        <a href="javascript:void(0)" class="active" th:rel="${menus.cUrl}" onclick="menuBox(this)">
-                            <i class="am-icon-home sidebar-nav-link-logo"></i>
-                            <td th:text="${menus.cTitle}">Onions</td>
-                        </a>
-                    </li>
-                </tr>
+                    <!--<li class="sidebar-nav-link">-->
+                        <!--<a href="javascript:void(0)" class="active" th:rel="${menus.cUrl}" onclick="menuBox(this)">-->
+                            <!--<i class="am-icon-home sidebar-nav-link-logo"></i>-->
+                            <!--<td th:text="${menus.cTitle}">Onions</td>-->
+                        <!--</a>-->
+                    <!--</li>-->
+                <!--</tr>-->
 
-                <li class="sidebar-nav-heading">Page<span class="sidebar-nav-heading-info"> 常用页面</span></li>
                 <li class="sidebar-nav-link">
                     <a href="javascript:;" class="sidebar-nav-sub-title">
-                        <i class="am-icon-table sidebar-nav-link-logo"></i> 数据列表
+                        <i class="am-icon-table sidebar-nav-link-logo"></i> 融资租赁事业部
                         <span class="am-icon-chevron-down am-fr am-margin-right-sm sidebar-nav-sub-ico"></span>
                     </a>
+
+
                     <ul class="sidebar-nav sidebar-nav-sub">
+
+                        <!--<ul th:each="menus,menusStat : ${session.menus}">-->
+                            <!---->
+                            <!--<li class="sidebar-nav-link">-->
+                                <!--<a href="javascript:void(0)"  th:rel="${menus.cUrl}" onclick="menuBox(this)">-->
+                                    <!--<span class="am-icon-angle-right sidebar-nav-link-logo"></span>-->
+                                    <!--<span th:text="${menus.cTitle}"></span>-->
+                                <!--</a>-->
+                            <!--</li>-->
+                        <!--</ul>-->
+
+
+
+                        <ul>
+
                         <li class="sidebar-nav-link">
-                            <a href="table-list.html">
-                                <span class="am-icon-angle-right sidebar-nav-link-logo"></span> 文字列表
+                            <a href="javascript:void(0)"  th:rel="table-list" onclick="menuBox(this)">
+                                <span class="am-icon-angle-right sidebar-nav-link-logo"></span>
+                                <span th:text="协同进度表"></span>
                             </a>
                         </li>
 
-                        <li class="sidebar-nav-link">
-                            <a href="table-list-img.html">
-                                <span class="am-icon-angle-right sidebar-nav-link-logo"></span> 图文列表
-                            </a>
-                        </li>
                     </ul>
-                </li>
-                <li class="sidebar-nav-link">
-                    <a href="sign-up.html">
-                        <i class="am-icon-clone sidebar-nav-link-logo"></i> 注册
-                        <span class="am-badge am-badge-secondary sidebar-nav-link-logo-ico am-round am-fr am-margin-right-sm">6</span>
-                    </a>
-                </li>
-                <li class="sidebar-nav-link">
-                    <a href="login.html">
-                        <i class="am-icon-key sidebar-nav-link-logo"></i> 登录
-                    </a>
-                </li>
-                <li class="sidebar-nav-link">
-                    <a href="404.html">
-                        <i class="am-icon-tv sidebar-nav-link-logo"></i> 404错误
-                    </a>
+
+                        <ul>
+
+                            <li class="sidebar-nav-link">
+                                <a href="javascript:void(0)"  th:rel="perCapitaCapacity" onclick="menuBox(this)">
+                                    <span class="am-icon-angle-right sidebar-nav-link-logo"></span>
+                                    <span th:text="人均产能"></span>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </ul>
                 </li>
 
             </ul>
