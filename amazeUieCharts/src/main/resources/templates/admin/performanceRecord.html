@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>业绩报表</title>
+    <meta name="description" content="">
+    <meta name="keywords" content="index">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="icon" type="image/png" href="assets/i/favicon.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/i/app-icon72x72@2x.png">
+    <meta name="apple-mobile-web-app-title" content="I" />
+    <script th:src="@{/assets/js/echarts.min.js}"></script>
+    <link rel="stylesheet" th:href="@{/assets/css/amazeui.min.css}" />
+    <link rel="stylesheet" th:href="@{/assets/layui/css/layui.css}" />
+    <link rel="stylesheet" th:href="@{/assets/css/amazeui.datatables.min.css}" />
+    <link rel="stylesheet" th:href="@{/assets/css/app.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/amazeui.page.css}">
+    <script th:src="@{/assets/js/jquery.min.js}"></script>
+    <!--<script th:src="@{/assets/layui/layui.js}"></script>-->
+
+    <style type="text/css">
+        .widget-body {
+            overflow-x: scroll
+        }
+
+        /* .widget-body th:nth-child(5){
+      display: none
+  } */
+
+        .widget-body td,
+        .widget-body th,
+            /*.widget-body tr {*/
+            /*min-width: 145px;*/
+            /*text-align: center*/
+            /*}*/
+
+            /*.widget-body td:nth-child(8), .widget-body th:nth-child(8), .widget-body tr:nth-child(8) {*/
+            /*min-width: 238px;*/
+            /*}*/
+
+        .tpl-table-list-select {
+            text-align: left;
+        }
+
+        .am-selected {
+            width: 120px;
+        }
+
+        .filtrateText {
+            color: floralwhite;
+        }
+
+        .row-content {
+            padding: 10px;
+        }
+
+        .widget {
+            height: 780px;
+        }
+
+        .s_button {
+            padding-right: 5px;
+        }
+
+        .am-u-sm-2 {
+            width: 15.666% !important;
+        }
+        .layui-table{
+            background-color: rgba(84, 94, 99,0);
+            color: #ffffff;
+        }
+        .layui-table th{
+            background-color: rgba(255, 255, 255, 0);
+
+        }
+        /*.layui-table-cell{*/
+        /*background-color: rgba(84, 94, 99,0);*/
+        /*}*/
+        .layui-table tbody tr:hover{
+            background-color: rgba(255, 255, 255, 0.16);
+        }
+        .layui-table thead{
+            background-color: #868686;
+        }
+        .layui-table thead tr,
+        .layui-table-click,
+        .layui-table-header,
+        .layui-table-hover,
+        .layui-table-mend,
+        .layui-table-patch,
+        .layui-table-tool,
+        .layui-table[lay-even] tr:nth-child(even) {
+            background-color: rgba(84, 94, 99,0);
+        }
+    </style>
+
+
+
+    <script type="text/javascript">
+        var exportPluginVal = "";
+        $(function () {
+
+
+            search_select();
+
+        });
+
+
+        function search_select(obj) {
+
+
+
+            var param = { }
+
+            var $btn = $(obj);
+            $btn.button('loading');
+            show_table(param);
+        }
+
+
+        function search_export() {
+
+            var param = { }
+            var pluginVal = $("#exprotTable").attr("title");
+            window.location.href = "exportExcel?area=" + area + "&brand=" + brand + "&carType=" + carType + "&phyStatus=" + phyStatus + "&owner=" + owner + "&arriveWay=" + arriveWay + "&pluginVal=" + exportPluginVal;
+
+        }
+        function export_city(){
+            window.location.href = "getPerformanceRecordTOExcal";
+
+        }
+        function export_region(){
+            window.location.href = "getRegionPerformanceRecordTOExcal";
+        }
+        function export_Tot15(){
+            window.location.href =  "getTop15RecordTOExcal";
+        }
+
+
+
+    </script>
+
+</head>
+
+<body data-type="widgets">
+<script th:src="@{/assets/js/theme.js}"></script>
+
+<script id="t1" type="text/html">
+    <ul>
+
+    </ul>
+
+</script>
+
+
+<!-- 内容区域 -->
+<div class="tpl-content-wrapper">
+
+    <div class="container-fluid am-cf">
+        <div class="row">
+            <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
+                <div class="page-header-heading">
+                    <span class="am-icon-home page-header-heading-icon"></span>业绩数据表</div>
+            </div>
+
+            <!--<div class="layui-form" >-->
+                <!--<div class="layui-form-item" >-->
+                    <!--<label class="layui-form-label" style="width:200px; color:#ccc">请选择日期</label>-->
+                    <!--<div class="layui-input-inline" >-->
+                        <!--<input type="text" class="layui-input" id="s_date" placeholder="请选择日期">-->
+                    <!--</div>-->
+                    <!--<button class="layui-btn">查 询</button>-->
+                <!--</div>-->
+            <!--</div>-->
+
+        </div>
+
+    </div>
+
+    <div class="row-content am-cf">
+        <div class="row">
+
+            <div class="layui-row layui-col-space10">
+                <div class="layui-col-md4">
+
+                        <div  id="test1"></div>
+
+                </div>
+                <div class="layui-col-md4">
+
+                        <div class="" id="regionRecord"></div>
+
+                </div>
+                <div class="layui-col-md4">
+
+                        <div class="" id="top15"></div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#s_date' //指定元素
+            ,type: 'month'
+        });
+    });
+//
+    function show_table(param){
+        layui.use(['form','layer','table'], function(){
+            var colss = [
+                    [
+                      {align: 'center', title: '业绩报表-城市<button title="导出" style="float: right" class="layui-btn" onclick="export_city()"><i class="layui-icon" style="font-size: 15px; color: #CCC;">导出</i> </button>', colspan: 7}
+                    ],
+                [
+                {field:'region',title: '大区',align:'center'},
+                {field:'province',title: '省级',align:'center'},
+                {field:'city',title: '城市',align:'center'},
+                {field:'month_achievement',title: '当月业绩',align:'center'},
+                {field:'yesterday_achievement',title: '昨日业绩',align:'center'}
+            ]];
+            var colss_region = [
+                [ {align: 'center', title: '业绩报表-省级<button title="导出" style="float: right" class="layui-btn" onclick="export_region()"><i class="layui-icon" style="font-size: 15px; color: #CCC;">导出</i> </button>', colspan: 6}
+                ],[
+                {field:'region',title: '大区',align:'center'},
+                {field:'province',title: '省级',align:'center',templet: function(d){
+                    if (d.province==''||d.province==null){
+                        return '<span style="color: #009688;">汇总</span>';
+                    }
+                    return d.province;
+            }},
+                {field:'month_achievement',title: '当月业绩',align:'center'},
+                {field:'yesterday_achievement',title: '昨日业绩',align:'center'}
+            ]];
+            var colss_top15 = [
+                [{align: 'center', title: '业务员业绩Top15<button title="导出" style="float: right" class="layui-btn" onclick="export_Tot15()"><i class="layui-icon"  style="font-size: 15px; color: #CCC;">导出</i> </button>', colspan: 6}],
+                [
+                {field:'排名',title: '排名',align:'center'},
+                {field:'业务员',title: '大区',align:'center'},
+                {field:'业绩-台',title: '业绩/台',align:'center'},
+                {field:'业绩-万',title: '业绩/万',align:'center'}
+            ]];
+
+            var table_region = layui.table;
+
+            table_region.render({
+                text: {
+                    none: '数据加载中，请稍等。。。。' //默认：无数据。注：该属性为 layui 2.2.5 开始新增
+                },
+                //width:500,
+                //cellMinWidth:10,
+                //skin: 'line' //行边框风格
+                even: true, //开启隔行背景
+                //,size: 'sm',//小尺寸的表格
+                elem: '#regionRecord'
+                ,url:'getRegionPerformanceRecord'
+                ,where: param
+                ,page: true
+                ,limit: 16 //默认采用10条
+                ,loading: true
+                ,cols: colss_region
+                ,request: {
+                    //pageName: 'pageNum' //页码的参数名称，默认：page
+                    limitName: 'pageSize' //每页数据量的参数名，默认：limit
+                }
+                ,response: {
+                    statusName: 'code' //数据状态的字段名称，默认：code
+                    ,statusCode: 0 //成功的状态码，默认：0
+                    ,msgName: 'message' //状态信息的字段名称，默认：msg
+                    ,countName: 'count' //数据总数的字段名称，默认：count
+                    ,dataName: 'data' //数据列表的字段名称，默认：data
+                }
+            });
+            var table = layui.table;
+
+            table.render({
+                text: {
+                    none: '数据加载中，请稍等。。。。' //默认：无数据。注：该属性为 layui 2.2.5 开始新增
+                },
+
+                //cellMinWidth:10,
+                //skin: 'line' //行边框风格
+                even: true, //开启隔行背景
+                //size: 'sm',//小尺寸的表格
+                elem: '#test1'
+                ,url:'getPerformanceRecord'
+                ,where: param
+                ,page: true
+                ,limit: 15 //默认采用10条
+                ,loading: true
+                ,cols: colss
+
+                ,request: {
+                    //pageName: 'pageNum' //页码的参数名称，默认：page
+                    limitName: 'pageSize' //每页数据量的参数名，默认：limit
+                }
+                ,response: {
+                    statusName: 'code' //数据状态的字段名称，默认：code
+                    ,statusCode: 0 //成功的状态码，默认：0
+                    ,msgName: 'message' //状态信息的字段名称，默认：msg
+                    ,countName: 'count' //数据总数的字段名称，默认：count
+                    ,dataName: 'data' //数据列表的字段名称，默认：data
+                }
+            });
+
+            var table_top15 = layui.table;
+
+            table_top15.render({
+                text: {
+                    none: '数据加载中，请稍等。。。。' //默认：无数据。注：该属性为 layui 2.2.5 开始新增
+                },
+                //width:500,
+                //cellMinWidth:10,
+                //skin: 'line' //行边框风格
+                even: true, //开启隔行背景
+                //,size: 'sm',//小尺寸的表格
+                elem: '#top15'
+                ,url:'getTop15Record'
+                ,where: param
+                ,page: true
+                ,limit: 15 //默认采用10条
+                ,limits:[15]
+                ,loading: true
+                ,cols: colss_top15
+
+                ,request: {
+                    //pageName: 'pageNum' //页码的参数名称，默认：page
+                    limitName: 'pageSize' //每页数据量的参数名，默认：limit
+                }
+                ,response: {
+                    statusName: 'code' //数据状态的字段名称，默认：code
+                    ,statusCode: 0 //成功的状态码，默认：0
+                    ,msgName: 'message' //状态信息的字段名称，默认：msg
+                    ,countName: 'count' //数据总数的字段名称，默认：count
+                    ,dataName: 'data' //数据列表的字段名称，默认：data
+                }
+            });
+
+        });
+    }
+</script>
+
+<script th:src="@{/assets/js/amazeui.min.js}"></script>
+<script th:src="@{/assets/js/amazeui.datatables.min.js}"></script>
+<script th:src="@{/assets/js/dataTables.responsive.min.js}"></script>
+<script th:src="@{/assets/js/amazeui.page.js}"></script>
+
+</body>
+
+
+
+
+
+</html>

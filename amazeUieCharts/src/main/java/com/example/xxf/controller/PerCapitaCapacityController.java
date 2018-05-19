@@ -3,8 +3,10 @@ package com.example.xxf.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.example.xxf.Util.DatetimeUtil;
+import com.example.xxf.Util.ExcelUtil;
 import com.example.xxf.Util.StringUtil;
 import com.example.xxf.bean.perCapitaCapacity;
+import com.example.xxf.bean.perCapitaCapacityDetail;
 import com.example.xxf.service.PerCapitaCapacityService;
 import com.example.xxf.vo.Layui;
 import com.example.xxf.vo.PageVo;
@@ -45,9 +47,31 @@ public class PerCapitaCapacityController {
         int count = (int)perCapitaCapacityService.getPerCapitaCapacityListCount(department);
         map.put("data",list);
         map.put("count",count);
+        return Layui.data(count,list);
+    }
+    @RequestMapping("/getPerCapitaCapacityDetailList")
+    @ResponseBody
+    public Layui getPerCapitaCapacityDetailList(String department, int page, int limit){
 
+        int start = (page-1)*limit+1;
+        int end = page*limit;
+        List<perCapitaCapacityDetail> list = perCapitaCapacityService.getPerCapitaCapacityDetailList(department,start,end);
+        int count = (int)perCapitaCapacityService.getPerCapitaCapacityDetailListCount(department);
 
         return Layui.data(count,list);
+    }
+
+    @RequestMapping(value="getPerCapitaCapacityDetailListTOExcel",produces="text/html;charset=UTF-8")
+    @ResponseBody
+    public void exprotPerCapitaCapacityDetailListTOExcal(String department,HttpServletRequest request,HttpServletResponse response){
+
+        List<LinkedHashMap<String,Object>> list = perCapitaCapacityService.getPerCapitaCapacityDetailListTOExcal(department);
+        String[] titles = {"部门","业务员","合同编号","车牌号","合同成交日期","车辆分类","分红比例", "业绩金额"};
+        try {
+            ExcelUtil.exportExcel(list,titles,"人均产能详细",response);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @RequestMapping(value="perCapitaCapacityexportExcel",produces="text/html;charset=UTF-8")

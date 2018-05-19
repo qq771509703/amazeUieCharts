@@ -1,10 +1,9 @@
 package com.example.xxf;
 
+import com.example.xxf.bean.Lborganization;
 import com.example.xxf.bean.perCapitaCapacityDetail;
 import com.example.xxf.controller.DataScreenController;
-import com.example.xxf.mapper.DataScreenMapper;
-import com.example.xxf.mapper.PerCapitaCapacityMapper;
-import com.example.xxf.mapper.SynergyEvolveMapper;
+import com.example.xxf.mapper.*;
 import com.example.xxf.service.AreaCoordService;
 import com.example.xxf.service.DataScreenService;
 import net.minidev.json.JSONObject;
@@ -48,6 +47,12 @@ public class AmazeUiEChartsApplicationTests {
 	@Autowired
 	PerCapitaCapacityMapper perCapitaCapacityMapper;
 
+	@Autowired
+	PerformanceRecordMapper performanceRecordMapper;
+
+	@Autowired
+	LborganizationMapper lborganizationMapper;
+
 
 	@Before // 在测试开始前初始化工作
 	public void setup() {
@@ -69,13 +74,27 @@ public class AmazeUiEChartsApplicationTests {
 //		long count = perCapitaCapacityMapper.getPerCapitaCapacityListCount("");
 //		System.out.println(count);
 
-		long count2 = perCapitaCapacityMapper.getPerCapitaCapacityDetailListCount("");
-		System.out.println(count2);
+//		long count2 = perCapitaCapacityMapper.getPerCapitaCapacityDetailListCount("");
+//		System.out.println(count2);
 
 //		List<perCapitaCapacityDetail> list = perCapitaCapacityMapper.getPerCapitaCapacityList();
 //		System.out.println(list);
 
+		//List list = performanceRecordMapper.getPerformanceRecord("","",0,50);
 
+		//long list = performanceRecordMapper.getRegionPerformanceRecordCount();
+
+//		performanceRecordMapper.getPerformanceRecordTOExcal();
+//		performanceRecordMapper.getRegionPerformanceRecordTOExcal();
+
+
+//		System.out.println(list);
+
+//		Lborganization lborganization =  lborganizationMapper.getOrganizationByUserName("张乔羽");
+//		String fdncoed = lborganization.getFdncode();
+//		String str = ".";
+//		String[] fdncoeds = fdncoed.split("\\.");
+//		System.out.println(fdncoeds[1]);
 	}
 
 }

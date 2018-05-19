@@ -1,16 +1,17 @@
 package com.example.xxf.service.Impl;
 
+import com.example.xxf.Util.BuildTree;
 import com.example.xxf.bean.*;
-import com.example.xxf.mapper.TBaseDataAnalyzeAccountRoleMapper;
-import com.example.xxf.mapper.TBaseDataAnalyzeMenuAclMapper;
-import com.example.xxf.mapper.TBaseDataAnalyzeMenuMapper;
-import com.example.xxf.mapper.TuserMapper;
+import com.example.xxf.mapper.*;
 import com.example.xxf.service.LoginService;
+import com.example.xxf.vo.Tree;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class LoginServiceImpl implements LoginService {
@@ -26,6 +27,9 @@ public class LoginServiceImpl implements LoginService {
 
     @Autowired
     TBaseDataAnalyzeMenuMapper tBaseDataAnalyzeMenuMapper;
+
+    @Autowired
+    LborganizationMapper lborganizationMapper;
 
     @Override
     public Tuser getUserByAccount(String account) {
@@ -45,32 +49,70 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public  List<TBaseDataAnalyzeMenu> getAccountMenu(Tuser user) {
+    public  List<Tree<TBaseDataAnalyzeMenu>> getAccountMenu(Tuser user) {
         List<TBaseDataAnalyzeMenu> menus = null;
+        List<Tree<TBaseDataAnalyzeMenu>> list = null;
         try{
-            //根据用户（Tuser）获取到角色（TBaseDataAnalyzeAccountRole）
-            TBaseDataAnalyzeAccountRoleExample Roleexample = new TBaseDataAnalyzeAccountRoleExample();
-            Roleexample.createCriteria().andCAccountEqualTo(user.getUserid()+"");
-            List<TBaseDataAnalyzeAccountRole> roles = tBaseDataAnalyzeAccountRoleMapper.selectByExample(Roleexample);
-            if (roles!=null && !roles.isEmpty()){
-                //根据用户（Tuser）的角色（TBaseDataAnalyzeAccountRole）获取到角色权限（TBaseDataAnalyzeMenuAcl）
-                TBaseDataAnalyzeMenuAclExample Aclexample1 = new TBaseDataAnalyzeMenuAclExample();
-                Aclexample1.createCriteria().andCCodeEqualTo(roles.get(0).getcRolecode());
-                List<TBaseDataAnalyzeMenuAcl> menuAcls = tBaseDataAnalyzeMenuAclMapper.selectByExample(Aclexample1);
-                TBaseDataAnalyzeMenuAcl menuAcl = null;
-                List<Integer> menuCodes = new ArrayList<>();
-                for (int i = 0; i < menuAcls.size(); i++) {
-                    menuAcl = menuAcls.get(i);
-                    menuCodes.add(Integer.parseInt(menuAcl.getcMenuid()+""));
-                }
-                //根据角色权限（TBaseDataAnalyzeMenuAcl）的menuid获取到菜单（TBaseDataAnalyzeMenu）
-                TBaseDataAnalyzeMenuExample menuExample = new TBaseDataAnalyzeMenuExample();
-                menuExample.createCriteria().andIdIn(menuCodes);
-                menus = tBaseDataAnalyzeMenuMapper.selectByExample(menuExample);
+            Lborganization lborganization =  lborganizationMapper.getOrganizationByUserName(user.getUserid());
+            String fdncoed = lborganization.getFdncode();
+            String[] fdncoeds = fdncoed.split("\\.");
+            fdncoed = lborganization.getId()+"";
+            if (fdncoeds.length>2){
+                fdncoed = fdncoeds[2];
             }
+            TBaseDataAnalyzeMenuAclExample Aclexample1 = new TBaseDataAnalyzeMenuAclExample();
+            Aclexample1.createCriteria().andCCodeEqualTo(fdncoed);
+
+            List<TBaseDataAnalyzeMenuAcl> menuAcls = tBaseDataAnalyzeMenuAclMapper.selectByExample(Aclexample1);
+            TBaseDataAnalyzeMenuAcl menuAcl = null;
+            List<Integer> menuCodes = new ArrayList<>();
+            for (int i = 0; i < menuAcls.size(); i++) {
+                menuAcl = menuAcls.get(i);
+                menuCodes.add(Integer.parseInt(menuAcl.getcMenuid()+""));
+            }
+            TBaseDataAnalyzeMenuExample menuExample = new TBaseDataAnalyzeMenuExample();
+            menuExample.createCriteria().andIdIn(menuCodes);
+            if ("5183208".equals(user.getUserid())){
+                menuExample = new TBaseDataAnalyzeMenuExample();
+            }
+            menus = tBaseDataAnalyzeMenuMapper.selectByExample(menuExample);
+            List<Tree<TBaseDataAnalyzeMenu>> trees = new ArrayList<Tree<TBaseDataAnalyzeMenu>>();
+            for (TBaseDataAnalyzeMenu menu : menus) {
+                Tree<TBaseDataAnalyzeMenu> tree = new Tree<TBaseDataAnalyzeMenu>();
+                tree.setId(menu.getId().toString());
+                tree.setParentId(menu.getcParentid().toString());
+                tree.setText(menu.getcTitle());
+                Map<String, Object> attributes = new HashMap<>(16);
+                attributes.put("url", menu.getcUrl());
+                attributes.put("icon", menu.getcIcon());
+                tree.setAttributes(attributes);
+                trees.add(tree);
+            }
+           list = BuildTree.buildList(trees, "0");
+
+            //根据用户（Tuser）获取到角色（TBaseDataAnalyzeAccountRole）
+//            TBaseDataAnalyzeAccountRoleExample Roleexample = new TBaseDataAnalyzeAccountRoleExample();
+//            Roleexample.createCriteria().andCAccountEqualTo(user.getUserid()+"");
+//            List<TBaseDataAnalyzeAccountRole> roles = tBaseDataAnalyzeAccountRoleMapper.selectByExample(Roleexample);
+//            if (roles!=null && !roles.isEmpty()){
+//                //根据用户（Tuser）的角色（TBaseDataAnalyzeAccountRole）获取到角色权限（TBaseDataAnalyzeMenuAcl）
+//                TBaseDataAnalyzeMenuAclExample Aclexample1 = new TBaseDataAnalyzeMenuAclExample();
+//                Aclexample1.createCriteria().andCCodeEqualTo(roles.get(0).getcRolecode());
+//                List<TBaseDataAnalyzeMenuAcl> menuAcls = tBaseDataAnalyzeMenuAclMapper.selectByExample(Aclexample1);
+//                TBaseDataAnalyzeMenuAcl menuAcl = null;
+//                List<Integer> menuCodes = new ArrayList<>();
+//                for (int i = 0; i < menuAcls.size(); i++) {
+//                    menuAcl = menuAcls.get(i);
+//                    menuCodes.add(Integer.parseInt(menuAcl.getcMenuid()+""));
+//                }
+//                //根据角色权限（TBaseDataAnalyzeMenuAcl）的menuid获取到菜单（TBaseDataAnalyzeMenu）
+//                TBaseDataAnalyzeMenuExample menuExample = new TBaseDataAnalyzeMenuExample();
+//                menuExample.createCriteria().andIdIn(menuCodes);
+//                menus = tBaseDataAnalyzeMenuMapper.selectByExample(menuExample);
+//            }
         }catch(Exception e){
             e.printStackTrace();
         }
-    return menus;
+    return list;
     }
 }

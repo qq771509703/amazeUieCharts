@@ -23,4 +23,7 @@ public interface PerCapitaCapacityService {
 
 
     List<LinkedHashMap<String,Object>> getPerCapitaCapacityListTOExcal(String department);
+
+
+    List<LinkedHashMap<String,Object>>  getPerCapitaCapacityDetailListTOExcal(String department);
 }

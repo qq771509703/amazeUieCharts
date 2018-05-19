@@ -5,6 +5,7 @@ import com.example.xxf.bean.TBaseDataAnalyzeMenu;
 import com.example.xxf.bean.Tuser;
 import com.example.xxf.service.LoginService;
 import com.example.xxf.vo.ResponseVo;
+import com.example.xxf.vo.Tree;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,7 +40,7 @@ public class sysControll {
                 HttpSession session = request.getSession();
                 session.setAttribute("name",user.getName());
                 //model.addAttribute("name",user.getName());
-                List<TBaseDataAnalyzeMenu> menus = loginService.getAccountMenu(user);
+                List<Tree<TBaseDataAnalyzeMenu>> menus = loginService.getAccountMenu(user);
                 session.setAttribute("menus",menus);
             }else{
                 vo.setCode(ResponseVo.UNAUTH);
@@ -86,8 +87,17 @@ public class sysControll {
     public String fightScreen(){
         return "admin/fightScreen";
     }
-    @RequestMapping("/fightScreen2")
+    @RequestMapping("/fightScreen3")
     public String fightScreen2(){
-        return "admin/fightScreen2";
+        return "admin/fightScreen3";
+    }
+
+    @RequestMapping("/performanceRecord")
+    public String performanceRecord(){
+        return "admin/performanceRecord";
+    }
+    @RequestMapping("/roleList")
+    public String roleList(){
+        return "admin/role/roleEdit";
     }
 }

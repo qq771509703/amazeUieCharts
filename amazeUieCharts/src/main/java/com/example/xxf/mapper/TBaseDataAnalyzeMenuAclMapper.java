@@ -1,5 +1,6 @@
 package com.example.xxf.mapper;
 
+import com.example.xxf.bean.RoleMenuDO;
 import com.example.xxf.bean.TBaseDataAnalyzeMenuAcl;
 import com.example.xxf.bean.TBaseDataAnalyzeMenuAclExample;
 import java.util.List;
@@ -27,4 +28,7 @@ public interface TBaseDataAnalyzeMenuAclMapper {
     int updateByPrimaryKeySelective(TBaseDataAnalyzeMenuAcl record);
 
     int updateByPrimaryKey(TBaseDataAnalyzeMenuAcl record);
+
+
+    int batchSave(List<RoleMenuDO> list);
 }

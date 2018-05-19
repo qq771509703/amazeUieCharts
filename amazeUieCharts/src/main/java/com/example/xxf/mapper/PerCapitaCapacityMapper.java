@@ -36,4 +36,6 @@ public interface PerCapitaCapacityMapper {
 
 
     List<LinkedHashMap<String,Object>> getPerCapitaCapacityListTOExcal(@Param("department")String department);
+
+    List<LinkedHashMap<String,Object>> getPerCapitaCapacityDetailListTOExcal(@Param("department")String department);
 }

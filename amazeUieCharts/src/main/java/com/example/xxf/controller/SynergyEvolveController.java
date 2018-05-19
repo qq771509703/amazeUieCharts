@@ -3,6 +3,7 @@ package com.example.xxf.controller;
 import com.example.xxf.Util.StringUtil;
 import com.example.xxf.bean.synergyEvolvePlug;
 import com.example.xxf.service.SynergyEvolveService;
+import com.example.xxf.vo.Layui;
 import com.example.xxf.vo.ResponseVo;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -105,6 +106,66 @@ public class SynergyEvolveController {
 
     @RequestMapping("/getSynergyEvolveTable")
     @ResponseBody
+    public Layui getSynergyEvolveTable(String area, String brand, String carType, String phyStatus, String owner,
+                                       String arriveWay, String pluginVal, int page, int pageSize
+                                                    ){
+        ResponseVo vo = new ResponseVo();
+        Map<String,Object> map = new HashMap<>();
+        Map<String,Object> returnMap = new HashMap<>();
+
+        List<String>  areaList = null;
+        List<String>  brandList = null;
+        List<String>  carTypeList = null;
+        List<String>  phyStatusList = null;
+        List<String>  ownerList = null;
+        List<String>  arriveWayList = null;
+
+        if (StringUtil.hasValue(area)){
+            areaList = Arrays.asList(area.split(","));
+        }
+        if (StringUtil.hasValue(brand)){
+            brandList = Arrays.asList(brand.split(","));
+        }
+        if (StringUtil.hasValue(carType)){
+            carTypeList = Arrays.asList(carType.split(","));
+        }
+        if (StringUtil.hasValue(phyStatus)){
+            phyStatusList = Arrays.asList(phyStatus.split(","));
+        }
+        if (StringUtil.hasValue(owner)){
+            ownerList = Arrays.asList(owner.split(","));
+        }
+        if (StringUtil.hasValue(arriveWay)){
+            arriveWayList = Arrays.asList(arriveWay.split(","));
+        }
+
+        map.put("areaList",areaList);
+        map.put("brandList",brandList);
+        map.put("carTypeList",carTypeList);
+        map.put("phyStatusList",phyStatusList);
+        map.put("ownerList",ownerList);
+        map.put("arriveWayList",arriveWayList);
+
+        map.put("pluginVal",pluginVal);
+
+        int start = (page-1)*pageSize+1;
+        int end = page*pageSize;
+
+        map.put("startRow",start);
+        map.put("endRow",end);
+        List<LinkedHashMap<String,Object>> listMap = synergyEvolveService.getSynergyEvolveTable(map);
+
+        returnMap.put("SETListMap",listMap);
+
+        int count = (int)synergyEvolveService.getSynergyEvolveTableCount(map);
+
+        returnMap.put("count",count);
+        vo.setData(returnMap);
+        return  Layui.data(count,listMap);
+    }
+/*
+   @RequestMapping("/getSynergyEvolveTable")
+    @ResponseBody
     public ResponseVo getSynergyEvolveTable(String area,String brand,String carType,String phyStatus,String owner,
                                             String arriveWay,String pluginVal,int page
                                                     ){
@@ -163,6 +224,7 @@ public class SynergyEvolveController {
         vo.setData(returnMap);
         return  vo;
     }
+*/
 
 
     @RequestMapping(value="exportExcel",produces="text/html;charset=UTF-8")
@@ -278,7 +340,7 @@ public class SynergyEvolveController {
             response.setContentType("application/msexcel");
             wb.write(output);
             output.flush();
-           // output.close();
+            output.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

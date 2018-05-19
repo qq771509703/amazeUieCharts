@@ -52,7 +52,8 @@
         <!--<table schema="" tableName="t_base_data_analyze_account_role"></table>-->
         <!--<table schema="" tableName="t_base_data_analyze_menu"></table>-->
         <!--<table schema="" tableName="t_base_data_analyze_menu_acl"></table>-->
-
+       <!-- <table schema="" tableName="t_base_role"></table>-->
+        <!--<table schema="" tableName="lbOrganization"></table>-->
 
     </context>
 </generatorConfiguration>

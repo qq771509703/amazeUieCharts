@@ -225,4 +225,15 @@
       C_OPTTYPE = #{cOpttype,jdbcType=INTEGER}
     where ID = #{id,jdbcType=INTEGER}
   </update>
+
+  <insert id="batchSave">
+    INSERT INTO t_base_data_analyze_menu_acl([C_CODE], [C_MENUID]) values
+    <foreach item="item" index="index" collection="list"
+             separator=",">
+      (#{item.roleId},#{item.menuId})
+    </foreach>
+  </insert>
+
+
+
 </mapper>

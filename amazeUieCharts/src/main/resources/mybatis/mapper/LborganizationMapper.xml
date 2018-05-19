@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.xxf.mapper.LborganizationMapper" >
+  <resultMap id="BaseResultMap" type="com.example.xxf.bean.Lborganization" >
+    <id column="ID" property="id" jdbcType="NUMERIC" />
+    <result column="FID" property="fid" jdbcType="NUMERIC" />
+    <result column="Grade" property="grade" jdbcType="NUMERIC" />
+    <result column="Type" property="type" jdbcType="NUMERIC" />
+    <result column="OrgType" property="orgtype" jdbcType="NUMERIC" />
+    <result column="OrgCode" property="orgcode" jdbcType="VARCHAR" />
+    <result column="Name" property="name" jdbcType="VARCHAR" />
+    <result column="Describe" property="describe" jdbcType="VARCHAR" />
+    <result column="FDNCode" property="fdncode" jdbcType="VARCHAR" />
+    <result column="BS" property="bs" jdbcType="VARCHAR" />
+    <result column="FState" property="fstate" jdbcType="NUMERIC" />
+    <result column="StopDate" property="stopdate" jdbcType="TIMESTAMP" />
+    <result column="PerNum" property="pernum" jdbcType="NUMERIC" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    ID, FID, Grade, Type, OrgType, OrgCode, Name, Describe, FDNCode, BS, FState, StopDate, 
+    PerNum
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.example.xxf.bean.LborganizationExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from lbOrganization
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from lbOrganization
+    where ID = #{id,jdbcType=NUMERIC}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from lbOrganization
+    where ID = #{id,jdbcType=NUMERIC}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.example.xxf.bean.LborganizationExample" >
+    delete from lbOrganization
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.example.xxf.bean.Lborganization" >
+    insert into lbOrganization (ID, FID, Grade, 
+      Type, OrgType, OrgCode, 
+      Name, Describe, FDNCode, 
+      BS, FState, StopDate, 
+      PerNum)
+    values (#{id,jdbcType=NUMERIC}, #{fid,jdbcType=NUMERIC}, #{grade,jdbcType=NUMERIC}, 
+      #{type,jdbcType=NUMERIC}, #{orgtype,jdbcType=NUMERIC}, #{orgcode,jdbcType=VARCHAR}, 
+      #{name,jdbcType=VARCHAR}, #{describe,jdbcType=VARCHAR}, #{fdncode,jdbcType=VARCHAR}, 
+      #{bs,jdbcType=VARCHAR}, #{fstate,jdbcType=NUMERIC}, #{stopdate,jdbcType=TIMESTAMP}, 
+      #{pernum,jdbcType=NUMERIC})
+  </insert>
+  <insert id="insertSelective" parameterType="com.example.xxf.bean.Lborganization" >
+    insert into lbOrganization
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="fid != null" >
+        FID,
+      </if>
+      <if test="grade != null" >
+        Grade,
+      </if>
+      <if test="type != null" >
+        Type,
+      </if>
+      <if test="orgtype != null" >
+        OrgType,
+      </if>
+      <if test="orgcode != null" >
+        OrgCode,
+      </if>
+      <if test="name != null" >
+        Name,
+      </if>
+      <if test="describe != null" >
+        Describe,
+      </if>
+      <if test="fdncode != null" >
+        FDNCode,
+      </if>
+      <if test="bs != null" >
+        BS,
+      </if>
+      <if test="fstate != null" >
+        FState,
+      </if>
+      <if test="stopdate != null" >
+        StopDate,
+      </if>
+      <if test="pernum != null" >
+        PerNum,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=NUMERIC},
+      </if>
+      <if test="fid != null" >
+        #{fid,jdbcType=NUMERIC},
+      </if>
+      <if test="grade != null" >
+        #{grade,jdbcType=NUMERIC},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=NUMERIC},
+      </if>
+      <if test="orgtype != null" >
+        #{orgtype,jdbcType=NUMERIC},
+      </if>
+      <if test="orgcode != null" >
+        #{orgcode,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="describe != null" >
+        #{describe,jdbcType=VARCHAR},
+      </if>
+      <if test="fdncode != null" >
+        #{fdncode,jdbcType=VARCHAR},
+      </if>
+      <if test="bs != null" >
+        #{bs,jdbcType=VARCHAR},
+      </if>
+      <if test="fstate != null" >
+        #{fstate,jdbcType=NUMERIC},
+      </if>
+      <if test="stopdate != null" >
+        #{stopdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="pernum != null" >
+        #{pernum,jdbcType=NUMERIC},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.example.xxf.bean.LborganizationExample" resultType="java.lang.Integer" >
+    select count(*) from lbOrganization
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update lbOrganization
+    <set >
+      <if test="record.id != null" >
+        ID = #{record.id,jdbcType=NUMERIC},
+      </if>
+      <if test="record.fid != null" >
+        FID = #{record.fid,jdbcType=NUMERIC},
+      </if>
+      <if test="record.grade != null" >
+        Grade = #{record.grade,jdbcType=NUMERIC},
+      </if>
+      <if test="record.type != null" >
+        Type = #{record.type,jdbcType=NUMERIC},
+      </if>
+      <if test="record.orgtype != null" >
+        OrgType = #{record.orgtype,jdbcType=NUMERIC},
+      </if>
+      <if test="record.orgcode != null" >
+        OrgCode = #{record.orgcode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.name != null" >
+        Name = #{record.name,jdbcType=VARCHAR},
+      </if>
+      <if test="record.describe != null" >
+        Describe = #{record.describe,jdbcType=VARCHAR},
+      </if>
+      <if test="record.fdncode != null" >
+        FDNCode = #{record.fdncode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.bs != null" >
+        BS = #{record.bs,jdbcType=VARCHAR},
+      </if>
+      <if test="record.fstate != null" >
+        FState = #{record.fstate,jdbcType=NUMERIC},
+      </if>
+      <if test="record.stopdate != null" >
+        StopDate = #{record.stopdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.pernum != null" >
+        PerNum = #{record.pernum,jdbcType=NUMERIC},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update lbOrganization
+    set ID = #{record.id,jdbcType=NUMERIC},
+      FID = #{record.fid,jdbcType=NUMERIC},
+      Grade = #{record.grade,jdbcType=NUMERIC},
+      Type = #{record.type,jdbcType=NUMERIC},
+      OrgType = #{record.orgtype,jdbcType=NUMERIC},
+      OrgCode = #{record.orgcode,jdbcType=VARCHAR},
+      Name = #{record.name,jdbcType=VARCHAR},
+      Describe = #{record.describe,jdbcType=VARCHAR},
+      FDNCode = #{record.fdncode,jdbcType=VARCHAR},
+      BS = #{record.bs,jdbcType=VARCHAR},
+      FState = #{record.fstate,jdbcType=NUMERIC},
+      StopDate = #{record.stopdate,jdbcType=TIMESTAMP},
+      PerNum = #{record.pernum,jdbcType=NUMERIC}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.example.xxf.bean.Lborganization" >
+    update lbOrganization
+    <set >
+      <if test="fid != null" >
+        FID = #{fid,jdbcType=NUMERIC},
+      </if>
+      <if test="grade != null" >
+        Grade = #{grade,jdbcType=NUMERIC},
+      </if>
+      <if test="type != null" >
+        Type = #{type,jdbcType=NUMERIC},
+      </if>
+      <if test="orgtype != null" >
+        OrgType = #{orgtype,jdbcType=NUMERIC},
+      </if>
+      <if test="orgcode != null" >
+        OrgCode = #{orgcode,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        Name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="describe != null" >
+        Describe = #{describe,jdbcType=VARCHAR},
+      </if>
+      <if test="fdncode != null" >
+        FDNCode = #{fdncode,jdbcType=VARCHAR},
+      </if>
+      <if test="bs != null" >
+        BS = #{bs,jdbcType=VARCHAR},
+      </if>
+      <if test="fstate != null" >
+        FState = #{fstate,jdbcType=NUMERIC},
+      </if>
+      <if test="stopdate != null" >
+        StopDate = #{stopdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="pernum != null" >
+        PerNum = #{pernum,jdbcType=NUMERIC},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=NUMERIC}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.example.xxf.bean.Lborganization" >
+    update lbOrganization
+    set FID = #{fid,jdbcType=NUMERIC},
+      Grade = #{grade,jdbcType=NUMERIC},
+      Type = #{type,jdbcType=NUMERIC},
+      OrgType = #{orgtype,jdbcType=NUMERIC},
+      OrgCode = #{orgcode,jdbcType=VARCHAR},
+      Name = #{name,jdbcType=VARCHAR},
+      Describe = #{describe,jdbcType=VARCHAR},
+      FDNCode = #{fdncode,jdbcType=VARCHAR},
+      BS = #{bs,jdbcType=VARCHAR},
+      FState = #{fstate,jdbcType=NUMERIC},
+      StopDate = #{stopdate,jdbcType=TIMESTAMP},
+      PerNum = #{pernum,jdbcType=NUMERIC}
+    where ID = #{id,jdbcType=NUMERIC}
+  </update>
+
+
+ <!--.................-->
+
+  <select id="getOrganizationByUserName" resultType="com.example.xxf.bean.Lborganization">
+    select * from lbOrganization where ID in (select OrgID from tUser where UserID = #{userID});
+  </select>
+
+
+  <select id="getLborganizationList" resultType="com.example.xxf.bean.Lborganization">
+
+    SELECT
+    *
+    FROM(
+    SELECT  ROW_NUMBER() OVER(ORDER BY ID desc) AS rowid,*
+    from
+    (
+    select
+    <include refid="Base_Column_List" />
+    from lbOrganization
+    WHERE 1 =1
+    <if test="orgName!='' and orgName != null">
+      AND  Name = LIKE '%'+#{orgName}+'%'
+    </if>
+    )a
+    where 1=1 AND Grade = 1
+    ) AS sys_roles
+    WHERE ROWID BETWEEN #{startRow} and #{endRow}
+
+  </select>
+
+  <select id="getLborganizationListCount" resultType="int">
+    select
+      count(1)
+    from lbOrganization
+    WHERE 1 =1 AND Grade = 1
+    <if test="orgName!='' and orgName != null">
+      AND Name = LIKE '%'+#{orgName}+'%'
+    </if>
+
+  </select>
+
+</mapper>

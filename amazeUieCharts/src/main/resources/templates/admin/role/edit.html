@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title></title>
+	<meta name="description" content="">
+	<meta name="keywords" content="index">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="Cache-Control" content="no-siteapp" />
+	<link rel="icon"  type="image/png" th:href="@{/assets/i/favicon.png}" >
+	<link rel="apple-touch-icon-precomposed" th:href="@{/assets/i/app-icon72x72@2x.png}">
+	<meta name="apple-mobile-web-app-title" content="Amaze UI" />
+	<link rel="stylesheet" th:href="@{/assets/css/plugins/jsTree/style.min.css}"  />
+	<link rel="stylesheet" th:href="@{/assets/layui/css/layui.css}" />
+	<link rel="stylesheet" th:href="@{/assets/js/css/modules/layer/default/layer.css}" />
+
+
+	<script th:src="@{/assets/js/jquery.min.js}"></script>
+	<script th:src="@{/assets/js/plugins/jsTree/jstree.min.js}"></script>
+	<script th:src="@{/assets/layui/layui.js}"></script>
+	<script th:src="@{/assets/js/lay/modules/layer.js}"></script>
+
+
+
+	<script>
+		$(function(){
+			getMenuTreeData();
+		});
+
+		function getMenuTreeData() {
+			var roleId = $('#roleId').val();
+			$.ajax({
+				type : "GET",
+				url : "/admin/tree/" + roleId,
+				success : function(data) {
+					loadMenuTree(data);
+				}
+			});
+		}
+		function loadMenuTree(menuTree) {
+			$('#menuTree').jstree({
+				"plugins" : [ "wholerow", "checkbox" ],
+				'core' : {
+					'data' : menuTree
+				},
+				"checkbox" : {
+					//"keep_selected_style" : false,
+					//"undetermined" : true
+					//"three_state" : false,
+					//"cascade" : ' up'
+				}
+			});
+			$('#menuTree').jstree('open_all');
+		}
+
+
+		function updateRoleAcl(){
+			var ref = $('#menuTree').jstree(true); // 获得整个树
+			var menuIds = ref.get_selected(); // 获得所有选中节点的，返回值为数组
+			$("#menuTree").find(".jstree-undetermined").each(function(i, element) {
+				menuIds.push($(element).closest('.jstree-node').attr("id"));
+			});
+			console.log(menuIds);
+
+
+			var roleId = $("#roleId").val();
+			var params = {"menuIds":menuIds.toString(),"roleId":roleId}
+			$.ajax({
+				type : "post",
+				url : "/admin/roleAcl/update",
+				data : params,
+				success : function(r) {
+
+					if (r.code == 200) {
+						parent.layer.msg("修改成功");
+						//parent.reLoad();
+						parent.search_select();
+						var index = parent.layer.getFrameIndex(window.name); // 获取窗口索引
+						parent.layer.close(index);
+
+
+					} else {
+						parent.layer.msg("修改失败");
+					}
+				}
+			});
+
+
+		}
+		function getAllSelectNodes() {
+			var ref = $('#menuTree').jstree(true); // 获得整个树
+			var menuIds = ref.get_selected(); // 获得所有选中节点的，返回值为数组
+			$("#menuTree").find(".jstree-undetermined").each(function(i, element) {
+				menuIds.push($(element).closest('.jstree-node').attr("id"));
+			});
+			console.log(menuIds);
+		}
+	</script>
+
+
+</head>
+
+<body class="gray-bg">
+	<div class="wrapper wrapper-content animated fadeInRight">
+		<div class="row">
+			<div class="col-sm-12">
+				<form class="am-form am-form-horizontal">
+					<div class="am-form-group">
+						<input id="roleId" name="roleId" type="hidden"
+							   th:value="${role.id}">
+
+						<div class="am-form-group" align="center">
+							<label for="roleName" style="font-size: 1.2em">部门名称：</label>
+							<input id="roleName" name="roleId" class="form-control" style="width: 200px;height: 30px;"
+								   type="text" th:value="${role.name}">
+						</div>
+					</div>
+
+							<div class="am-form-group" style="padding-left: 32%;padding-top: 15px;">
+								<label for="menuTree" style="font-size: 1.2em">菜单权限：</label>
+									<div id="menuTree"></div>
+							</div>
+
+							<div class="form-group" style="padding-top: 10px" align="center">
+								<div class="col-sm-8 col-sm-offset-3">
+									<button title="" class="layui-btn layui-btn-sm" onclick="updateRoleAcl()"><i class="layui-icon" style="font-size: 15px; color: #fef9f4;">提 交</i> </button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+</body>
+
+</html>

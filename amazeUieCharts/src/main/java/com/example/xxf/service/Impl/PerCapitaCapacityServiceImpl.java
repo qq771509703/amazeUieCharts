@@ -72,5 +72,16 @@ public class PerCapitaCapacityServiceImpl implements PerCapitaCapacityService {
         return listMap;
     }
 
+    @Override
+    public List<LinkedHashMap<String, Object>> getPerCapitaCapacityDetailListTOExcal(String department) {
+        List<LinkedHashMap<String,Object>> listMap = null;
+        try {
+            listMap =  perCapitaCapacityMapper.getPerCapitaCapacityDetailListTOExcal(department);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return listMap;
+    }
+
 
 }

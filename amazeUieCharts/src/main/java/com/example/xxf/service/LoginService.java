@@ -2,6 +2,7 @@ package com.example.xxf.service;
 
 import com.example.xxf.bean.TBaseDataAnalyzeMenu;
 import com.example.xxf.bean.Tuser;
+import com.example.xxf.vo.Tree;
 
 import java.util.List;
 
@@ -15,6 +16,6 @@ public interface LoginService {
      */
     Tuser getUserByAccount(String account);
 
-    List<TBaseDataAnalyzeMenu> getAccountMenu(Tuser user);
+    List<Tree<TBaseDataAnalyzeMenu>> getAccountMenu(Tuser user);
 
 }

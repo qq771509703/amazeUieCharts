@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>协同进度表</title>
+    <meta name="description" content="">
+    <meta name="keywords" content="index">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="icon" type="image/png" href="assets/i/favicon.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/i/app-icon72x72@2x.png">
+    <meta name="apple-mobile-web-app-title" content="" />
+    <script th:src="@{/assets/js/echarts.min.js}"></script>
+    <link rel="stylesheet" th:href="@{/assets/css/amazeui.min.css}" />
+    <link rel="stylesheet" th:href="@{/assets/layui/css/layui.css}" />
+    <link rel="stylesheet" th:href="@{/assets/css/amazeui.datatables.min.css}" />
+    <link rel="stylesheet" th:href="@{/assets/css/app.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/amazeui.page.css}">
+
+    <!--<link rel="stylesheet" th:href="@{/assets/js/css/modules/layer/default/layer.css}" />-->
+    <script th:src="@{/assets/js/jquery.min.js}"></script>
+    <!--<script th:src="@{/assets/layui/lay/modules/layer.js}"></script>-->
+<!--    <script th:src="@{/assets/layui/layui.js}"></script>-->
+    <!--<script th:src="@{/assets/js/lay/modules/layer.js}"></script>-->
+
+    <style type="text/css">
+        .widget-body {
+            overflow-x: scroll
+        }
+
+
+        .widget-body td,
+        .widget-body th,
+
+
+        .tpl-table-list-select {
+            text-align: left;
+        }
+
+        .am-selected {
+            width: 120px;
+        }
+
+        .filtrateText {
+            color: floralwhite;
+        }
+
+        .row-content {
+            padding: 10px;
+        }
+
+        .widget {
+            height: 780px;
+        }
+
+        .s_button {
+            padding-right: 5px;
+        }
+
+        .theme-black .tpl-form-line-form input[type=number],
+        .theme-black .tpl-form-line-form input[type=search],
+        .theme-black .tpl-form-line-form input[type=text],
+        .theme-black .tpl-form-line-form input[type=password],
+        .theme-black .tpl-form-line-form input[type=datetime],
+        .theme-black .tpl-form-line-form input[type=datetime-local],
+        .theme-black .tpl-form-line-form input[type=date],
+        .theme-black .tpl-form-line-form input[type=month],
+        .theme-black .tpl-form-line-form input[type=time],
+        .theme-black .tpl-form-line-form input[type=week],
+        .theme-black .tpl-form-line-form input[type=email],
+        .theme-black .tpl-form-line-form input[type=url],
+        .theme-black .tpl-form-line-form input[type=tel],
+        .theme-black .tpl-form-line-form input[type=color],
+        .theme-black .tpl-form-line-form select,
+        .theme-black .tpl-form-line-form textarea,
+        .theme-black .am-form-field {
+            display: block;
+            width: 100%;
+            padding: 6px 12px;
+            line-height: 1.42857;
+            color: rgb(0, 0, 0);
+            background-color: rgba(34, 34, 34, 0.15);
+            background-image: none;
+            border: 1px solid #000000;
+        }
+
+        .am-u-sm-2 {
+            width: 15.666% !important;
+        }
+        .layui-table{
+            background-color: rgba(84, 94, 99,0);
+            color: #ffffff;
+        }
+        .layui-table th{
+            background-color: rgba(255, 255, 255, 0);
+
+        }
+        /*.layui-table-cell{*/
+        /*background-color: rgba(84, 94, 99,0);*/
+        /*}*/
+        .layui-table tbody tr:hover{
+            background-color: rgba(255, 255, 255, 0.16);
+        }
+        .layui-table thead{
+            background-color: #868686;
+        }
+        .layui-table thead tr,
+        .layui-table-click,
+        .layui-table-header,
+        .layui-table-hover,
+        .layui-table-mend,
+        .layui-table-patch,
+        .layui-table-tool,
+        .layui-table[lay-even] tr:nth-child(even) {
+            background-color: rgba(84, 94, 99,0);
+        }
+    </style>
+
+
+
+    <script type="text/javascript">
+
+        $(function () {
+
+            search_select();
+
+        });
+
+
+        function search_select(obj) {
+
+
+            show_table();
+        }
+
+        function edit(id) {
+            layer.open({
+                type : 2,
+                title : '角色修改',
+                maxmin : true,
+                shadeClose : true, // 点击遮罩关闭层
+                area : [ '800px', '520px' ],
+                content :'edit/' + id // iframe的url
+            });
+        }
+
+
+
+
+    </script>
+
+</head>
+
+<body data-type="widgets">
+<script th:src="@{/assets/js/theme.js}"></script>
+
+
+<!-- 内容区域 -->
+<div class="tpl-content-wrapper">
+
+
+
+    <div class="row-content am-cf">
+        <div class="row">
+
+            <div class="layui-row layui-col-space10">
+                <div class="layui-col-md12">
+
+                    <div  id="test1"></div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+<script type="text/javascript">
+    function show_table(){
+        layui.use(['form','layer','table'], function(){
+            var colss = [
+                [
+                    {align: 'center', title: '组织架构列表', colspan: 7}
+                ],
+                [
+                    {field:'name',title: '组织名字',align:'center'},
+                    {field:'orgcode',title: '组织Code',align:'center'},
+                    {field:'',title: '操作',align:'center',templet: function (d) {
+                        return "<a href='javascript:void(0)' style='color: #e8f6f6' onclick='edit("+d.id+")'>编 辑</a>"
+                    }}
+                ]];
+            var table = layui.table;
+
+            table.render({
+                text: {
+                    none: '数据加载中，请稍等。。。。' //默认：无数据。注：该属性为 layui 2.2.5 开始新增
+                },
+                //cellMinWidth:10,
+                //skin: 'line' //行边框风格
+                //even: true, //开启隔行背景
+                //,size: 'sm',//小尺寸的表格
+                elem: '#test1'
+                ,url:'getOrganizationList'
+                //,where: param
+                ,page: true
+                ,limit: 15 //默认采用10条
+                ,loading: true
+                ,cols: colss
+                ,request: {
+                    //pageName: 'pageNum' //页码的参数名称，默认：page
+                    limitName: 'pageSize' //每页数据量的参数名，默认：limit
+                }
+                ,response: {
+                    statusName: 'code' //数据状态的字段名称，默认：code
+                    ,statusCode: 0 //成功的状态码，默认：0
+                    ,msgName: 'message' //状态信息的字段名称，默认：msg
+                    ,countName: 'count' //数据总数的字段名称，默认：count
+                    ,dataName: 'data' //数据列表的字段名称，默认：data
+                }
+            });
+
+        });
+    }
+</script>
+
+<script th:src="@{/assets/js/amazeui.min.js}"></script>
+<script th:src="@{/assets/js/amazeui.datatables.min.js}"></script>
+<script th:src="@{/assets/js/dataTables.responsive.min.js}"></script>
+<script th:src="@{/assets/js/amazeui.page.js}"></script>
+
+</body>
+
+
+
+
+
+</html>
