@@ -342,13 +342,17 @@ order by SUM(a.分红比例)
     </select>
 
     <select id="getSalesStaffDistribution" resultType="map">
-       select
-case when year(a.FBirthday) >= 2000 then '00后'
-     when year(a.FBirthday) >= 1995 then '95后'
-     when year(a.FBirthday) >= 1990 then '90后'
-     when year(a.FBirthday) >= 1980 then '80后'
-     end 'name'
-,count(1) 'value'
+      /*排除营销部*/
+select *
+from (
+select
+case when year(a.FBirthday) > 1994 then '95后'
+     when year(a.FBirthday) > 1989 then '90后'
+     when year(a.FBirthday) > 1984 then '85后'
+     when year(a.FBirthday) > 1979 then '80后'
+     else '80前'
+     end 'age'
+,count(1) 'co'
 from T_BD_Person a  --人员表
 left join T_ORG_PositionMember c on c.FPersonID = a.fid  --人员岗位对应表
 left join T_ORG_Position d on c.FPositionID = d.FID  --岗位表
@@ -357,14 +361,23 @@ left join T_HR_PERSONPOSITION j on j.fpersonid = a.fid  --入离职日期表
 left join T_ORG_Admin k on k.fid = d.FAdminOrgUnitID  --架构表
 /*在职*/
 where j.fleftdate is null
-and a.FBirthday is not null
 /*融资租赁事业部--营销部*/
-and k.FDisplayName_L2 like '%喜相逢_股东大会_总裁_常务副总裁_融资性租赁事业部%'
-group by case when year(a.FBirthday) >= 2000 then '00后'
-      when year(a.FBirthday) >= 1995 then '95后'
-      when year(a.FBirthday) >= 1990 then '90后'
-      when year(a.FBirthday) >= 1980 then '80后'
-      end
+and k.FDisplayName_L2 not like '%喜相逢_股东大会_总裁_常务副总裁_融资性租赁事业部%'
+and a.FBirthday is not null
+group by
+case when year(a.FBirthday) > 1994 then '95后'
+     when year(a.FBirthday) > 1989 then '90后'
+     when year(a.FBirthday) > 1984 then '85后'
+     when year(a.FBirthday) > 1979 then '80后'
+     else '80前'
+     end
+) a
+order by case a.age when '95后' then 5
+                    when '90后' then 4
+                    when '85后' then 3
+                    when '80后' then 2
+                    when '80前' then 1
+                    end
     </select>
 
     <select id="getHQDistribution" resultType="map">
