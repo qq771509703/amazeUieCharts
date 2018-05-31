@@ -12,19 +12,16 @@
     <meta http-equiv="Cache-Control" content="no-siteapp" />
     <link rel="icon" type="image/png" href="assets/i/favicon.png">
     <link rel="apple-touch-icon-precomposed" href="assets/i/app-icon72x72@2x.png">
-    <meta name="apple-mobile-web-app-title" content="Amaze UI" />
-    <script th:src="@{/assets/js/echarts.min.js}"></script>
-    <link rel="stylesheet" th:href="@{/assets/css/amazeui.min.css}" />
-    <link rel="stylesheet" th:href="@{/assets/layui/css/layui.css}" />
-    <link rel="stylesheet" th:href="@{/assets/css/amazeui.datatables.min.css}" />
-    <link rel="stylesheet" th:href="@{/assets/css/app.css}">
-    <link rel="stylesheet" th:href="@{/assets/css/amazeui.page.css}">
+    <meta name="apple-mobile-web-app-title" content="UI" />
+    <!--<link rel="stylesheet" th:href="@{/assets/css/amazeui.min.css}" />-->
+    <!--<link rel="stylesheet" th:href="@{/assets/layui/css/layui.css}" />-->
+    <!--<link rel="stylesheet" th:href="@{/assets/css/app.css}">-->
     <script th:src="@{/assets/js/jquery.min.js}"></script>
-    <script th:src="@{/assets/layui/layui.js}"></script>
+    <!--<script th:src="@{/assets/layui/layui.js}"></script>-->
 
 
     <style type="text/css">
-        
+
 
         .widget-body td,
         .widget-body th,
@@ -69,22 +66,7 @@
             text-align: center;
         }
 
-        .theme-black .tpl-form-line-form input[type=number],
-        .theme-black .tpl-form-line-form input[type=search],
-        .theme-black .tpl-form-line-form input[type=text],
-        .theme-black .tpl-form-line-form input[type=password],
-        .theme-black .tpl-form-line-form input[type=datetime],
-        .theme-black .tpl-form-line-form input[type=datetime-local],
-        .theme-black .tpl-form-line-form input[type=date],
-        .theme-black .tpl-form-line-form input[type=month],
-        .theme-black .tpl-form-line-form input[type=time],
-        .theme-black .tpl-form-line-form input[type=week],
-        .theme-black .tpl-form-line-form input[type=email],
-        .theme-black .tpl-form-line-form input[type=url],
-        .theme-black .tpl-form-line-form input[type=tel],
-        .theme-black .tpl-form-line-form input[type=color],
-        .theme-black .tpl-form-line-form select,
-        .theme-black .tpl-form-line-form textarea,
+
         .theme-black .am-form-field {
             display: block;
             width: 100%;
@@ -132,7 +114,7 @@
 
         /*}*/
 
-       .layui-table-box,     .layui-table th{
+        .layui-table-box,     .layui-table th{
             text-align: center;
         }
 
@@ -160,159 +142,227 @@
             height: 30px;
             line-height: 30px;
         }
+        .layui-table-page a{
+            font-size: -0.2em;
+            color: #ffffff;
+        }
+        .layui-table-page span[class=layui-laypage-count]{
+            color: #ffffff;
+        }
+
+
+        #detail_table_div .layui-table-page a{
+            font-size: -0.2em;
+            color: #000000;
+        }
+        #detail_table_div .layui-table-page span[class=layui-laypage-count]{
+            color: #000000;
+        }
     </style>
 
     <script type="text/javascript">
-        var page;
-        var countPP = 0;
-        var lock = false;//锁作为全局变量
+
         $(function () {
+            initialize_select();
             search();
+
         });
+
+        /**
+         *初始化下拉菜单
+         */
+        function initialize_select(){
+            $.post("initialize_select_department_PCC",{},function(data){
+                var $selected = $("#selected-department")
+                for(var i = 0; i<data.length;i++){
+                    $selected.append('<option value='+data[i]+'>'+data[i]+'</option>');
+
+                }
+            });
+
+
+        }
+
 
     </script>
 
 </head>
 
 <body data-type="widgets">
-    <script th:src="@{/assets/js/theme.js}"></script>
-    <!-- 内容区域 -->
-    <div class="tpl-content-wrapper">
-        <div class="container-fluid am-cf">
-            <div class="row">
-                <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
-                    <div class="page-header-heading">
-                        <span class="am-icon-home page-header-heading-icon"></span>人均产能表
-                    </div>
+<script th:src="@{/assets/js/theme.js}"></script>
+<!-- 内容区域 -->
+<div class="tpl-content-wrapper">
+    <div class="container-fluid am-cf">
+        <div class="row">
+            <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
+                <div class="page-header-heading">
+                    <span class="am-icon-home page-header-heading-icon"></span>人均产能表
                 </div>
             </div>
-            <div class="demoTable" style="padding-top: 30px">
-                <div class="layui-input-block" style="display: inline-block">
-                    <input name="title" autocomplete="off" placeholder="请输入搜索内容" class="layui-input" id="demoReload" type="text" data-type="reload"
-                        style="width: 190px">
-                </div>
-                <button class="layui-btn layui-btn-normal" onclick="search(this)">搜索
-                    <i class="layui-icon">&#xe615;</i>
-                </button>
-                <button class="layui-btn layui-btn-normal" style="float: right;margin-right: 32px" onclick="exportExcel(this)">导出</button>
+        </div>
+        <div class="demoTable" style="padding-top: 30px">
+            <span class="filtrateText">部门:</span>
+            <div class="am-form-group tpl-table-list-select">
+                <select multiple data-am-selected="{maxHeight: 300,btnWidth: '12%',searchBox: 1}" id="selected-department">
+                   <!-- <tr th:each="department,stat : ${departments}">
+                        <option th:value="${carType}" th:text="${carType}"></option>
+                    </tr>-->
+                </select>
+                <button type="button" onclick="search(this)" style="width: 115px;margin-left: 20px; position: relative;left: -17px;"
+                        class="am-btn am-btn-primary btn-loading-example">查 询</button>
+                <button type="button" onclick="exportExcel(this)" style="width: 115px;margin-left: 20px; position: relative;left: -17px;"
+                        class="am-btn am-btn-primary btn-loading-example">导 出</button>
+                <button type="button" onclick="clearSelect(this)" style="width: 115px;margin-left: 20px; position: relative;left: -17px;"
+                        class="am-btn am-btn-primary btn-loading-example">重 置</button>
             </div>
-
-
+            <!--   <button class="layui-btn layui-btn-normal" onclick="search(this)">搜索
+                  <i class="layui-icon">&#xe615;</i>
+              </button>
+              <button class="layui-btn layui-btn-normal" style="float: right;margin-right: 32px" onclick="exportExcel(this)">导出</button>-->
         </div>
 
 
-
-
-        <div id="table_div">
-            <table class="layui-hide" id="test"></table>
-        </div>
-
-        <div style="display: none" id="detail_table_div">
-            <table id="xz">
-
-            </table>
-     
-        </div>
     </div>
 
-    <script>    
 
-        function exportExcel(){
-            var li = $('#demoReload').val();
-            if (li != null) {
-                li = li.toString()
-            }
-            window.location.href = "perCapitaCapacityexportExcel?department="+li;
+
+
+    <div id="table_div">
+        <table class="layui-hide" id="test"></table>
+    </div>
+
+    <div style="display: none" id="detail_table_div">
+        <table id="xz">
+
+        </table>
+
+    </div>
+</div>
+
+<script>
+
+    function exportExcel(){
+
+        var li = $('#selected-department').val();
+        if (li != null) {
+            li = li.toString()
         }
-
-        function y_cz(e) {
-            console.log(e);
-
-            var param = { "department": e }
-            show_table_detail(param)
-
-            layer.open({
-                type: 1
-                ,title:['详情','font-size:22px']
-                ,btn:['导出']
-                ,yes:function(index,layero){
-                    var li = $('#demoReload').val();
-             if (li != null) {
-                li = li.toString()
+        $.post("getPerCapitaCapacityetableExportStatus",{},function (statu) {
+            if(statu==1){
+                window.location.href = "perCapitaCapacityexportExcel?department="+li;
+            }else {
+                layer.msg("数据准备中，请稍后再试", {
+                    time: 4000 //4s后自动关闭
+                    //btn: ['明白了', '知道了', '哦']
+                });
             }
-            window.location.href = "getPerCapitaCapacityDetailListTOExcel?department="+li;
+        });
+        //
+    }
+
+    function clearSelect(){
+        var   $checked = $(".am-checked");
+        var checkedText = $checked.text();
+        $checked.attr("class","");
+        $(".am-selected-status").text("点击选择...");
+        $("#selected-department").val("");
+
+    }
+
+    function y_cz(e) {
+        console.log(e);
+
+        var param = { "department": e }
+        show_table_detail(param)
+
+        layer.open({
+            type: 1
+            ,title:['详情','font-size:22px']
+            ,btn:['导出']
+            ,yes:function(index,layero){
+                var li = $('#selected-department').val();
+                if (li != null) {
+                    li = li.toString()
                 }
-                ,content: $('#detail_table_div')
-                , area: ['840px', '600px']
-                , shade: 0
-            })
-        }
-
-        function search(obj) {
-            var li = $('#demoReload').val();
-            if (li != null) {
-                li = li.toString();
+                window.location.href = "getPerCapitaCapacityDetailListTOExcel?department="+e;
             }
-            var param = { "department": li }
-            show_table(param);
+            ,content: $('#detail_table_div')
+            , area: ['840px', '600px']
+            , shade: 0
+        })
+    }
+
+    function search(obj) {
+        var li = $('#selected-department').val();
+        if (li != null) {
+            li = li.toString();
         }
-    </script>
-    <script>
-        function show_table(param) {
-            layui.use(['form', 'layer', 'table'], function () {
-                var colss = [{ field: 'department', width: 118, title: '部门' },
-            { field: 'target_sale', width: 92, title: '目标台数' },
-            { field: 'target_salemoney', width: 130, title: '目标金额（万）' },
-            { field: 'new_car_increment', width: 88, title: '新车总量' },
-            { field: 'new_car_total', width: 88, title: '新增车辆' },
-            { field: 'old_car_increment', width: 100, title: '二手车增量' },
-            { field: 'old_car_total', width: 100, title: '二手车总量' },
-            { field: 'total', width: 86, title: '本月总量' },
-            { field: 'total_money', width: 119, title: '本月业绩(万)' },
-            { field: 'man_count', width: 81, title: '人头数' },
-            { field: 'sale_capacity', width: 131, title: '人均产能（台）' },
-            { field: 'sale_money_capacity', width: 131, title: '人均产能（万）' },
-            { field: 'rank', width: 67, title: '排名' },
-            { field: 'total_all', width: 220, title: '本月总量（包含新人和经理）' },
-            {
-                field: 'xx', width: 95, height: 40, title: '操作', templet: function (d) {
+        var param = { "department": li }
+        show_table(param);
+    }
+</script>
+<script>
+    function show_table(param) {
+        layui.use(['form', 'layer', 'table'], function () {
+            var colss = [{ field: 'department', width: 118, title: '部门' },
+                { field: 'target_sale', width: 92, title: '目标台数' },
+                { field: 'target_salemoney', width: 130, title: '目标金额（万）' },
+                { field: 'new_car_increment', width: 88, title: '新车总量' },
+                { field: 'new_car_total', width: 88, title: '新增车辆' },
+                { field: 'old_car_increment', width: 100, title: '二手车增量' },
+                { field: 'old_car_total', width: 100, title: '二手车总量' },
+                { field: 'total', width: 86, title: '本月总量' },
+                { field: 'total_money', width: 119, title: '本月业绩(万)' },
+                { field: 'man_count', width: 81, title: '人头数' },
+                { field: 'sale_capacity', width: 131, title: '人均产能（台）' },
+                { field: 'sale_money_capacity', width: 131, title: '人均产能（万）' },
+                { field: 'rank', width: 67, title: '排名' },
+                { field: 'total_all', width: 220, title: '本月总量（包含新人和经理）' },
+                {
+                    field: 'xx', width: 95, height: 40, title: '操作', templet: function (d) {
 
                     return "<button class='layui-btn' onclick=\"y_cz('" + d.department + "')\">明细</button>"
                 }
-            }];
+                }];
 
 
-                var table = layui.table;
+            var table = layui.table;
 
-                table.render({
-                    elem: "#test"
-                    , url: 'getPerCapitaCapacityList'
-                    , where: param
-                    , page: true
-                    , limit: 15 //默认采用10条
-                    , loading: true
-                    , cols: [colss]
-                    , request: {
-                        //pageName: 'pageNum' //页码的参数名称，默认：page
-                        limitName: 'pageSize' //每页数据量的参数名，默认：limit
+            table.render({
+                elem: "#test"
+                , url: 'getPerCapitaCapacityList'
+                , where: param
+                , page: true
+                , limit: 15 //默认采用10条
+                , loading: true
+                , cols: [colss]
+                , request: {
+                    //pageName: 'pageNum' //页码的参数名称，默认：page
+                    limitName: 'pageSize' //每页数据量的参数名，默认：limit
+                }
+                , response: {
+                    statusName: 'code' //数据状态的字段名称，默认：code
+                    , statusCode: 0 //成功的状态码，默认：0
+                    , msgName: 'msg' //状态信息的字段名称，默认：msg
+                    , countName: 'count' //数据总数的字段名称，默认：count
+                    , dataName: 'data' //数据列表的字段名称，默认：data
+                },
+                done: function(res, curr, count){
+                    //如果是异步请求数据方式，res即为你接口返回的信息。
+                    if(res.msg!=''){
+                        layer.msg(res.msg, {
+                            time: 4000 //20s后自动关闭
+                            //btn: ['明白了', '知道了', '哦']
+                        });
                     }
-                    , response: {
-                        statusName: 'code' //数据状态的字段名称，默认：code
-                        , statusCode: 0 //成功的状态码，默认：0
-                        , msgName: 'message' //状态信息的字段名称，默认：msg
-                        , countName: 'count' //数据总数的字段名称，默认：count
-                        , dataName: 'data' //数据列表的字段名称，默认：data
-                    }
-                });
+
+                }
             });
-        }
-
-
-
-
-        function show_table_detail(param) {
-            layui.use(['form', 'layer', 'table'], function () {
-                var colss = [{ field: 'department', width: 180, title: '部门' },
+        });
+    }
+    function show_table_detail(param) {
+        layui.use(['form', 'layer', 'table'], function () {
+            var colss = [{ field: 'department', width: 180, title: '部门' },
                 { field: 'saleman', width: 133, title: '业务员' },
                 { field: 'fcontract', width: 133, title: '合同编号' },
                 { field: 'FPlateNum', width: 133, title: '车牌号' },
@@ -321,37 +371,37 @@
                 { field: 'FDividendRatio', width: 133, title: '分红比例' },
                 { field: 'money', width: 133, title: '业绩金额' }
 
-                ];
-                var table_detail = layui.table;
+            ];
+            var table_detail = layui.table;
 
-                table_detail.render({
-                    elem: "#xz"
-                    , url: 'getPerCapitaCapacityDetailList'
-                    , where: param
-                    , page: true
-                    , limit: 15 //默认采用10条
-                    , loading: true
-                    , cols: [colss]
-                    , request: {
-                        //pageName: 'pageNum' //页码的参数名称，默认：page
-                        limitName: 'limit' //每页数据量的参数名，默认：limit
-                    }
-                    , response: {
-                        statusName: 'code' //数据状态的字段名称，默认：code
-                        , statusCode: 0 //成功的状态码，默认：0
-                        , msgName: 'message' //状态信息的字段名称，默认：msg
-                        , countName: 'count' //数据总数的字段名称，默认：count
-                        , dataName: 'data' //数据列表的字段名称，默认：data
-                    }
-                });
+            table_detail.render({
+                elem: "#xz"
+                , url: 'getPerCapitaCapacityDetailList'
+                , where: param
+                , page: true
+                , limit: 15 //默认采用10条
+                , loading: true
+                , cols: [colss]
+                , request: {
+                    //pageName: 'pageNum' //页码的参数名称，默认：page
+                    limitName: 'limit' //每页数据量的参数名，默认：limit
+                }
+                , response: {
+                    statusName: 'code' //数据状态的字段名称，默认：code
+                    , statusCode: 0 //成功的状态码，默认：0
+                    , msgName: 'message' //状态信息的字段名称，默认：msg
+                    , countName: 'count' //数据总数的字段名称，默认：count
+                    , dataName: 'data' //数据列表的字段名称，默认：data
+                }
             });
-        }
-    </script>
+        });
+    }
+</script>
 
-    <script th:src="@{/assets/js/amazeui.min.js}"></script>
-    <script th:src="@{/assets/js/amazeui.datatables.min.js}"></script>
-    <script th:src="@{/assets/js/dataTables.responsive.min.js}"></script>
-    <script th:src="@{/assets/js/amazeui.page.js}"></script>
+<script th:src="@{/assets/js/amazeui.min.js}"></script>
+<script th:src="@{/assets/js/amazeui.datatables.min.js}"></script>
+<script th:src="@{/assets/js/dataTables.responsive.min.js}"></script>
+<script th:src="@{/assets/js/amazeui.page.js}"></script>
 </body>
 
 

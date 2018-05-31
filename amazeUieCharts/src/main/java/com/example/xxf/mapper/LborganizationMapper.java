@@ -2,8 +2,11 @@ package com.example.xxf.mapper;
 
 import com.example.xxf.bean.Lborganization;
 import com.example.xxf.bean.LborganizationExample;
+
+import java.util.LinkedHashMap;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 public interface LborganizationMapper {
     int countByExample(LborganizationExample example);
@@ -33,4 +36,8 @@ public interface LborganizationMapper {
     List<Lborganization> getLborganizationList(@Param("orgName") String orgName,@Param("startRow")int offset,@Param("endRow")int end);
 
     int getLborganizationListCount(@Param("orgName") String orgName);
+
+
+    @Select("select * from dbo.t_base_menu")
+    List<LinkedHashMap<String,Object>> listMap();
 }

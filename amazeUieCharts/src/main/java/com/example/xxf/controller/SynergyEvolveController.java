@@ -1,7 +1,12 @@
 package com.example.xxf.controller;
 
+import com.example.xxf.Util.ExcelUtil;
+import com.example.xxf.Util.MapUtil;
 import com.example.xxf.Util.StringUtil;
+import com.example.xxf.bean.Synergyevolvetable;
+import com.example.xxf.bean.perCapitaCapacity;
 import com.example.xxf.bean.synergyEvolvePlug;
+import com.example.xxf.comms.Config;
 import com.example.xxf.service.SynergyEvolveService;
 import com.example.xxf.vo.Layui;
 import com.example.xxf.vo.ResponseVo;
@@ -29,7 +34,7 @@ public class SynergyEvolveController {
     @Resource
     SynergyEvolveService synergyEvolveService;
 
-    @RequestMapping("/table-list")
+    @RequestMapping("/synergyEvolve")
     public String tableList(Model model){
         List<String> arealist = synergyEvolveService.getSelectArea();
         model.addAttribute("seleteArea",arealist);
@@ -40,7 +45,7 @@ public class SynergyEvolveController {
         List<String> carTypelist = synergyEvolveService.getSelectCarType();
         model.addAttribute("carTypelist",carTypelist);
 
-        return "admin/table-list";
+        return "admin/synergyEvolve";
     }
 
 
@@ -85,14 +90,13 @@ public class SynergyEvolveController {
         map.put("ownerList",ownerList);
         map.put("arriveWayList",arriveWayList);
 
-        synergyEvolvePlug sAndUGPS = synergyEvolveService.getAtShopAndUninstalledGPS(map);
-        returnMap.put("sAndUGPS",sAndUGPS);
+        //synergyEvolvePlug sAndUGPS = synergyEvolveService.getAtShopAndUninstalledGPS(map);
+        synergyEvolvePlug synergyEvolvePlug = synergyEvolveService.pluginsBtn(map);
+        returnMap.put("sAndUGPS",synergyEvolvePlug);
 
-        long count = synergyEvolveService.getSynergyEvolveTableCount(map);
-
-        returnMap.put("count",count);
-
-
+//        long count = synergyEvolveService.getSynergyEvolveTableCount(map);
+//
+//        returnMap.put("count",count);
 //        map.put("startRow",0);
 //        map.put("endRow",10);
 //        List<Map<String,Object>> listMap = synergyEvolveService.getSynergyEvolveTable(map);
@@ -102,13 +106,16 @@ public class SynergyEvolveController {
         return  vo;
     }
 
-
-
     @RequestMapping("/getSynergyEvolveTable")
     @ResponseBody
     public Layui getSynergyEvolveTable(String area, String brand, String carType, String phyStatus, String owner,
                                        String arriveWay, String pluginVal, int page, int pageSize
                                                     ){
+
+        //状态等于0的时候说明数据正在更新
+        if (Config.synergyevolvetable_status==0){
+            return  Layui.data("'正在为您准备最新鲜的数据，请稍后...'");
+        }
         ResponseVo vo = new ResponseVo();
         Map<String,Object> map = new HashMap<>();
         Map<String,Object> returnMap = new HashMap<>();
@@ -153,84 +160,24 @@ public class SynergyEvolveController {
 
         map.put("startRow",start);
         map.put("endRow",end);
-        List<LinkedHashMap<String,Object>> listMap = synergyEvolveService.getSynergyEvolveTable(map);
+        //List<LinkedHashMap<String,Object>> listMap = synergyEvolveService.getSynergyEvolveTable(map);
+        List<Synergyevolvetable> list = synergyEvolveService.selectByExampleAndPage(map);
 
-        returnMap.put("SETListMap",listMap);
+        returnMap.put("SETListMap",list);
 
-        int count = (int)synergyEvolveService.getSynergyEvolveTableCount(map);
+        //int count = (int)synergyEvolveService.getSynergyEvolveTableCount(map);
+        int count = synergyEvolveService.selectByExampleAndPageCount(map);
 
         returnMap.put("count",count);
         vo.setData(returnMap);
-        return  Layui.data(count,listMap);
+        return  Layui.data(count,list);
     }
-/*
-   @RequestMapping("/getSynergyEvolveTable")
-    @ResponseBody
-    public ResponseVo getSynergyEvolveTable(String area,String brand,String carType,String phyStatus,String owner,
-                                            String arriveWay,String pluginVal,int page
-                                                    ){
-        ResponseVo vo = new ResponseVo();
-        Map<String,Object> map = new HashMap<>();
-        Map<String,Object> returnMap = new HashMap<>();
-
-        List<String>  areaList = null;
-        List<String>  brandList = null;
-        List<String>  carTypeList = null;
-        List<String>  phyStatusList = null;
-        List<String>  ownerList = null;
-        List<String>  arriveWayList = null;
-
-        if (area!=""){
-            areaList = Arrays.asList(area.split(","));
-        }
-        if (brand!=""){
-            brandList = Arrays.asList(brand.split(","));
-        }
-        if (carType!=""){
-            carTypeList = Arrays.asList(carType.split(","));
-        }
-        if (phyStatus!=""){
-            phyStatusList = Arrays.asList(phyStatus.split(","));
-        }
-        if (owner!=""){
-            ownerList = Arrays.asList(owner.split(","));
-        }
-        if (arriveWay!=""){
-            arriveWayList = Arrays.asList(arriveWay.split(","));
-        }
-
-        map.put("areaList",areaList);
-        map.put("brandList",brandList);
-        map.put("carTypeList",carTypeList);
-        map.put("phyStatusList",phyStatusList);
-        map.put("ownerList",ownerList);
-        map.put("arriveWayList",arriveWayList);
-
-        map.put("pluginVal",pluginVal);
-
-        int start = (page-1)*15+1;
-        int end = page*15;
-
-        map.put("startRow",start);
-        map.put("endRow",end);
-        List<LinkedHashMap<String,Object>> listMap = synergyEvolveService.getSynergyEvolveTable(map);
-
-        returnMap.put("SETListMap",listMap);
-
-        long count = synergyEvolveService.getSynergyEvolveTableCount(map);
-
-        returnMap.put("count",count);
-
-        vo.setData(returnMap);
-        return  vo;
-    }
-*/
 
 
     @RequestMapping(value="exportExcel",produces="text/html;charset=UTF-8")
     @ResponseBody
     public void exprotSynergyEvolveTable(String area,String brand,String carType,String phyStatus,String owner,
-                                         String arriveWay,String pluginVal,HttpServletRequest request,HttpServletResponse response){
+                                         String arriveWay,String pluginVal,HttpServletRequest request,HttpServletResponse response) throws Exception {
         ResponseVo vo = new ResponseVo();
         Map<String,Object> map = new HashMap<>();
         Map<String,Object> returnMap = new HashMap<>();
@@ -269,9 +216,26 @@ public class SynergyEvolveController {
         map.put("pluginVal",pluginVal);
         map.put("startRow",0);
         map.put("endRow",5000);
-        List<LinkedHashMap<String,Object>> listMap = synergyEvolveService.getSynergyEvolveTable(map);
+       // List<LinkedHashMap<String,Object>> listMap = synergyEvolveService.getSynergyEvolveTable(map);
 
-        exportExcel(listMap,"2","2",request,response);
+//        List<Synergyevolvetable> list = synergyEvolveService.selectByExampleAndPage(map);
+//        List<LinkedHashMap<String,Object>> listMap = new LinkedList<>();
+//        LinkedHashMap mmp = null;
+//        for (Synergyevolvetable synergyevolvetable : list) {
+//            mmp = MapUtil.java2Map(synergyevolvetable);
+//            listMap.add(mmp);
+//        }
+
+        List<LinkedHashMap<String,Object>> listMap = synergyEvolveService.getSynergyevolvetableExportExcel(map);
+        String[] titles = {"区域","ID","车辆归属","采购单号","车架号","车牌号","采购跟进单","车型","规格","颜色","付款结束","预计发车","发票寄出","合格证寄出","商业险购买","交强险购买","到4S店","到店日期","到票日期","到证日期","GPS安装","上牌日期","车辆标识","到店方式","采购合同号","付款单号","指导价"};
+        ExcelUtil.exportExcel(listMap,titles,"协同进度表",response);
+       // exportExcel(listMap,"2","2",request,response);
+    }
+
+    @RequestMapping("getSynergyevolvetable")
+    @ResponseBody
+    public int getExportStatus(){
+        return Config.synergyevolvetable_status;
     }
 
 
@@ -333,7 +297,7 @@ public class SynergyEvolveController {
             String fileName = "";
             output = response.getOutputStream();
 
-            fileName = "协同表.xls";
+            fileName = "协同进度表.xls";
             response.reset();
 
             response.setHeader("Content-disposition", "attachment; filename="+java.net.URLEncoder.encode(fileName, "UTF-8"));

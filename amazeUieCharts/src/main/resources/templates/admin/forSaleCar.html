@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>待售车</title>
+    <meta name="description" content="">
+    <meta name="keywords" content="index">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="icon" type="image/png" href="assets/i/favicon.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/i/app-icon72x72@2x.png">
+    <meta name="apple-mobile-web-app-title" content="I" />
+    <script th:src="@{/assets/js/jquery.min.js}"></script>
+
+    <style type="text/css">
+        .widget-body {
+            overflow-x: scroll
+        }
+
+
+        .widget-body td,
+        .widget-body th,
+
+
+        .tpl-table-list-select {
+            text-align: left;
+        }
+
+        .am-selected {
+            width: 120px;
+        }
+
+        .filtrateText {
+            color: floralwhite;
+        }
+
+        .row-content {
+            padding: 10px;
+        }
+
+        .widget {
+            height: 780px;
+        }
+
+        .s_button {
+            padding-right: 5px;
+        }
+
+        /*       .theme-black .tpl-form-line-form input[type=number],
+               .theme-black .tpl-form-line-form input[type=search],
+               .theme-black .tpl-form-line-form input[type=text],
+               .theme-black .tpl-form-line-form input[type=password],
+               .theme-black .tpl-form-line-form input[type=datetime],
+               .theme-black .tpl-form-line-form input[type=datetime-local],
+               .theme-black .tpl-form-line-form input[type=date],
+               .theme-black .tpl-form-line-form input[type=month],
+               .theme-black .tpl-form-line-form input[type=time],
+               .theme-black .tpl-form-line-form input[type=week],
+               .theme-black .tpl-form-line-form input[type=email],
+               .theme-black .tpl-form-line-form input[type=url],
+               .theme-black .tpl-form-line-form input[type=tel],
+               .theme-black .tpl-form-line-form input[type=color],
+               .theme-black .tpl-form-line-form select,*/
+        .theme-black .tpl-form-line-form textarea,
+        .theme-black .am-form-field {
+            display: block;
+            width: 100%;
+            padding: 6px 12px;
+            line-height: 1.42857;
+            color: rgb(0, 0, 0);
+            background-color: rgba(34, 34, 34, 0.15);
+            background-image: none;
+            border: 1px solid #000000;
+        }
+
+        .am-u-sm-2 {
+            width: 15.666% !important;
+        }
+        .layui-table{
+            background-color: rgba(84, 94, 99,0);
+            color: #ffffff;
+        }
+        .layui-table th{
+            background-color: rgba(255, 255, 255, 0);
+
+        }
+        /*.layui-table-cell{*/
+        /*background-color: rgba(84, 94, 99,0);*/
+        /*}*/
+        .layui-table tbody tr:hover{
+            background-color: rgba(255, 255, 255, 0.16);
+        }
+        .layui-table thead{
+            background-color: #868686;
+        }
+        .layui-table thead tr,
+        .layui-table-click,
+        .layui-table-header,
+        .layui-table-hover,
+        .layui-table-mend,
+        .layui-table-patch,
+        .layui-table-tool,
+        .layui-table[lay-even] tr:nth-child(even) {
+            background-color: rgba(84, 94, 99,0);
+        }
+        .layui-table-page a{
+            font-size: -0.2em;
+            color: #ffffff;
+        }
+        .layui-table-page span[class=layui-laypage-count]{
+            color: #ffffff;
+        }
+    </style>
+
+
+
+    <script type="text/javascript">
+        var exportPluginVal = "";
+        $(function () {
+
+            initialize_select();
+            search_select();
+
+        });
+
+
+        function search_select(obj) {
+
+            var areas = $("#selected-area").val();
+            if (areas != null) {
+                areas = areas.toString();
+            }
+
+            var biaoshi = $("#selected-biaoshi").val();
+            if (biaoshi != null) {
+                biaoshi = biaoshi.toString();
+                if(biaoshi=="全部"){
+
+                    biaoshi="";
+                }
+            }
+            var param = {"area":areas,"biaoshi":biaoshi}
+            show_table(param);
+        }
+
+
+        function search_export() {
+
+            var param = { }
+            var pluginVal = $("#exprotTable").attr("title");
+            window.location.href = "exportExcel?area=" + area + "&brand=" + brand + "&carType=" + carType + "&phyStatus=" + phyStatus + "&owner=" + owner + "&arriveWay=" + arriveWay + "&pluginVal=" + exportPluginVal;
+
+        }
+        /**
+         *初始化下拉菜单
+         */
+        function initialize_select(){
+            $.post("initializeSelect",{},function(data){
+                var $selected = $("#selected-area")
+                for(var i = 0; i<data.length;i++){
+                    $selected.append('<option value='+data[i]+'>'+data[i]+'</option>');
+
+                }
+            });
+
+
+        }
+
+        function clearSelect(){
+            var   $checked = $(".am-checked");
+            $checked.attr("class","");
+            $(".am-selected-status").text("点击选择...");
+            $("#selected-biaoshi").val("");
+            $("#selected-area").val("");
+        }
+
+        function exportExcelBase(){
+
+            var areas = $("#selected-area").val();
+            if (areas != null) {
+                areas = areas.toString();
+            }
+
+            var biaoshi = $("#selected-biaoshi").val();
+            if (biaoshi != null) {
+                biaoshi = biaoshi.toString();
+                if(biaoshi=="全部"){
+
+                    biaoshi="";
+                }
+            }
+            $.post("getForsalecarbaseListExportStatus",{},function (statu) {
+                if(statu==1){
+                    window.location.href = "getForsalecarbaseListTOExcel?area="+areas;
+                }else {
+                    layer.msg("数据准备中，请稍后再试", {
+                        time: 4000 //4s后自动关闭
+                        //btn: ['明白了', '知道了', '哦']
+                    });
+                }
+            });
+            //
+        }
+
+        function exportExcelDetail(){
+            var areas = $("#selected-area").val();
+            if (areas != null) {
+                areas = areas.toString();
+            }
+
+            var biaoshi = $("#selected-biaoshi").val();
+            if (biaoshi != null) {
+                biaoshi = biaoshi.toString();
+                if(biaoshi=="全部"){
+                    biaoshi="";
+                }
+            }
+            var param = {"area":areas,"biaoshi":biaoshi}
+            $.post("getForsalecardetailListExportStatus",{},function (statu) {
+                if(statu==1){
+                    window.location.href = "getForsalecardetailListTOExcel?area="+areas+"&biaoshi="+biaoshi;
+                }else {
+                    layer.msg("数据准备中，请稍后再试", {
+                        time: 4000 //4s后自动关闭
+                        //btn: ['明白了', '知道了', '哦']
+                    });
+                }
+            });
+        }
+
+    </script>
+
+</head>
+
+<body data-type="widgets">
+<script th:src="@{/assets/js/theme.js}"></script>
+
+<script id="t1" type="text/html">
+    <ul>
+
+    </ul>
+
+</script>
+
+
+<!-- 内容区域 -->
+<div class="tpl-content-wrapper">
+
+    <div class="container-fluid am-cf">
+        <div class="row">
+            <div class="am-g">
+            <!--<div class="am-u-sm-3">-->
+                <div class="page-header-heading">
+                    <span class="am-icon-home page-header-heading-icon"></span>待售车记录<br/>
+
+                </div>
+            <!--</div>-->
+            <div class="am-u-md-2">
+                <span class="filtrateText">区域:</span>
+                <div class="am-form-group tpl-table-list-select">
+                    <select multiple data-am-selected="{maxHeight: 300,btnWidth: '60%',searchBox: 1}" id="selected-area">
+                        <!-- <tr th:each="department,stat : ${departments}">
+                             <option th:value="${carType}" th:text="${carType}"></option>
+                         </tr>-->
+                    </select>
+
+                </div>
+
+
+            </div>
+                <div class="am-u-md-2">
+                    <span class="filtrateText">车辆标识:</span>
+                    <div class="am-form-group tpl-table-list-select">
+                        <div class="am-form-group tpl-table-list-select">
+                            <select data-am-selected="{maxHeight: 300,btnWidth: '60%'}" id="selected-biaoshi">
+                                <option value="全部">全部</option>
+                                <option value="待售二手车">待售二手车</option>
+                                <option value="待售新车">待售新车</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            <div class="am-u-md-2">
+                <div style="padding-top: 18px">
+                    <button type="button" onclick="search_select(this)" style="width: 70px;margin-left: 0px; position: relative;left: -17px;"
+                            class="am-btn am-btn-primary btn-loading-example">查 询</button>
+                    <button type="button" onclick="clearSelect(this)" style="width: 70px;margin-left: 0px; position: relative;left: -17px;"
+                            class="am-btn am-btn-primary btn-loading-example">重 置</button>
+                </div>
+            </div>
+                <div class="am-u-md-2"></div>
+
+        </div>
+        </div>
+
+    </div>
+
+    <div class="row-content am-cf">
+        <div class="row">
+
+            <div class="layui-row layui-col-space10">
+                <div class="layui-col-md4">
+
+                        <div  id="ForSaleCarBase"></div>
+
+                </div>
+                <div class="layui-col-md8">
+                        <div class="" id="ForSaleCarDetail"></div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#s_date' //指定元素
+            ,type: 'month'
+        });
+    });
+//
+    function show_table(param){
+        layui.use(['form','layer','table'], function(){
+            var colss_base = [
+                    [
+                      {align: 'center', title: '待售车记录<button title="导出" style="float: left" class="layui-btn" onclick="exportExcelBase()"><i class="layui-icon" style="font-size: 15px; color: #CCC;">导出</i> </button>', colspan: 4}
+                    ],
+                [
+                {field:'area',title: '区域',align:'center',width:'135'},
+                {field:'forsalenewcar',title: '待售新车',align:'center',width:'135'},
+                {field:'forsaleusedcar',title: '待售二手车',align:'center',width:'135'},
+                {field:'summary',title: '汇总',align:'center',width:'138'}
+            ]];
+            var colss_detail = [
+                [
+                    {align: 'center', title: '待售车记录明细<button title="导出" style="float: left" class="layui-btn" onclick="exportExcelDetail()"><i class="layui-icon" style="font-size: 15px; color: #CCC;">导出</i> </button>', colspan: 11}
+                ],
+                [
+                    {field:'area',title: '区域',align:'center',width:'80'},
+                    {field:'oldid',title: 'ID',align:'center',width:'80'},
+                    {field:'caraffiliation',title: '车辆归属',align:'center',width:'100'},
+                    {field:'vin',title: '车架号',align:'center' ,width:'210'},
+                    {field:'platenum',title: '车牌号',align:'center',width:'120'},
+                    {field:'brand',title: '品牌',align:'center',width:'157'},
+                    {field:'cartype',title: '车型',align:'center' ,width:'150'},
+                    {field:'model',title: '规格',align:'center',width:'310'},
+                    {field:'betweenprice',title: '区间价格',align:'center',width:'152'},
+                    {field:'physicalstate',title: '车辆标识',align:'center',width:'136'},
+                    {field:'stockduration',title: '库存时长',align:'center',width:'100'}
+                ]];
+
+            var table_base = layui.table;
+
+            table_base.render({
+                text: {
+                    none: '没有相应的数据' //默认：无数据。注：该属性为 layui 2.2.5 开始新增
+                },
+                //width:500,
+                //cellMinWidth:10,
+                //skin: 'line' //行边框风格
+                even: true, //开启隔行背景
+                //,size: 'sm',//小尺寸的表格
+                elem: '#ForSaleCarBase'
+                ,url:'getForsalecarbaseList'
+                ,where: param
+                ,page: true
+                ,limit: 20 //默认采用10条
+                ,loading: true
+                ,cols: colss_base
+                ,request: {
+                    //pageName: 'pageNum' //页码的参数名称，默认：page
+                    limitName: 'pageSize' //每页数据量的参数名，默认：limit
+                }
+                ,response: {
+                    statusName: 'code' //数据状态的字段名称，默认：code
+                    ,statusCode: 0 //成功的状态码，默认：0
+                    ,msgName: 'message' //状态信息的字段名称，默认：msg
+                    ,countName: 'count' //数据总数的字段名称，默认：count
+                    ,dataName: 'data' //数据列表的字段名称，默认：data
+                }
+            });
+
+            var table_detail = layui.table;
+            table_detail.render({
+                text: {
+                    none: '没有相应的数据' //默认：无数据。注：该属性为 layui 2.2.5 开始新增
+                },
+                //width:500,
+                //cellMinWidth:10,
+                //skin: 'line' //行边框风格
+                even: true, //开启隔行背景
+                //,size: 'sm',//小尺寸的表格
+                elem: '#ForSaleCarDetail'
+                ,url:'getForsalecardetailList'
+                ,where: param
+                ,page: true
+                ,limit: 20 //默认采用10条
+                ,loading: true
+                ,cols: colss_detail
+                ,request: {
+                    //pageName: 'pageNum' //页码的参数名称，默认：page
+                    limitName: 'pageSize' //每页数据量的参数名，默认：limit
+                }
+                ,response: {
+                    statusName: 'code' //数据状态的字段名称，默认：code
+                    ,statusCode: 0 //成功的状态码，默认：0
+                    ,msgName: 'message' //状态信息的字段名称，默认：msg
+                    ,countName: 'count' //数据总数的字段名称，默认：count
+                    ,dataName: 'data' //数据列表的字段名称，默认：data
+                }
+            });
+
+        });
+    }
+</script>
+
+<script th:src="@{/assets/js/amazeui.min.js}"></script>
+
+
+</body>
+
+
+
+
+
+</html>

@@ -1,0 +1,511 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.xxf.mapper.ForsalecardetailMapper" >
+  <resultMap id="BaseResultMap" type="com.example.xxf.bean.Forsalecardetail" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="area" property="area" jdbcType="VARCHAR" />
+    <result column="oldID" property="oldid" jdbcType="VARCHAR" />
+    <result column="carAffiliation" property="caraffiliation" jdbcType="VARCHAR" />
+    <result column="VIN" property="vin" jdbcType="VARCHAR" />
+    <result column="plateNum" property="platenum" jdbcType="VARCHAR" />
+    <result column="brand" property="brand" jdbcType="VARCHAR" />
+    <result column="carType" property="cartype" jdbcType="VARCHAR" />
+    <result column="model" property="model" jdbcType="VARCHAR" />
+    <result column="betweenPrice" property="betweenprice" jdbcType="VARCHAR" />
+    <result column="PhysicalState" property="physicalstate" jdbcType="VARCHAR" />
+    <result column="stockDuration" property="stockduration" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, area, oldID, carAffiliation, VIN, plateNum, brand, carType, model, betweenPrice, 
+    PhysicalState, stockDuration
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.example.xxf.bean.ForsalecardetailExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from forSaleCarDetail
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <delete id="deleteByExample" parameterType="com.example.xxf.bean.ForsalecardetailExample" >
+    delete from forSaleCarDetail
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.example.xxf.bean.Forsalecardetail" >
+    insert into forSaleCarDetail (id, area, oldID, 
+      carAffiliation, VIN, plateNum, 
+      brand, carType, model, 
+      betweenPrice, PhysicalState, stockDuration
+      )
+    values (#{id,jdbcType=INTEGER}, #{area,jdbcType=VARCHAR}, #{oldid,jdbcType=VARCHAR}, 
+      #{caraffiliation,jdbcType=VARCHAR}, #{vin,jdbcType=VARCHAR}, #{platenum,jdbcType=VARCHAR}, 
+      #{brand,jdbcType=VARCHAR}, #{cartype,jdbcType=VARCHAR}, #{model,jdbcType=VARCHAR}, 
+      #{betweenprice,jdbcType=VARCHAR}, #{physicalstate,jdbcType=VARCHAR}, #{stockduration,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.example.xxf.bean.Forsalecardetail" >
+    insert into forSaleCarDetail
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="area != null" >
+        area,
+      </if>
+      <if test="oldid != null" >
+        oldID,
+      </if>
+      <if test="caraffiliation != null" >
+        carAffiliation,
+      </if>
+      <if test="vin != null" >
+        VIN,
+      </if>
+      <if test="platenum != null" >
+        plateNum,
+      </if>
+      <if test="brand != null" >
+        brand,
+      </if>
+      <if test="cartype != null" >
+        carType,
+      </if>
+      <if test="model != null" >
+        model,
+      </if>
+      <if test="betweenprice != null" >
+        betweenPrice,
+      </if>
+      <if test="physicalstate != null" >
+        PhysicalState,
+      </if>
+      <if test="stockduration != null" >
+        stockDuration,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="area != null" >
+        #{area,jdbcType=VARCHAR},
+      </if>
+      <if test="oldid != null" >
+        #{oldid,jdbcType=VARCHAR},
+      </if>
+      <if test="caraffiliation != null" >
+        #{caraffiliation,jdbcType=VARCHAR},
+      </if>
+      <if test="vin != null" >
+        #{vin,jdbcType=VARCHAR},
+      </if>
+      <if test="platenum != null" >
+        #{platenum,jdbcType=VARCHAR},
+      </if>
+      <if test="brand != null" >
+        #{brand,jdbcType=VARCHAR},
+      </if>
+      <if test="cartype != null" >
+        #{cartype,jdbcType=VARCHAR},
+      </if>
+      <if test="model != null" >
+        #{model,jdbcType=VARCHAR},
+      </if>
+      <if test="betweenprice != null" >
+        #{betweenprice,jdbcType=VARCHAR},
+      </if>
+      <if test="physicalstate != null" >
+        #{physicalstate,jdbcType=VARCHAR},
+      </if>
+      <if test="stockduration != null" >
+        #{stockduration,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.example.xxf.bean.ForsalecardetailExample" resultType="java.lang.Integer" >
+    select count(*) from forSaleCarDetail
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update forSaleCarDetail
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.area != null" >
+        area = #{record.area,jdbcType=VARCHAR},
+      </if>
+      <if test="record.oldid != null" >
+        oldID = #{record.oldid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.caraffiliation != null" >
+        carAffiliation = #{record.caraffiliation,jdbcType=VARCHAR},
+      </if>
+      <if test="record.vin != null" >
+        VIN = #{record.vin,jdbcType=VARCHAR},
+      </if>
+      <if test="record.platenum != null" >
+        plateNum = #{record.platenum,jdbcType=VARCHAR},
+      </if>
+      <if test="record.brand != null" >
+        brand = #{record.brand,jdbcType=VARCHAR},
+      </if>
+      <if test="record.cartype != null" >
+        carType = #{record.cartype,jdbcType=VARCHAR},
+      </if>
+      <if test="record.model != null" >
+        model = #{record.model,jdbcType=VARCHAR},
+      </if>
+      <if test="record.betweenprice != null" >
+        betweenPrice = #{record.betweenprice,jdbcType=VARCHAR},
+      </if>
+      <if test="record.physicalstate != null" >
+        PhysicalState = #{record.physicalstate,jdbcType=VARCHAR},
+      </if>
+      <if test="record.stockduration != null" >
+        stockDuration = #{record.stockduration,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update forSaleCarDetail
+    set id = #{record.id,jdbcType=INTEGER},
+      area = #{record.area,jdbcType=VARCHAR},
+      oldID = #{record.oldid,jdbcType=VARCHAR},
+      carAffiliation = #{record.caraffiliation,jdbcType=VARCHAR},
+      VIN = #{record.vin,jdbcType=VARCHAR},
+      plateNum = #{record.platenum,jdbcType=VARCHAR},
+      brand = #{record.brand,jdbcType=VARCHAR},
+      carType = #{record.cartype,jdbcType=VARCHAR},
+      model = #{record.model,jdbcType=VARCHAR},
+      betweenPrice = #{record.betweenprice,jdbcType=VARCHAR},
+      PhysicalState = #{record.physicalstate,jdbcType=VARCHAR},
+      stockDuration = #{record.stockduration,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+
+
+
+  <select id="getForsalecardetailByXXFDB" resultType="com.example.xxf.bean.Forsalecardetail">
+  SELECT
+            *
+            FROM(
+            SELECT  ROW_NUMBER() OVER(ORDER BY oldid) AS rowid,*
+            from
+            (
+    select *
+    from (
+    select
+    replace(i.FName,'分公司','') 'area'
+    ,a.ID AS oldid
+    ,case when o.Name = '淘汽互联网子公司' then '淘汽'
+    when o.Name != '淘汽互联网子公司' and w.Ftq = '1' then '淘汽'
+    else '喜相逢'
+    end 'carAffiliation'
+    ,a.FVIN 'VIN'
+    ,a.FPlateNum 'plateNum'
+    , m.FBrand 'brand'
+    ,case when m.FBrand is null then m.FName else m.FBrand + m.FName end 'carType'
+    ,n.FModel 'model'
+    ,case when m.FPrice &lt; 100000 and m.FType = 4 then 'a7-10万以下SUV'
+    when m.FPrice > 100000 and m.FType = 4 then 'a8-10万以上SUV'
+    when m.FPrice &lt; 60000 then 'a1-6万以下'
+    when m.FPrice &lt; 80000 then 'a2-6-8万'
+    when m.FPrice &lt; 100000 then 'a3-8-10万'
+    when m.FPrice &lt; 120000 then 'a4-10-12万'
+    when m.FPrice &lt; 150000 then 'a5-12-15万'
+    when m.FPrice > 150000 then 'a6-15万以上'
+    end 'betweenPrice'
+
+    ,case when (f.FQuoType = 1 and a.FCarPreStatus in (108,107)) and f.FSaleState = 1
+    and a.id not in(select isnull(a.FQuoteLed,0) from WO_RZYZDGSCLC a join OS_WFENTRY f on a.InstID = f.id where f.STATE in(1))
+    then '待售新车'
+    when f.FQuoType = 2 and a.FCarPreStatus in (121,139) and f.FSaleState=1 then '待售二手车'
+    else null
+    end 'PhysicalState'
+
+    ,case when (f.FQuoType = 1 and a.FCarPreStatus in (108,109,107)) or a.FCarPreStatus = 108 then DATEDIFF(dd,p.FSPSJ,getdate())
+    when (f.FQuoType = 2 and a.FCarPreStatus in (109,121,139)) or a.FCarPreStatus = 121 then DATEDIFF(dd,f.FCreateT,getdate()) end 'stockDuration'
+
+    from FCar a
+    /*车辆当前状态*/
+    left join tXTDM c on a.FCarPreStatus = c.IBM AND c.FLMC = '车辆当前状态'
+    /*采购明细*/
+    left join (
+    select a.Ftq,a.FCarID
+    from WO_GCCLGLLC_detail a with (nolock)
+    left join WO_GCCLGLLC b with (nolock) on a.WO_GCCLGLLC_ID = b.ID
+    where isnull(b.WFState,0) != 3 and isnull(b.FAppType,0) != 3
+    ) w
+    on w.FCarID = a.ID
+    /*报价种类*/
+    LEFT JOIN FNewCarOffer f on f.FVType = a.ID
+    /*区域*/
+    left join Area i on a.FArea=i.ID
+    /*采购相关信息表*/
+    left join WO_CGSQDLC j on j.ID = a.FPurNo
+    /*请购相关信息表，请购结束时间以流程结束时间为准*/
+    left join (
+    select a.ID,c.Name
+    from WO_QGLC a with (nolock)
+    left join lbOrganization c with (nolock) on a.FOrgid = c.ID
+    where isnull(a.FAppType,0) != 3 and isnull(a.WFState,0) != 3
+    ) o
+    on o.ID = j.FBuying_Requisition
+    /*车型*/
+    left join Vehicle_Mana m on a.FVType = m.ID
+    /*产品信息*/
+    left join GoodsCode n on n.ID = a.FVType1
+    /*购车车辆提车流程*/
+    left join (select a.FVIN,a.FSPSJ from WO_GCCLTCLC a where isnull(a.WFState,0) != 3) p on p.FVIN = a.FVIN
+
+    where a.FUseStatus = 1   /*融资租赁*/
+    and i.FName like '%公司%'   /*区域归属为分公司*/
+    and a.FCarPreStatus != '138'   /*排除放弃采购的车*/
+    ) a
+    where 1 = 1
+    and a.PhysicalState is not null
+    /*传入参数*/
+    <if test="area != ''and area != null">
+     and a.area = #{area}
+    </if>
+     )
+	    t
+	    where 1=1
+	    ) AS sys_roles
+	    WHERE ROWID BETWEEN #{startRow} and #{endRow}
+
+  </select>
+
+  <select id="getForsalecardetailCountByXXFDB" resultType="int">
+
+    select  count(1)
+    from (
+    select
+    replace(i.FName,'分公司','') 'area'
+    ,a.ID
+    ,case when o.Name = '淘汽互联网子公司' then '淘汽'
+    when o.Name != '淘汽互联网子公司' and w.Ftq = '1' then '淘汽'
+    else '喜相逢'
+    end 'carAffiliation'
+    ,a.FVIN 'VIN'
+    ,a.FPlateNum 'plateNum'
+    , m.FBrand 'brand'
+    ,case when m.FBrand is null then m.FName else m.FBrand + m.FName end 'carType'
+    ,n.FModel 'model'
+    ,case when m.FPrice &lt; 100000 and m.FType = 4 then 'a7-10万以下SUV'
+    when m.FPrice > 100000 and m.FType = 4 then 'a8-10万以上SUV'
+    when m.FPrice &lt; 60000 then 'a1-6万以下'
+    when m.FPrice &lt; 80000 then 'a2-6-8万'
+    when m.FPrice &lt; 100000 then 'a3-8-10万'
+    when m.FPrice &lt; 120000 then 'a4-10-12万'
+    when m.FPrice &lt; 150000 then 'a5-12-15万'
+    when m.FPrice > 150000 then 'a6-15万以上'
+    end 'betweenPrice'
+
+    ,case when (f.FQuoType = 1 and a.FCarPreStatus in (108,107)) and f.FSaleState = 1
+    and a.id not in(select isnull(a.FQuoteLed,0) from WO_RZYZDGSCLC a join OS_WFENTRY f on a.InstID = f.id where f.STATE in(1))
+    then '待售新车'
+    when f.FQuoType = 2 and a.FCarPreStatus in (121,139) and f.FSaleState=1 then '待售二手车'
+    else null
+    end 'PhysicalState'
+
+    ,case when (f.FQuoType = 1 and a.FCarPreStatus in (108,109,107)) or a.FCarPreStatus = 108 then DATEDIFF(dd,p.FSPSJ,getdate())
+    when (f.FQuoType = 2 and a.FCarPreStatus in (109,121,139)) or a.FCarPreStatus = 121 then DATEDIFF(dd,f.FCreateT,getdate()) end 'stockDuration'
+
+    from FCar a
+    /*车辆当前状态*/
+    left join tXTDM c on a.FCarPreStatus = c.IBM AND c.FLMC = '车辆当前状态'
+    /*采购明细*/
+    left join (
+    select a.Ftq,a.FCarID
+    from WO_GCCLGLLC_detail a with (nolock)
+    left join WO_GCCLGLLC b with (nolock) on a.WO_GCCLGLLC_ID = b.ID
+    where isnull(b.WFState,0) != 3 and isnull(b.FAppType,0) != 3
+    ) w
+    on w.FCarID = a.ID
+    /*报价种类*/
+    LEFT JOIN FNewCarOffer f on f.FVType = a.ID
+    /*区域*/
+    left join Area i on a.FArea=i.ID
+    /*采购相关信息表*/
+    left join WO_CGSQDLC j on j.ID = a.FPurNo
+    /*请购相关信息表，请购结束时间以流程结束时间为准*/
+    left join (
+    select a.ID,c.Name
+    from WO_QGLC a with (nolock)
+    left join lbOrganization c with (nolock) on a.FOrgid = c.ID
+    where isnull(a.FAppType,0) != 3 and isnull(a.WFState,0) != 3
+    ) o
+    on o.ID = j.FBuying_Requisition
+    /*车型*/
+    left join Vehicle_Mana m on a.FVType = m.ID
+    /*产品信息*/
+    left join GoodsCode n on n.ID = a.FVType1
+    /*购车车辆提车流程*/
+    left join (select a.FVIN,a.FSPSJ from WO_GCCLTCLC a where isnull(a.WFState,0) != 3) p on p.FVIN = a.FVIN
+
+    where a.FUseStatus = 1   /*融资租赁*/
+    and i.FName like '%公司%'   /*区域归属为分公司*/
+    and a.FCarPreStatus != '138'   /*排除放弃采购的车*/
+    ) a
+    where 1 = 1
+    and a.PhysicalState is not null
+    /*传入参数*/
+    <if test="area != ''and area != null">
+      and a.area = #{area}
+    </if>
+  </select>
+
+  <insert id="batchInsert" parameterType="com.example.xxf.bean.Forsalecardetail">
+    INSERT INTO forSaleCarDetail
+    ( area, oldID,
+      carAffiliation, VIN, plateNum,
+      brand, carType, model,
+      betweenPrice, PhysicalState, stockDuration
+      )
+    values
+    <foreach item="item" index="index" collection="list" separator=",">
+      ( #{item.area,jdbcType=VARCHAR}, #{item.oldid,jdbcType=VARCHAR},
+      #{item.caraffiliation,jdbcType=VARCHAR}, #{item.vin,jdbcType=VARCHAR}, #{item.platenum,jdbcType=VARCHAR},
+      #{item.brand,jdbcType=VARCHAR}, #{item.cartype,jdbcType=VARCHAR}, #{item.model,jdbcType=VARCHAR},
+      #{item.betweenprice,jdbcType=VARCHAR}, #{item.physicalstate,jdbcType=VARCHAR}, #{item.stockduration,jdbcType=VARCHAR}
+      )
+    </foreach>
+  </insert>
+
+
+  <select id="getForsalecardetailByLocal" resultType="com.example.xxf.bean.Forsalecardetail">
+    SELECT
+    *
+    FROM(
+    SELECT  ROW_NUMBER() OVER(ORDER BY area) AS rowid,*
+    from
+    (
+    SELECT
+    <include refid="Base_Column_List" />
+    from forSaleCarDetail WHERE 1 =1
+    <if test="areas !=null and areas.size >0">
+      AND area IN
+      <foreach collection="areas" index="index" item="area" open="(" separator="," close=")">
+        #{area}
+      </foreach>
+    </if>
+    <if test="biaoshi != ''">
+      AND PhysicalState = #{biaoshi}
+    </if>
+    )
+    t
+    where 1=1
+    ) AS sys_roles
+    WHERE ROWID BETWEEN #{startRow} and #{endRow}
+  </select>
+
+  <select id="getForsalecardetailCountByLocal" resultType="int">
+
+    SELECT
+      COUNT(1)
+    from forSaleCarDetail WHERE 1 =1
+    <if test="areas !=null and areas.size >0">
+      AND area IN
+      <foreach collection="areas" index="index" item="area" open="(" separator="," close=")">
+        #{area}
+      </foreach>
+    </if>
+    <if test="biaoshi != ''">
+      AND PhysicalState = #{biaoshi}
+    </if>
+  </select>
+
+  <select id="getForsalecardetailByLocalToExcel" resultType="java.util.LinkedHashMap">
+
+    SELECT
+    area, oldID, carAffiliation, VIN, plateNum, brand, carType, model, betweenPrice,
+    PhysicalState, stockDuration
+    from forSaleCarDetail WHERE 1 =1
+    <if test="areas !=null and areas.size >0">
+      AND area IN
+      <foreach collection="areas" index="index" item="area" open="(" separator="," close=")">
+        #{area}
+      </foreach>
+    </if>
+    <if test="biaoshi != ''">
+      AND PhysicalState = #{biaoshi}
+    </if>
+  </select>
+
+
+</mapper>

@@ -78,9 +78,7 @@
         and a.FContract_Old is not null
         ) hf on a.ID = hf.old_ID
 
-        where isnull(b.FIsDrop,0)!=1
-        and e.FQuoType in (1,2)
-        and isnull(a.WFState,0) != 3
+        where e.FQuoType in (1,2)
         and c.FDividendRatio != 0
         and case when d.Name = '苏州上海办事处' then '上海' else LEFT(d.Name,2) end != '淘汽'
         and d.Name not like '%营销部%'
@@ -170,9 +168,7 @@
         and a.FContract_Old is not null
         ) hf on a.ID = hf.old_ID
 
-        where isnull(b.FIsDrop,0)!=1
-        and e.FQuoType in (1,2)
-        and isnull(a.WFState,0) != 3
+        where e.FQuoType in (1,2)
         and c.FDividendRatio != 0
         and case when d.Name = '苏州上海办事处' then '上海' else LEFT(d.Name,2) end != '淘汽'
         and d.Name like '%营销部%'
@@ -272,9 +268,7 @@
         and a.FContract_Old is not null
         ) hf on a.ID = hf.old_ID
 
-        where isnull(b.FIsDrop,0)!=1
-        and e.FQuoType in (1,2)
-        and isnull(a.WFState,0) != 3
+        where e.FQuoType in (1,2)
         and c.FDividendRatio != 0
         and case when d.Name = '苏州上海办事处' then '上海' else LEFT(d.Name,2) end != '淘汽'
         and d.Name not like '%营销部%'
@@ -364,9 +358,7 @@
         and a.FContract_Old is not null
         ) hf on a.ID = hf.old_ID
 
-        where isnull(b.FIsDrop,0)!=1
-        and e.FQuoType in (1,2)
-        and isnull(a.WFState,0) != 3
+        where e.FQuoType in (1,2)
         and c.FDividendRatio != 0
         and case when d.Name = '苏州上海办事处' then '上海' else LEFT(d.Name,2) end != '淘汽'
         and d.Name like '%营销部%'
@@ -469,9 +461,7 @@
         and a.FContract_Old is not null
         ) hf on a.ID = hf.old_ID
 
-        where isnull(b.FIsDrop,0)!=1
-        and e.FQuoType in (1,2)
-        and isnull(a.WFState,0) != 3
+        where e.FQuoType in (1,2)
         and c.FDividendRatio != 0
         and case when d.Name = '苏州上海办事处' then '上海' else LEFT(d.Name,2) end != '淘汽'
         and d.Name not like '%营销部%'
@@ -561,9 +551,7 @@
         and a.FContract_Old is not null
         ) hf on a.ID = hf.old_ID
 
-        where isnull(b.FIsDrop,0)!=1
-        and e.FQuoType in (1,2)
-        and isnull(a.WFState,0) != 3
+        where e.FQuoType in (1,2)
         and c.FDividendRatio != 0
         and case when d.Name = '苏州上海办事处' then '上海' else LEFT(d.Name,2) end != '淘汽'
         and d.Name like '%营销部%'
@@ -663,9 +651,7 @@
         and a.FContract_Old is not null
         ) hf on a.ID = hf.old_ID
 
-        where isnull(b.FIsDrop,0)!=1
-        and e.FQuoType in (1,2)
-        and isnull(a.WFState,0) != 3
+        where e.FQuoType in (1,2)
         and c.FDividendRatio != 0
         and case when d.Name = '苏州上海办事处' then '上海' else LEFT(d.Name,2) end != '淘汽'
         and d.Name not like '%营销部%'
@@ -755,9 +741,7 @@
         and a.FContract_Old is not null
         ) hf on a.ID = hf.old_ID
 
-        where isnull(b.FIsDrop,0)!=1
-        and e.FQuoType in (1,2)
-        and isnull(a.WFState,0) != 3
+        where e.FQuoType in (1,2)
         and c.FDividendRatio != 0
         and case when d.Name = '苏州上海办事处' then '上海' else LEFT(d.Name,2) end != '淘汽'
         and d.Name like '%营销部%'
@@ -860,9 +844,7 @@
         and a.FContract_Old is not null
         ) hf on a.ID = hf.old_ID
 
-        where isnull(b.FIsDrop,0)!=1
-        and e.FQuoType in (1,2)
-        and isnull(a.WFState,0) != 3
+        where e.FQuoType in (1,2)
         and c.FDividendRatio != 0
         and case when d.Name = '苏州上海办事处' then '上海' else LEFT(d.Name,2) end != '淘汽'
         and d.Name not like '%营销部%'
@@ -950,9 +932,7 @@
         and a.FContract_Old is not null
         ) hf on a.ID = hf.old_ID
 
-        where isnull(b.FIsDrop,0)!=1
-        and e.FQuoType in (1,2)
-        and isnull(a.WFState,0) != 3
+        where e.FQuoType in (1,2)
         and c.FDividendRatio != 0
         and case when d.Name = '苏州上海办事处' then '上海' else LEFT(d.Name,2) end != '淘汽'
         and d.Name like '%营销部%'
@@ -985,7 +965,7 @@
 
         )b
 	    ) AS sys_roles
-	    WHERE ROWID BETWEEN 0 and 50
+	    WHERE ROWID BETWEEN #{startRow} and #{endRow}
 
     </select>
     <select id="getRegionPerformanceRecordCount" resultType="long">
@@ -1054,9 +1034,7 @@
         and a.FContract_Old is not null
         ) hf on a.ID = hf.old_ID
 
-        where isnull(b.FIsDrop,0)!=1
-        and e.FQuoType in (1,2)
-        and isnull(a.WFState,0) != 3
+        where e.FQuoType in (1,2)
         and c.FDividendRatio != 0
         and case when d.Name = '苏州上海办事处' then '上海' else LEFT(d.Name,2) end != '淘汽'
         and d.Name not like '%营销部%'
@@ -1144,9 +1122,7 @@
         and a.FContract_Old is not null
         ) hf on a.ID = hf.old_ID
 
-        where isnull(b.FIsDrop,0)!=1
-        and e.FQuoType in (1,2)
-        and isnull(a.WFState,0) != 3
+        where e.FQuoType in (1,2)
         and c.FDividendRatio != 0
         and case when d.Name = '苏州上海办事处' then '上海' else LEFT(d.Name,2) end != '淘汽'
         and d.Name like '%营销部%'
@@ -1247,9 +1223,7 @@
         and a.FContract_Old is not null
         ) hf on a.ID = hf.old_ID
 
-        where isnull(b.FIsDrop,0)!=1
-        and e.FQuoType in (1,2)
-        and isnull(a.WFState,0) != 3
+        where e.FQuoType in (1,2)
         and c.FDividendRatio != 0
         and case when d.Name = '苏州上海办事处' then '上海' else LEFT(d.Name,2) end != '淘汽'
         and d.Name not like '%营销部%'
@@ -1337,9 +1311,7 @@
         and a.FContract_Old is not null
         ) hf on a.ID = hf.old_ID
 
-        where isnull(b.FIsDrop,0)!=1
-        and e.FQuoType in (1,2)
-        and isnull(a.WFState,0) != 3
+        where e.FQuoType in (1,2)
         and c.FDividendRatio != 0
         and case when d.Name = '苏州上海办事处' then '上海' else LEFT(d.Name,2) end != '淘汽'
         and d.Name like '%营销部%'
@@ -1441,9 +1413,7 @@
         and a.FContract_Old is not null
         ) hf on a.ID = hf.old_ID
 
-        where isnull(b.FIsDrop,0)!=1
-        and e.FQuoType in (1,2)
-        and isnull(a.WFState,0) != 3
+        where e.FQuoType in (1,2)
         and c.FDividendRatio != 0
         and case when d.Name = '苏州上海办事处' then '上海' else LEFT(d.Name,2) end != '淘汽'
         and d.Name not like '%营销部%'
@@ -1533,9 +1503,7 @@
         and a.FContract_Old is not null
         ) hf on a.ID = hf.old_ID
 
-        where isnull(b.FIsDrop,0)!=1
-        and e.FQuoType in (1,2)
-        and isnull(a.WFState,0) != 3
+        where e.FQuoType in (1,2)
         and c.FDividendRatio != 0
         and case when d.Name = '苏州上海办事处' then '上海' else LEFT(d.Name,2) end != '淘汽'
         and d.Name like '%营销部%'
@@ -1635,9 +1603,7 @@
         and a.FContract_Old is not null
         ) hf on a.ID = hf.old_ID
 
-        where isnull(b.FIsDrop,0)!=1
-        and e.FQuoType in (1,2)
-        and isnull(a.WFState,0) != 3
+        where e.FQuoType in (1,2)
         and c.FDividendRatio != 0
         and case when d.Name = '苏州上海办事处' then '上海' else LEFT(d.Name,2) end != '淘汽'
         and d.Name not like '%营销部%'
@@ -1727,9 +1693,7 @@
         and a.FContract_Old is not null
         ) hf on a.ID = hf.old_ID
 
-        where isnull(b.FIsDrop,0)!=1
-        and e.FQuoType in (1,2)
-        and isnull(a.WFState,0) != 3
+        where e.FQuoType in (1,2)
         and c.FDividendRatio != 0
         and case when d.Name = '苏州上海办事处' then '上海' else LEFT(d.Name,2) end != '淘汽'
         and d.Name like '%营销部%'
@@ -1827,9 +1791,7 @@
         and a.FContract_Old is not null
         ) hf on a.ID = hf.old_ID
 
-        where isnull(b.FIsDrop,0)!=1
-        and e.FQuoType in (1,2)
-        and isnull(a.WFState,0) != 3
+        where e.FQuoType in (1,2)
         and c.FDividendRatio != 0
         and case when d.Name = '苏州上海办事处' then '上海' else LEFT(d.Name,2) end != '淘汽'
         and d.Name not like '%营销部%'
@@ -1918,9 +1880,7 @@
         and a.FContract_Old is not null
         ) hf on a.ID = hf.old_ID
 
-        where isnull(b.FIsDrop,0)!=1
-        and e.FQuoType in (1,2)
-        and isnull(a.WFState,0) != 3
+        where e.FQuoType in (1,2)
         and c.FDividendRatio != 0
         and case when d.Name = '苏州上海办事处' then '上海' else LEFT(d.Name,2) end != '淘汽'
         and d.Name like '%营销部%'
@@ -1951,5 +1911,8 @@
         group by a.业务员
         order by SUM(a.分红比例) desc ,SUM(a.业绩金额) desc
     </select>
+
+
+
 
 </mapper>

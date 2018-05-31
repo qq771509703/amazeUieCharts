@@ -12,4 +12,10 @@ public class Layui extends HashMap<String, Object> {
         r.put("data", data);
         return r;
     }
+    public static Layui data(String msg){
+        Layui r = new Layui();
+        r.put("code", 0);
+        r.put("msg", msg);
+        return r;
+    }
 }

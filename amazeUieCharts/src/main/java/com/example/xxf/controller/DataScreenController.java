@@ -17,7 +17,7 @@ import java.util.*;
 @PropertySource({"classpath:config.properties"})
 @Component
 @Controller
-@RequestMapping("/admin")
+@RequestMapping("/assets")
 public class DataScreenController {
 
     @Autowired
@@ -265,6 +265,16 @@ public class DataScreenController {
         return response;
     }
 
+
+    @RequestMapping("/getNearMonth12FinancingAmoun")
+    @ResponseBody
+    public ResponseVo nearMonth12FinancingAmoun(){
+        ResponseVo response = new ResponseVo();
+        Map<String,Object> returnMap = new HashMap<>();
+        List<Map<String,Object>> listMap = dataScreenService.year_financing_amoun();
+        response.setData(listMap);
+        return response;
+    }
 
 
     public static double getMax(double[] arr)

@@ -1,6 +1,7 @@
 package com.example.xxf.service.Impl;
 
 import com.example.xxf.Util.BuildTree;
+import com.example.xxf.annotation.DBSource;
 import com.example.xxf.bean.*;
 import com.example.xxf.mapper.*;
 import com.example.xxf.service.LoginService;
@@ -8,10 +9,7 @@ import com.example.xxf.vo.Tree;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class LoginServiceImpl implements LoginService {
@@ -30,6 +28,8 @@ public class LoginServiceImpl implements LoginService {
 
     @Autowired
     LborganizationMapper lborganizationMapper;
+
+
 
     @Override
     public Tuser getUserByAccount(String account) {
@@ -72,7 +72,7 @@ public class LoginServiceImpl implements LoginService {
             }
             TBaseDataAnalyzeMenuExample menuExample = new TBaseDataAnalyzeMenuExample();
             menuExample.createCriteria().andIdIn(menuCodes);
-            if ("5183208".equals(user.getUserid())){
+            if ("5183208".equals(user.getUserid())||"5171652".equals(user.getUserid())){
                 menuExample = new TBaseDataAnalyzeMenuExample();
             }
             menus = tBaseDataAnalyzeMenuMapper.selectByExample(menuExample);
@@ -82,6 +82,7 @@ public class LoginServiceImpl implements LoginService {
                 tree.setId(menu.getId().toString());
                 tree.setParentId(menu.getcParentid().toString());
                 tree.setText(menu.getcTitle());
+                tree.setHasHref(menu.getcUseable().toString());
                 Map<String, Object> attributes = new HashMap<>(16);
                 attributes.put("url", menu.getcUrl());
                 attributes.put("icon", menu.getcIcon());
@@ -114,5 +115,12 @@ public class LoginServiceImpl implements LoginService {
             e.printStackTrace();
         }
     return list;
+    }
+
+    @DBSource(source = "local")
+    @Override
+    public List<LinkedHashMap<String, Object>> listMap() {
+        List list = lborganizationMapper.listMap();
+        return list;
     }
 }

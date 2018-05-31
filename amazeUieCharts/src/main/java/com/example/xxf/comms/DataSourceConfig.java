@@ -38,6 +38,16 @@ public class DataSourceConfig {
     @Value("${spring.datasource.xxf.driver-class-name}")
     private String masterDBDreiverName;
 
+
+    @Value("${spring.datasource.localxxf.jdbc-url}")
+    private String localxxfDBUrl;
+    @Value("${spring.datasource.localxxf.username}")
+    private String localxxfDBUser;
+    @Value("${spring.datasource.localxxf.password}")
+    private String localxxfDBPassword;
+    @Value("${spring.datasource.localxxf.driver-class-name}")
+    private String localxxfDBDreiverName;
+
     @Bean
     public DynamicDataSource dynamicDataSource() {
 
@@ -55,9 +65,18 @@ public class DataSourceConfig {
         xxfDataSource.setUsername(masterDBUser);
         xxfDataSource.setPassword(masterDBPassword);
 
+
+        DruidDataSource localXXFSource = new DruidDataSource();
+        localXXFSource.setDriverClassName(localxxfDBDreiverName);
+        localXXFSource.setUrl(localxxfDBUrl);
+        localXXFSource.setUsername(localxxfDBUser);
+        localXXFSource.setPassword(localxxfDBPassword);
+
+
         Map<Object,Object> map = new HashMap<>();
         map.put("xxfcar", xxfcarDataSource);
         map.put("xxf", xxfDataSource);
+        map.put("local", localXXFSource);
         dynamicDataSource.setTargetDataSources(map);
         dynamicDataSource.setDefaultTargetDataSource(xxfcarDataSource);
 

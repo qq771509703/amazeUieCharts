@@ -23,7 +23,7 @@ public class DBSourceAspect {
             //DBSource dbSource =  method.getAnnotation(DBSource.class);
             //DBSource dbSource  = pjp.getTarget().getClass().getAnnotation(DBSource.class);//获取类上面的注解
             String dataSourceKey = dbs.source();
-           // System.out.println("-------@Around切换数据源----"+dataSourceKey+"---");
+            System.out.println("-------@Around切换数据源----"+dataSourceKey+"---");
             DbContextHolder.setDbType(dataSourceKey);
             ret = pjp.proceed();
         } catch (Exception e) {
@@ -31,7 +31,7 @@ public class DBSourceAspect {
             throw e;
         }finally{
             DbContextHolder.setDbType(null);
-           // System.out.println("-------@Around恢复数据源-------");
+            System.out.println("-------@Around恢复数据源-------");
         }
         return ret;
 

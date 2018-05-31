@@ -1,12 +1,13 @@
 package com.example.xxf.controller;
 
 
-import com.alibaba.fastjson.JSON;
+
 import com.example.xxf.Util.DatetimeUtil;
 import com.example.xxf.Util.ExcelUtil;
 import com.example.xxf.Util.StringUtil;
 import com.example.xxf.bean.perCapitaCapacity;
 import com.example.xxf.bean.perCapitaCapacityDetail;
+import com.example.xxf.comms.Config;
 import com.example.xxf.service.PerCapitaCapacityService;
 import com.example.xxf.vo.Layui;
 import com.example.xxf.vo.PageVo;
@@ -24,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Writer;
 import java.util.*;
 
 @Controller
@@ -37,16 +39,26 @@ public class PerCapitaCapacityController {
     @RequestMapping("/getPerCapitaCapacityList")
     @ResponseBody
     public Layui getPerCapitaCapacityList(String department, int page, int pageSize){
-        Map<String,Object> map = new HashMap<>();
 
+        if (Config.perCapitaCapacityetable_status==0){
+            return  Layui.data("'正在为您准备最新鲜的数据，请稍后...'");
+        }
+        List<String> departments = new ArrayList<>();
+        if (StringUtil.hasValue(department)){
+            departments = Arrays.asList(department.split(","));
+        }
+        Map<String,Object> map = new HashMap<>();
         ResponseVo vo = new ResponseVo();
         int start = (page-1)*pageSize+1;
         int end = page*pageSize;
+        map.put("departments",departments);
+        map.put("startRow",start);
+        map.put("endRow",end);
+        List<perCapitaCapacity> list =  perCapitaCapacityService.getPerCapitaCapacityListByLocal(map);
+        int count = perCapitaCapacityService.getPerCapitaCapacityListByLocalCount(map);
+        //List<perCapitaCapacity> list = perCapitaCapacityService.getPerCapitaCapacityList(department,start,end);
+        //int count = (int)perCapitaCapacityService.getPerCapitaCapacityListCount(department);
 
-        List<perCapitaCapacity> list = perCapitaCapacityService.getPerCapitaCapacityList(department,start,end);
-        int count = (int)perCapitaCapacityService.getPerCapitaCapacityListCount(department);
-        map.put("data",list);
-        map.put("count",count);
         return Layui.data(count,list);
     }
     @RequestMapping("/getPerCapitaCapacityDetailList")
@@ -64,6 +76,7 @@ public class PerCapitaCapacityController {
     @RequestMapping(value="getPerCapitaCapacityDetailListTOExcel",produces="text/html;charset=UTF-8")
     @ResponseBody
     public void exprotPerCapitaCapacityDetailListTOExcal(String department,HttpServletRequest request,HttpServletResponse response){
+        ResponseVo vo = new ResponseVo();
 
         List<LinkedHashMap<String,Object>> list = perCapitaCapacityService.getPerCapitaCapacityDetailListTOExcal(department);
         String[] titles = {"部门","业务员","合同编号","车牌号","合同成交日期","车辆分类","分红比例", "业绩金额"};
@@ -76,11 +89,29 @@ public class PerCapitaCapacityController {
 
     @RequestMapping(value="perCapitaCapacityexportExcel",produces="text/html;charset=UTF-8")
     @ResponseBody
-    public void exprotPerCapitaCapacityTable(String department,HttpServletRequest request,HttpServletResponse response){
-
-        List<LinkedHashMap<String,Object>> list = perCapitaCapacityService.getPerCapitaCapacityListTOExcal(department);
-
+    public void exprotPerCapitaCapacityTable(String department,HttpServletRequest request,HttpServletResponse response) throws IOException {
+        ResponseVo vo = new ResponseVo();
+        List<String> departments = new ArrayList<>();
+        Map<String,Object> map = new HashMap<>();
+        if (StringUtil.hasValue(department)){
+            departments = Arrays.asList(department.split(","));
+        }
+        map.put("departments",departments);
+        List<LinkedHashMap<String,Object>> list = perCapitaCapacityService.getPerCapitaCapacityListByLocalTOExcel(map);
+        //List<LinkedHashMap<String,Object>> list = perCapitaCapacityService.getPerCapitaCapacityListTOExcal(department);
         exportExcel(list,"人均产能",request,response);
+
+    }
+    @RequestMapping(value = "getPerCapitaCapacityetableExportStatus")
+    @ResponseBody
+    public int getExportStatus(){
+        return Config.perCapitaCapacityetable_status;
+    }
+
+    @RequestMapping(value = "initialize_select_department_PCC")
+    @ResponseBody
+    public List<String> initializeSelectDepartment(){
+        return perCapitaCapacityService.getDepartmentInitialize_select();
     }
 
     public void exportExcel( List<LinkedHashMap<String,Object>> list, String s_type, HttpServletRequest request, HttpServletResponse response){

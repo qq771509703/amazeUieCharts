@@ -279,7 +279,6 @@
 
     </select>
 
-
     <select id="getSynergyEvolveTable" resultType="java.util.LinkedHashMap" parameterType="java.util.Map">
 
         SELECT
@@ -571,7 +570,7 @@
         <if test="pluginVal =='ztcl_span'" >
             and a.车辆标识 = '在途车辆'
         </if>
- )
+        )
         t
         where 1=1
         ) AS sys_roles
@@ -590,7 +589,6 @@
 
 
     </select>
-
 
     <select id="getSynergyEvolveTableCount" resultType="java.lang.Long" parameterType="java.util.Map">
     select count(1) from (
@@ -880,4 +878,621 @@
 
     </select>
 
+
+    <select id="getSynergyEvolveTableByBase" resultType="com.example.xxf.bean.Synergyevolvetable">
+        SELECT
+        *
+        FROM(
+        SELECT  ROW_NUMBER() OVER(ORDER BY OldID desc) AS rowid,*
+        from
+        (
+        select
+        a.区域 AS area
+        ,a.ID AS OldID
+        ,a.车辆归属 AS carAffiliation
+        ,a.采购单号 AS purchaseOrder
+        ,a.车架号 AS VIN
+        ,a.车牌号 AS carNum
+        ,a.采购跟进单 AS purchaseTrackingNum
+        ,a.车型 AS carType
+        ,a.规格 AS specification
+        ,a.颜色 AS color
+        ,a.付款结束 AS paymentEndDate
+        ,a.预计发车 AS predictSendCar
+        ,a.发票寄出 AS invoiceSendoff
+        ,a.合格证寄出 AS conformityCertificationSendoff
+        ,a.商业险购买 AS commerceInsurance
+        ,a.交强险购买 AS trafficInsurance
+        ,a.到4S店 AS at4Sstore
+        ,a.到店日期 AS atStoreDate
+        ,a.到票日期 AS atTicketDate
+        ,a.到证日期 AS atCertificateDate
+        ,a.GPS安装 AS GPSInstallDate
+        ,a.上牌日期 AS installLicencePlate
+        ,a.车辆标识 AS physicalState
+        ,a.到店方式 AS atStoreWay
+        ,a.采购合同号 AS procurementContractNo
+        ,a.付款单号 AS paymentOrder
+        ,a.指导价 AS guidePrice
+        ,a.Ftime_i AS ftime_i
+        ,a.品牌 AS fBrand
+        from (
+        select
+        left(i.FName,2) '区域'
+        ,a.ID
+        ,case when o.Name = '淘汽互联网子公司' then '淘汽'
+        when o.Name != '淘汽互联网子公司' and w.Ftq = '1' then '淘汽'
+        else '喜相逢'
+        end '车辆归属'
+
+        ,j.AppNo '采购单号'
+        ,a.FVIN '车架号'
+        ,a.FPlateNum '车牌号'
+        ,w.AppNo '采购跟进单'
+        , m.FBrand '品牌'
+        ,case when m.FBrand+m.FName is null then m.FName when  m.FBrand+m.FName is not null then m.FBrand+m.FName end '车型'
+        ,n.FModel '规格'
+        ,fc.FColor '颜色'
+        /*付款结束时间*/
+        ,right(CONVERT(varchar(10), case when aa.WFEndTime is null then ae.WFEndTime    /*无首款结束时间则取尾款结束时间*/
+        when j.FIsFinCredit = 2 then aa.WFEndTime     /*非金融贷取首款结束时间*/
+        when j.FIsFinCredit = 1 and j.Ffkbl != 1 then aa.WFEndTime     /*金融贷且付款比例不为1则取首款结束时间*/
+        else j.FloanTime     /*金融贷付款时间*/
+        end,111) ,5) '付款结束'
+
+        ,right(convert(varchar(10),w.Ftime,111),5) '预计发车'
+        ,w.Ftime_i
+        ,right(convert(varchar(10),w.Ftime_i,111),5) '发票寄出'
+        ,right(convert(varchar(10),w.Ftime_c,111),5) '合格证寄出'
+        ,right(convert(varchar(10),w.FsyxPayDate,111),5) '商业险购买'
+        ,right(convert(varchar(10),w.FjqxPayDate_copy,111),5) '交强险购买'
+        ,right(convert(varchar(10),l.Ftime_4S,111),5) '到4S店'
+        ,right(convert(varchar(10),l.Ftime,111),5) '到店日期'
+        ,right(convert(varchar(10),l.Ftime_i,111),5) '到票日期'
+        ,right(convert(varchar(10),l.Ftime_c,111),5) '到证日期'
+        ,right(convert(varchar(10),q.FJHSJ,111),5) 'GPS安装'
+        ,convert(varchar(10),p.FSPSJ,111) '上牌日期'
+
+        /*case when 语法问题，若一辆车同时满足两种状态，会被判断成第一种状态*/
+        ,case when a.FCarPreStatus in (110,128) and (e.FStatus IN (1,2,3,13,14,21) or e.FStatus IS null) and cc.co = 1 then '履约新车'
+        /*车辆当前状态(以租代购、合同审批中)且售车跟进状态(正常、期满结清、违约结清、换车结清、提前还款、报废申请或为空)且只有一个合同*/
+        when a.FCarPreStatus in (110,128) and (e.FStatus IN (1,2,3,13,14,21) or e.FStatus IS null) and cc.co > 1 then '履约二手车'
+        when (f.FQuoType = 1 and a.FCarPreStatus in (108,107)) and f.FSaleState = 1
+        and a.id not in(select isnull(a.FQuoteLed,0) from WO_RZYZDGSCLC a join OS_WFENTRY f on a.InstID=f.id where f.STATE in(1))
+        then '待售新车'
+        when (a.FCarPreStatus  = 109 or a.FCarPreStatus in ('108','121')
+        and a.id in(select isnull(a.FQuoteLed,0) from WO_RZYZDGSCLC a inner join OS_WFENTRY f on a.InstID=f.id where f.STATE in(1)))
+        then '预售车'
+        /*(报价种类为新车报价且车辆当前状态为(已上牌、新车在库、已预订))*/
+        when f.FQuoType = 2 and a.FCarPreStatus in (121,139) and f.FSaleState=1 then '待售二手车'
+        when a.FCarPreStatus = '140' then '库存车已预订'
+        when a.FCarPreStatus = '141' then '库存出售车'
+        when e.FStatus = 5 and a.FCarPreStatus != 121 then '待收车'
+        when e.FStatus in (6,7,12) then '已收车待处理'
+        when e.FStatus in (16,17,4,25) then '法务介入'
+        when e.FStatus in (8) then '技术部待处理'
+        when e.FStatus in (9,24)  then '车管待处理'
+        when a.FCarPreStatus IN (117,124) then '待过户'
+        when a.FCarPreStatus in (118,120,125) then '过户或外卖车'
+        when a.FCarPreStatus in (119,126)  then '报废车'
+        when a.FCarPreStatus in (123,127) then '公务车'
+        when a.FPlateNum='' and j.AppNo!='' and k.FContract!='' and l.Ftime is null and l.Ftime_4S is null and aa.WFEndTime!='' then '在途车辆'
+        when a.FPlateNum='' and j.AppNo!='' and k.FContract!='' and (l.Ftime is not null or l.Ftime_4S is not null)
+        and aa.WFEndTime!='' then '在库处理车辆'
+        when (f.FQuoType = 1 and a.FCarPreStatus in (108,107)) and f.FSaleState != 1 then '在库处理车辆'
+        when a.FPlateNum='' and j.AppNo!='' and k.FContract!='' and aa.WFEndTime is null then '待付款新车'
+        end '车辆标识'
+
+        ,case w.Fmode when '1' then '门店' when '2' then '4S店并上牌' when '3' then '4S店未上牌' else null end '到店方式'
+        ,k.FContract '采购合同号'
+        ,aa.AppNo '付款单号'
+        ,m.Fguidingprice '指导价'
+        from FCar a
+        /*最新合同*/
+        left join (
+        select a.Fstate,a.ID,a.FCar,a.rw
+        from (
+        select ROW_NUMBER() over(partition by b.fcp order by b.FContractTime desc,b.FSignDate desc) rw,b.Fstate,b.ID,b.FCar
+        from FM_ConAcc b
+        where b.FIsDrop = 0 and b.ID != '14291'
+        ) a
+        where a.rw = 1
+        ) b
+        on a.ID = b.FCar
+        /*车辆当前状态*/
+        left join tXTDM c on a.FCarPreStatus = c.IBM AND c.FLMC = '车辆当前状态'
+        /*合同状态*/
+        left join Entity_SCGJZT d on b.Fstate = d.ID
+        /*售车跟进状态*/
+        left join Entity_SCGJ e on b.ID=e.FContract
+        /*采购明细*/
+        left join (
+        select b.AppNo,a.Ftq,a.Ftime,a.Ftime_i,a.Ftime_c,a.FsyxPayDate,a.FjqxPayDate_copy,a.Fmode,a.FCarID
+        from WO_GCCLGLLC_detail a with (nolock)
+        left join WO_GCCLGLLC b with (nolock) on a.WO_GCCLGLLC_ID = b.ID
+        where isnull(b.WFState,0) != 3 and isnull(b.FAppType,0) != 3
+        ) w
+        on w.FCarID = a.ID
+        /*报价种类*/
+        LEFT JOIN FNewCarOffer f on f.FVType = a.ID
+        /*区域*/
+        left join Area i on a.FArea=i.ID
+        /*采购相关信息表，采购结束时间以流程结束时间为准*/
+        left join (
+        select a.ID,a.FBuying_Requisition,a.FIsFinCredit,a.Ffkbl,a.FloanTime,a.AppNo,MIN(b.START_DATE) 'START_DATE'
+        ,MAX(case when b.STEP_ID = 1 then  b.FINISH_DATE end) 'FINISH_DATE'
+        from WO_CGSQDLC a with (nolock)
+        left join OS_HISTORYSTEP b with (nolock) on b.ENTRY_ID = a.InstID
+        where isnull(a.FAppType,0) != 3 and isnull(a.WFState,0) != 3
+        group by a.ID,a.FBuying_Requisition,a.FIsFinCredit,a.Ffkbl,a.FloanTime,a.AppNo
+        ) j
+        on j.ID = a.FPurNo
+        /*请购相关信息表，请购结束时间以流程结束时间为准*/
+        left join (
+        select a.ID,c.Name,a.AppNo,MIN(b.START_DATE) 'START_DATE',MAX(case when b.STEP_ID = 1 then  b.FINISH_DATE end) 'FINISH_DATE'
+        from WO_QGLC a with (nolock)
+        left join OS_HISTORYSTEP b with (nolock) on b.ENTRY_ID = a.InstID
+        left join lbOrganization c with (nolock) on a.FOrgid = c.ID
+        where isnull(a.FAppType,0) != 3 and isnull(a.WFState,0) != 3
+        group by a.ID,c.Name,a.AppNo
+        ) o
+        on o.ID = j.FBuying_Requisition
+        /*采购合同发起和结束时间*/
+        left join (
+        select a.lyCGID,a.FContract,MIN(b.START_DATE) 'START_DATE',MAX(case when b.STEP_ID = 1 then b.FINISH_DATE end) 'FINISH_DATE'
+        from CarPurchase_Contract a with (nolock)
+        left join OS_HISTORYSTEP b with (nolock) on b.ENTRY_ID = a.InstID
+        left join OS_WFENTRY c with (nolock) on a.InstID = c.ID
+        where isnull(a.FAppType,0) != 3 and isnull(c.STATE,0) != 3
+        group by a.lyCGID,a.FContract
+        ) k
+        on k.lyCGID = j.ID
+        /*到店交接单*/
+        left join Entity_JJD l on l.Fvin = a.FVIN
+        /*车型*/
+        left join Vehicle_Mana m on a.FVType = m.ID
+        /*产品信息*/
+        left join GoodsCode n on n.ID = a.FVType1
+        /*购车车辆提车流程*/
+        left join (select a.FVIN,a.FSPSJ from WO_GCCLTCLC a where isnull(a.WFState,0) != 3) p on p.FVIN = a.FVIN
+        /*定位安装情况判断*/
+        left join (
+        select a.RelaCar,a.FState,MAX(b.FJHSJ) FJHSJ
+        from Entity_JSGXSJ a with (nolock)
+        left join Entity_JSGXSJ_GPSNO b with (nolock) on b.Entity_JSGXSJ_ID = a.ID
+        group by a.RelaCar,a.FState
+        ) q
+        on q.RelaCar = a.ID
+        /*采购付款时间--付首款*/
+        left join (
+        select a.CarID,a.InstID,a.WFAppTime,a.WFEndTime,a.AppNo
+        from (
+        select aa.InstID,aa.WFAppTime,aa.WFEndTime,aa.WFState,b.CarID,aa.AppNo,
+        row_number() over(partition by b.CarID order by aa.Reimburse_Time) rn
+        from WO_BXLC aa with (nolock)
+        left join WO_BXLC_ReimburseDetail b with (nolock) on aa.id = b.WO_BXLC_ID
+        left join FM_ConAcc ab with (nolock) on ab.ID = aa.FReiInfo
+        left join CarPurchase_Contract ac with (nolock) on ab.FPurContract_NO = ac.ID
+        where isnull(aa.WFState,0) = 4 and ac.FContract is not null and aa.FDocCate in (7,51)
+        ) a
+        where a.rn = 1
+        ) aa
+        on  aa.CarID = a.ID
+        /*当合同数量为1，判定新车，大于1，二手车*/
+        left join (
+        select a.FCar,COUNT(1) co
+        from FM_ConAcc a
+        where a.FIsDrop = 0
+        group by a.FCar
+        ) cc
+        on cc.FCar = a.ID
+        /*付尾款时间*/
+        left join (
+        select a.CarID,a.WFAppTime,a.WFEndTime
+        from (
+        select b.CarID,aa.WFAppTime,aa.WFEndTime,row_number() over(partition by b.CarID order by aa.Reimburse_Time) rn
+        from WO_BXLC aa with (nolock)
+        left join WO_BXLC_ReimburseDetail b with (nolock) on aa.id = b.WO_BXLC_ID
+        left join FM_ConAcc ab with (nolock) on ab.ID = aa.FReiInfo
+        left join CarPurchase_Contract ac with (nolock) on ab.FPurContract_NO = ac.ID
+        where isnull(aa.WFState,0) = 4 and ac.FContract is not null and aa.FDocCate = 13
+        ) a
+        where a.rn = 1   /*防止一辆车重复报销多次的情况，取最新一次的时间(几乎不会有这种情况)*/
+        ) ae
+        on ae.CarID = a.ID
+        /*车身颜色*/
+        left join FColor fc on fc.ID = a.FColor
+
+        where a.FUseStatus = 1
+        and i.FName like '%公司%'
+        and a.FCarPreStatus != '138'
+        ) a
+        where 1 = 1
+        and a.车辆标识 in ('在途车辆','在库处理车辆','待付款新车','待售新车','预售车')
+        )
+        t
+        where 1=1
+        ) AS sys_roles
+        WHERE ROWID BETWEEN #{startRow} and #{endRow}
+
+
+    </select>
+    <select id="getSynergyEvolveTableByBaseCount" resultType="java.lang.Long" >
+        select count(1) from (
+        select
+        a.区域
+        ,a.车辆归属
+        ,a.采购单号
+        ,a.车架号
+        ,a.车牌号
+        ,a.采购跟进单
+        ,a.车型
+        ,a.规格
+        ,a.颜色
+        ,a.付款结束
+        ,a.预计发车
+        ,a.发票寄出
+        ,a.合格证寄出
+        ,a.商业险购买
+        ,a.交强险购买
+        ,a.到4S店
+        ,a.到店日期
+        ,a.到票日期
+        ,a.到证日期
+        ,a.GPS安装
+        ,a.上牌日期
+        ,a.车辆标识
+        ,a.到店方式
+        ,a.采购合同号
+        ,a.付款单号
+        ,a.指导价
+        from (
+        select
+        left(i.FName,2) '区域'
+        ,a.ID
+        ,case when o.Name = '淘汽互联网子公司' then '淘汽'
+        when o.Name != '淘汽互联网子公司' and w.Ftq = '1' then '淘汽'
+        else '喜相逢'
+        end '车辆归属'
+
+        ,j.AppNo '采购单号'
+        ,a.FVIN '车架号'
+        ,a.FPlateNum '车牌号'
+        ,w.AppNo '采购跟进单'
+        , m.FBrand '品牌'
+        ,case when m.FBrand+m.FName is null then m.FName when  m.FBrand+m.FName is not null then m.FBrand+m.FName end '车型'
+        ,n.FModel '规格'
+        ,fc.FColor '颜色'
+        /*付款结束时间*/
+        ,right(CONVERT(varchar(10), case when aa.WFEndTime is null then ae.WFEndTime    /*无首款结束时间则取尾款结束时间*/
+        when j.FIsFinCredit = 2 then aa.WFEndTime     /*非金融贷取首款结束时间*/
+        when j.FIsFinCredit = 1 and j.Ffkbl != 1 then aa.WFEndTime     /*金融贷且付款比例不为1则取首款结束时间*/
+        else j.FloanTime     /*金融贷付款时间*/
+        end,111) ,5) '付款结束'
+
+        ,right(convert(varchar(10),w.Ftime,111),5) '预计发车'
+        ,w.Ftime_i
+        ,right(convert(varchar(10),w.Ftime_i,111),5) '发票寄出'
+        ,right(convert(varchar(10),w.Ftime_c,111),5) '合格证寄出'
+        ,right(convert(varchar(10),w.FsyxPayDate,111),5) '商业险购买'
+        ,right(convert(varchar(10),w.FjqxPayDate_copy,111),5) '交强险购买'
+        ,right(convert(varchar(10),l.Ftime_4S,111),5) '到4S店'
+        ,right(convert(varchar(10),l.Ftime,111),5) '到店日期'
+        ,right(convert(varchar(10),l.Ftime_i,111),5) '到票日期'
+        ,right(convert(varchar(10),l.Ftime_c,111),5) '到证日期'
+        ,right(convert(varchar(10),q.FJHSJ,111),5) 'GPS安装'
+        ,convert(varchar(10),p.FSPSJ,111) '上牌日期'
+
+        /*case when 语法问题，若一辆车同时满足两种状态，会被判断成第一种状态*/
+        ,case when a.FCarPreStatus in (110,128) and (e.FStatus IN (1,2,3,13,14,21) or e.FStatus IS null) and cc.co = 1 then '履约新车'
+        /*车辆当前状态(以租代购、合同审批中)且售车跟进状态(正常、期满结清、违约结清、换车结清、提前还款、报废申请或为空)且只有一个合同*/
+        when a.FCarPreStatus in (110,128) and (e.FStatus IN (1,2,3,13,14,21) or e.FStatus IS null) and cc.co > 1 then '履约二手车'
+        when (f.FQuoType = 1 and a.FCarPreStatus in (108,107)) and f.FSaleState = 1
+        and a.id not in(select isnull(a.FQuoteLed,0) from WO_RZYZDGSCLC a join OS_WFENTRY f on a.InstID=f.id where f.STATE in(1))
+        then '待售新车'
+        when (a.FCarPreStatus  = 109 or a.FCarPreStatus in ('108','121')
+        and a.id in(select isnull(a.FQuoteLed,0) from WO_RZYZDGSCLC a inner join OS_WFENTRY f on a.InstID=f.id where f.STATE in(1)))
+        then '预售车'
+        /*(报价种类为新车报价且车辆当前状态为(已上牌、新车在库、已预订))*/
+        when f.FQuoType = 2 and a.FCarPreStatus in (121,139) and f.FSaleState=1 then '待售二手车'
+        when a.FCarPreStatus = '140' then '库存车已预订'
+        when a.FCarPreStatus = '141' then '库存出售车'
+        when e.FStatus = 5 and a.FCarPreStatus != 121 then '待收车'
+        when e.FStatus in (6,7,12) then '已收车待处理'
+        when e.FStatus in (16,17,4,25) then '法务介入'
+        when e.FStatus in (8) then '技术部待处理'
+        when e.FStatus in (9,24)  then '车管待处理'
+        when a.FCarPreStatus IN (117,124) then '待过户'
+        when a.FCarPreStatus in (118,120,125) then '过户或外卖车'
+        when a.FCarPreStatus in (119,126)  then '报废车'
+        when a.FCarPreStatus in (123,127) then '公务车'
+        when a.FPlateNum='' and j.AppNo!='' and k.FContract!='' and l.Ftime is null and l.Ftime_4S is null and aa.WFEndTime!='' then '在途车辆'
+        when a.FPlateNum='' and j.AppNo!='' and k.FContract!='' and (l.Ftime is not null or l.Ftime_4S is not null)
+        and aa.WFEndTime!='' then '在库处理车辆'
+        when (f.FQuoType = 1 and a.FCarPreStatus in (108,107)) and f.FSaleState != 1 then '在库处理车辆'
+        when a.FPlateNum='' and j.AppNo!='' and k.FContract!='' and aa.WFEndTime is null then '待付款新车'
+        end '车辆标识'
+
+        ,case w.Fmode when '1' then '门店' when '2' then '4S店并上牌' when '3' then '4S店未上牌' else null end '到店方式'
+        ,k.FContract '采购合同号'
+        ,aa.AppNo '付款单号'
+        ,m.Fguidingprice '指导价'
+        from FCar a
+        /*最新合同*/
+        left join (
+        select a.Fstate,a.ID,a.FCar,a.rw
+        from (
+        select ROW_NUMBER() over(partition by b.fcp order by b.FContractTime desc,b.FSignDate desc) rw,b.Fstate,b.ID,b.FCar
+        from FM_ConAcc b
+        where b.FIsDrop = 0 and b.ID != '14291'
+        ) a
+        where a.rw = 1
+        ) b
+        on a.ID = b.FCar
+        /*车辆当前状态*/
+        left join tXTDM c on a.FCarPreStatus = c.IBM AND c.FLMC = '车辆当前状态'
+        /*合同状态*/
+        left join Entity_SCGJZT d on b.Fstate = d.ID
+        /*售车跟进状态*/
+        left join Entity_SCGJ e on b.ID=e.FContract
+        /*采购明细*/
+        left join (
+        select b.AppNo,a.Ftq,a.Ftime,a.Ftime_i,a.Ftime_c,a.FsyxPayDate,a.FjqxPayDate_copy,a.Fmode,a.FCarID
+        from WO_GCCLGLLC_detail a with (nolock)
+        left join WO_GCCLGLLC b with (nolock) on a.WO_GCCLGLLC_ID = b.ID
+        where isnull(b.WFState,0) != 3 and isnull(b.FAppType,0) != 3
+        ) w
+        on w.FCarID = a.ID
+        /*报价种类*/
+        LEFT JOIN FNewCarOffer f on f.FVType = a.ID
+        /*区域*/
+        left join Area i on a.FArea=i.ID
+        /*采购相关信息表，采购结束时间以流程结束时间为准*/
+        left join (
+        select a.ID,a.FBuying_Requisition,a.FIsFinCredit,a.Ffkbl,a.FloanTime,a.AppNo,MIN(b.START_DATE) 'START_DATE'
+        ,MAX(case when b.STEP_ID = 1 then  b.FINISH_DATE end) 'FINISH_DATE'
+        from WO_CGSQDLC a with (nolock)
+        left join OS_HISTORYSTEP b with (nolock) on b.ENTRY_ID = a.InstID
+        where isnull(a.FAppType,0) != 3 and isnull(a.WFState,0) != 3
+        group by a.ID,a.FBuying_Requisition,a.FIsFinCredit,a.Ffkbl,a.FloanTime,a.AppNo
+        ) j
+        on j.ID = a.FPurNo
+        /*请购相关信息表，请购结束时间以流程结束时间为准*/
+        left join (
+        select a.ID,c.Name,a.AppNo,MIN(b.START_DATE) 'START_DATE',MAX(case when b.STEP_ID = 1 then  b.FINISH_DATE end) 'FINISH_DATE'
+        from WO_QGLC a with (nolock)
+        left join OS_HISTORYSTEP b with (nolock) on b.ENTRY_ID = a.InstID
+        left join lbOrganization c with (nolock) on a.FOrgid = c.ID
+        where isnull(a.FAppType,0) != 3 and isnull(a.WFState,0) != 3
+        group by a.ID,c.Name,a.AppNo
+        ) o
+        on o.ID = j.FBuying_Requisition
+        /*采购合同发起和结束时间*/
+        left join (
+        select a.lyCGID,a.FContract,MIN(b.START_DATE) 'START_DATE',MAX(case when b.STEP_ID = 1 then b.FINISH_DATE end) 'FINISH_DATE'
+        from CarPurchase_Contract a with (nolock)
+        left join OS_HISTORYSTEP b with (nolock) on b.ENTRY_ID = a.InstID
+        left join OS_WFENTRY c with (nolock) on a.InstID = c.ID
+        where isnull(a.FAppType,0) != 3 and isnull(c.STATE,0) != 3
+        group by a.lyCGID,a.FContract
+        ) k
+        on k.lyCGID = j.ID
+        /*到店交接单*/
+        left join Entity_JJD l on l.Fvin = a.FVIN
+        /*车型*/
+        left join Vehicle_Mana m on a.FVType = m.ID
+        /*产品信息*/
+        left join GoodsCode n on n.ID = a.FVType1
+        /*购车车辆提车流程*/
+        left join (select a.FVIN,a.FSPSJ from WO_GCCLTCLC a where isnull(a.WFState,0) != 3) p on p.FVIN = a.FVIN
+        /*定位安装情况判断*/
+        left join (
+        select a.RelaCar,a.FState,MAX(b.FJHSJ) FJHSJ
+        from Entity_JSGXSJ a with (nolock)
+        left join Entity_JSGXSJ_GPSNO b with (nolock) on b.Entity_JSGXSJ_ID = a.ID
+        group by a.RelaCar,a.FState
+        ) q
+        on q.RelaCar = a.ID
+        /*采购付款时间--付首款*/
+        left join (
+        select a.CarID,a.InstID,a.WFAppTime,a.WFEndTime,a.AppNo
+        from (
+        select aa.InstID,aa.WFAppTime,aa.WFEndTime,aa.WFState,b.CarID,aa.AppNo,
+        row_number() over(partition by b.CarID order by aa.Reimburse_Time) rn
+        from WO_BXLC aa with (nolock)
+        left join WO_BXLC_ReimburseDetail b with (nolock) on aa.id = b.WO_BXLC_ID
+        left join FM_ConAcc ab with (nolock) on ab.ID = aa.FReiInfo
+        left join CarPurchase_Contract ac with (nolock) on ab.FPurContract_NO = ac.ID
+        where isnull(aa.WFState,0) = 4 and ac.FContract is not null and aa.FDocCate in (7,51)
+        ) a
+        where a.rn = 1
+        ) aa
+        on  aa.CarID = a.ID
+        /*当合同数量为1，判定新车，大于1，二手车*/
+        left join (
+        select a.FCar,COUNT(1) co
+        from FM_ConAcc a
+        where a.FIsDrop = 0
+        group by a.FCar
+        ) cc
+        on cc.FCar = a.ID
+        /*付尾款时间*/
+        left join (
+        select a.CarID,a.WFAppTime,a.WFEndTime
+        from (
+        select b.CarID,aa.WFAppTime,aa.WFEndTime,row_number() over(partition by b.CarID order by aa.Reimburse_Time) rn
+        from WO_BXLC aa with (nolock)
+        left join WO_BXLC_ReimburseDetail b with (nolock) on aa.id = b.WO_BXLC_ID
+        left join FM_ConAcc ab with (nolock) on ab.ID = aa.FReiInfo
+        left join CarPurchase_Contract ac with (nolock) on ab.FPurContract_NO = ac.ID
+        where isnull(aa.WFState,0) = 4 and ac.FContract is not null and aa.FDocCate = 13
+        ) a
+        where a.rn = 1   /*防止一辆车重复报销多次的情况，取最新一次的时间(几乎不会有这种情况)*/
+        ) ae
+        on ae.CarID = a.ID
+        /*车身颜色*/
+        left join FColor fc on fc.ID = a.FColor
+
+        where a.FUseStatus = 1
+        and i.FName like '%公司%'
+        and a.FCarPreStatus != '138'
+        ) a
+        where 1 = 1
+        and a.车辆标识 in ('在途车辆','在库处理车辆','待付款新车','待售新车','预售车')
+
+        /* 全局控件查询*/
+        <if test="areaList != null and areaList.size >0" >
+            and a.区域 in
+            <foreach collection="areaList" index="index" item="area" open="(" separator="," close=")">
+                #{area}
+            </foreach>
+        </if>
+
+        <if test="brandList != null and brandList.size >0" >
+            and a.品牌 in
+            <foreach collection="brandList" index="index" item="brand" open="(" separator="," close=")">
+                #{brand}
+            </foreach>
+        </if>
+
+
+        <if test="carTypeList != null and carTypeList.size >0" >
+            and a.车型 in
+            <foreach collection="carTypeList" index="index" item="carType" open="(" separator="," close=")">
+                #{carType}
+            </foreach>
+        </if>
+
+        <if test="phyStatusList != null and phyStatusList.size >0" >
+            and a.车辆标识 in
+            <foreach collection="phyStatusList" index="index" item="phyStatus" open="(" separator="," close=")">
+                #{phyStatus}
+            </foreach>
+        </if>
+
+
+        <if test="ownerList != null and ownerList.size >0" >
+            and a.车辆归属 in
+            <foreach collection="ownerList" index="index" item="owner" open="(" separator="," close=")">
+                #{owner}
+            </foreach>
+        </if>
+
+        <if test="arriveWayList != null and arriveWayList.size >0" >
+            and a.车辆归属 in
+            <foreach collection="arriveWayList" index="index" item="arriveWay" open="(" separator="," close=")">
+                #{arriveWay}
+            </foreach>
+        </if>
+
+        <if test="pluginVal =='sAndUGPS_span'" >
+            and ISNULL(a.到店日期,a.到4S店) is not null and a.GPS安装 is null
+        </if>
+        <if test="pluginVal =='fpjcjqxwm_span'" >
+            and a.发票寄出 is not null and a.交强险购买 is null and a.Ftime_i  &lt;= GETDATE()
+        </if>
+        <if test="pluginVal =='yspwjsyx_span'" >
+            and a.交强险购买 is not null and a.车牌号 != '' and a.商业险购买 is null
+        </if>
+        <if test="pluginVal =='zpqqwsp_span'" >
+            and ISNULL(a.到店日期,a.到4S店) is not null and a.到票日期 is not null and a.到证日期 is not null and a.交强险购买 is not null and a.上牌日期 is null
+        </if>
+        <if test="pluginVal =='ztcl_span'" >
+            and a.车辆标识 = '在途车辆'
+        </if>
+        )
+        t
+
+    </select>
+
+
+    <select id="getSynergyEvolveTableByLocal" resultType="java.util.List" parameterType="java.util.Map">
+
+        SELECT
+        *
+        FROM(
+        SELECT  ROW_NUMBER() OVER(ORDER BY 区域 desc) AS rowid,*
+        from
+        (
+
+
+        /* 全局控件查询*/
+        <if test="areaList != null and areaList.size >0" >
+            and area in
+            <foreach collection="areaList" index="index" item="area" open="(" separator="," close=")">
+                #{area}
+            </foreach>
+        </if>
+
+        <if test="brandList != null and brandList.size >0" >
+            and pingpai in
+            <foreach collection="brandList" index="index" item="brand" open="(" separator="," close=")">
+                #{brand}
+            </foreach>
+        </if>
+
+
+        <if test="carTypeList != null and carTypeList.size >0" >
+            and chexing in
+            <foreach collection="carTypeList" index="index" item="carType" open="(" separator="," close=")">
+                #{carType}
+            </foreach>
+        </if>
+
+        <if test="phyStatusList != null and phyStatusList.size >0" >
+            and a.cheliangshibie in
+            <foreach collection="phyStatusList" index="index" item="phyStatus" open="(" separator="," close=")">
+                #{phyStatus}
+            </foreach>
+        </if>
+
+
+        <if test="ownerList != null and ownerList.size >0" >
+            and a.carAffiliation in
+            <foreach collection="ownerList" index="index" item="owner" open="(" separator="," close=")">
+                #{owner}
+            </foreach>
+        </if>
+
+        <if test="arriveWayList != null and arriveWayList.size >0" >
+            and a.atStoreWay in
+            <foreach collection="arriveWayList" index="index" item="arriveWay" open="(" separator="," close=")">
+                #{arriveWay}
+            </foreach>
+        </if>
+
+        <if test="pluginVal =='sAndUGPS_span'" >
+            and ISNULL(a.到店日期,a.到4S店) is not null and a.GPS安装 is null
+        </if>
+        <if test="pluginVal =='fpjcjqxwm_span'" >
+            and a.发票寄出 is not null and a.交强险购买 is null and a.Ftime_i  &lt;= GETDATE()
+        </if>
+        <if test="pluginVal =='yspwjsyx_span'" >
+            and a.交强险购买 is not null and a.车牌号 != '' and a.商业险购买 is null
+        </if>
+        <if test="pluginVal =='zpqqwsp_span'" >
+            and ISNULL(a.到店日期,a.到4S店) is not null and a.到票日期 is not null and a.到证日期 is not null and a.交强险购买 is not null and a.上牌日期 is null
+        </if>
+        <if test="pluginVal =='ztcl_span'" >
+            and a.车辆标识 = '在途车辆'
+        </if>
+        )
+        t
+        where 1=1
+        ) AS sys_roles
+        WHERE ROWID BETWEEN #{startRow} and #{endRow}
+
+        /*已到店未装GPS*/
+        --and ISNULL(a.到店日期,a.到4S店) is not null and a.GPS安装 is null
+        /*已上牌未买商业险*/
+        --and a.交强险购买 is not null and a.车牌号 != '' and a.商业险购买 is null
+        /*发票寄出交强险未买*/
+        --and a.发票寄出 is not null and a.交强险购买 is null and a.Ftime_i  &lt;= GETDATE()
+        /*证票齐全未上牌*/
+        --and ISNULL(a.到店日期,a.到4S店) is not null and a.到票日期 is not null and a.到证日期 is not null and a.交强险购买 is not null and a.上牌日期 is null
+        /*在途车辆*/
+        --and a.车辆标识 = '在途车辆'
+
+
+    </select>
 </mapper>

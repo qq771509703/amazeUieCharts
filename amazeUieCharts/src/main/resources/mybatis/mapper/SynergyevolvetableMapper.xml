@@ -1,0 +1,745 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.xxf.mapper.SynergyevolvetableMapper" >
+  <resultMap id="BaseResultMap" type="com.example.xxf.bean.Synergyevolvetable" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="OldID" property="oldid" jdbcType="INTEGER" />
+    <result column="area" property="area" jdbcType="VARCHAR" />
+    <result column="carAffiliation" property="caraffiliation" jdbcType="VARCHAR" />
+    <result column="purchaseOrder" property="purchaseorder" jdbcType="VARCHAR" />
+    <result column="VIN" property="vin" jdbcType="VARCHAR" />
+    <result column="carNum" property="carnum" jdbcType="VARCHAR" />
+    <result column="purchaseTrackingNum" property="purchasetrackingnum" jdbcType="VARCHAR" />
+    <result column="carType" property="cartype" jdbcType="VARCHAR" />
+    <result column="specification" property="specification" jdbcType="VARCHAR" />
+    <result column="color" property="color" jdbcType="VARCHAR" />
+    <result column="paymentEndDate" property="paymentenddate" jdbcType="VARCHAR" />
+    <result column="predictSendCar" property="predictsendcar" jdbcType="VARCHAR" />
+    <result column="invoiceSendoff" property="invoicesendoff" jdbcType="VARCHAR" />
+    <result column="conformityCertificationSendoff" property="conformitycertificationsendoff" jdbcType="VARCHAR" />
+    <result column="commerceInsurance" property="commerceinsurance" jdbcType="VARCHAR" />
+    <result column="trafficInsurance" property="trafficinsurance" jdbcType="VARCHAR" />
+    <result column="at4Sstore" property="at4sstore" jdbcType="VARCHAR" />
+    <result column="atStoreDate" property="atstoredate" jdbcType="VARCHAR" />
+    <result column="atTicketDate" property="atticketdate" jdbcType="VARCHAR" />
+    <result column="atCertificateDate" property="atcertificatedate" jdbcType="VARCHAR" />
+    <result column="GPSInstallDate" property="gpsinstalldate" jdbcType="VARCHAR" />
+    <result column="installLicencePlate" property="installlicenceplate" jdbcType="VARCHAR" />
+    <result column="physicalState" property="physicalstate" jdbcType="VARCHAR" />
+    <result column="atStoreWay" property="atstoreway" jdbcType="VARCHAR" />
+    <result column="procurementContractNo" property="procurementcontractno" jdbcType="VARCHAR" />
+    <result column="paymentOrder" property="paymentorder" jdbcType="VARCHAR" />
+    <result column="guidePrice" property="guideprice" jdbcType="VARCHAR" />
+
+    <result column="ftime_i" property="ftime_i" jdbcType="VARCHAR" />
+    <result column="fBrand" property="fBrand" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, OldID, area, carAffiliation, purchaseOrder, VIN, carNum, purchaseTrackingNum, 
+    carType, specification, color, paymentEndDate, predictSendCar, invoiceSendoff, conformityCertificationSendoff, 
+    commerceInsurance, trafficInsurance, at4Sstore, atStoreDate, atTicketDate, atCertificateDate, 
+    GPSInstallDate, installLicencePlate, physicalState, atStoreWay, procurementContractNo, 
+    paymentOrder, guidePrice,ftime_i,fBrand
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.example.xxf.bean.SynergyevolvetableExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from synergyEvolveTable
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <delete id="deleteByExample" parameterType="com.example.xxf.bean.SynergyevolvetableExample" >
+    delete from synergyEvolveTable
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.example.xxf.bean.Synergyevolvetable" >
+    insert into synergyEvolveTable (id, OldID, area, 
+      carAffiliation, purchaseOrder, VIN, 
+      carNum, purchaseTrackingNum, carType, 
+      specification, color, paymentEndDate, 
+      predictSendCar, invoiceSendoff, conformityCertificationSendoff, 
+      commerceInsurance, trafficInsurance, at4Sstore, 
+      atStoreDate, atTicketDate, atCertificateDate, 
+      GPSInstallDate, installLicencePlate, physicalState, 
+      atStoreWay, procurementContractNo, paymentOrder, 
+      guidePrice)
+    values (#{id,jdbcType=INTEGER}, #{oldid,jdbcType=INTEGER}, #{area,jdbcType=VARCHAR}, 
+      #{caraffiliation,jdbcType=VARCHAR}, #{purchaseorder,jdbcType=VARCHAR}, #{vin,jdbcType=VARCHAR}, 
+      #{carnum,jdbcType=VARCHAR}, #{purchasetrackingnum,jdbcType=VARCHAR}, #{cartype,jdbcType=VARCHAR}, 
+      #{specification,jdbcType=VARCHAR}, #{color,jdbcType=VARCHAR}, #{paymentenddate,jdbcType=VARCHAR}, 
+      #{predictsendcar,jdbcType=VARCHAR}, #{invoicesendoff,jdbcType=VARCHAR}, #{conformitycertificationsendoff,jdbcType=VARCHAR}, 
+      #{commerceinsurance,jdbcType=VARCHAR}, #{trafficinsurance,jdbcType=VARCHAR}, #{at4sstore,jdbcType=VARCHAR}, 
+      #{atstoredate,jdbcType=VARCHAR}, #{atticketdate,jdbcType=VARCHAR}, #{atcertificatedate,jdbcType=VARCHAR}, 
+      #{gpsinstalldate,jdbcType=VARCHAR}, #{installlicenceplate,jdbcType=VARCHAR}, #{physicalstate,jdbcType=VARCHAR}, 
+      #{atstoreway,jdbcType=VARCHAR}, #{procurementcontractno,jdbcType=VARCHAR}, #{paymentorder,jdbcType=VARCHAR}, 
+      #{guideprice,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.example.xxf.bean.Synergyevolvetable" >
+    insert into synergyEvolveTable
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="oldid != null" >
+        OldID,
+      </if>
+      <if test="area != null" >
+        area,
+      </if>
+      <if test="caraffiliation != null" >
+        carAffiliation,
+      </if>
+      <if test="purchaseorder != null" >
+        purchaseOrder,
+      </if>
+      <if test="vin != null" >
+        VIN,
+      </if>
+      <if test="carnum != null" >
+        carNum,
+      </if>
+      <if test="purchasetrackingnum != null" >
+        purchaseTrackingNum,
+      </if>
+      <if test="cartype != null" >
+        carType,
+      </if>
+      <if test="specification != null" >
+        specification,
+      </if>
+      <if test="color != null" >
+        color,
+      </if>
+      <if test="paymentenddate != null" >
+        paymentEndDate,
+      </if>
+      <if test="predictsendcar != null" >
+        predictSendCar,
+      </if>
+      <if test="invoicesendoff != null" >
+        invoiceSendoff,
+      </if>
+      <if test="conformitycertificationsendoff != null" >
+        conformityCertificationSendoff,
+      </if>
+      <if test="commerceinsurance != null" >
+        commerceInsurance,
+      </if>
+      <if test="trafficinsurance != null" >
+        trafficInsurance,
+      </if>
+      <if test="at4sstore != null" >
+        at4Sstore,
+      </if>
+      <if test="atstoredate != null" >
+        atStoreDate,
+      </if>
+      <if test="atticketdate != null" >
+        atTicketDate,
+      </if>
+      <if test="atcertificatedate != null" >
+        atCertificateDate,
+      </if>
+      <if test="gpsinstalldate != null" >
+        GPSInstallDate,
+      </if>
+      <if test="installlicenceplate != null" >
+        installLicencePlate,
+      </if>
+      <if test="physicalstate != null" >
+        physicalState,
+      </if>
+      <if test="atstoreway != null" >
+        atStoreWay,
+      </if>
+      <if test="procurementcontractno != null" >
+        procurementContractNo,
+      </if>
+      <if test="paymentorder != null" >
+        paymentOrder,
+      </if>
+      <if test="guideprice != null" >
+        guidePrice,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="oldid != null" >
+        #{oldid,jdbcType=INTEGER},
+      </if>
+      <if test="area != null" >
+        #{area,jdbcType=VARCHAR},
+      </if>
+      <if test="caraffiliation != null" >
+        #{caraffiliation,jdbcType=VARCHAR},
+      </if>
+      <if test="purchaseorder != null" >
+        #{purchaseorder,jdbcType=VARCHAR},
+      </if>
+      <if test="vin != null" >
+        #{vin,jdbcType=VARCHAR},
+      </if>
+      <if test="carnum != null" >
+        #{carnum,jdbcType=VARCHAR},
+      </if>
+      <if test="purchasetrackingnum != null" >
+        #{purchasetrackingnum,jdbcType=VARCHAR},
+      </if>
+      <if test="cartype != null" >
+        #{cartype,jdbcType=VARCHAR},
+      </if>
+      <if test="specification != null" >
+        #{specification,jdbcType=VARCHAR},
+      </if>
+      <if test="color != null" >
+        #{color,jdbcType=VARCHAR},
+      </if>
+      <if test="paymentenddate != null" >
+        #{paymentenddate,jdbcType=VARCHAR},
+      </if>
+      <if test="predictsendcar != null" >
+        #{predictsendcar,jdbcType=VARCHAR},
+      </if>
+      <if test="invoicesendoff != null" >
+        #{invoicesendoff,jdbcType=VARCHAR},
+      </if>
+      <if test="conformitycertificationsendoff != null" >
+        #{conformitycertificationsendoff,jdbcType=VARCHAR},
+      </if>
+      <if test="commerceinsurance != null" >
+        #{commerceinsurance,jdbcType=VARCHAR},
+      </if>
+      <if test="trafficinsurance != null" >
+        #{trafficinsurance,jdbcType=VARCHAR},
+      </if>
+      <if test="at4sstore != null" >
+        #{at4sstore,jdbcType=VARCHAR},
+      </if>
+      <if test="atstoredate != null" >
+        #{atstoredate,jdbcType=VARCHAR},
+      </if>
+      <if test="atticketdate != null" >
+        #{atticketdate,jdbcType=VARCHAR},
+      </if>
+      <if test="atcertificatedate != null" >
+        #{atcertificatedate,jdbcType=VARCHAR},
+      </if>
+      <if test="gpsinstalldate != null" >
+        #{gpsinstalldate,jdbcType=VARCHAR},
+      </if>
+      <if test="installlicenceplate != null" >
+        #{installlicenceplate,jdbcType=VARCHAR},
+      </if>
+      <if test="physicalstate != null" >
+        #{physicalstate,jdbcType=VARCHAR},
+      </if>
+      <if test="atstoreway != null" >
+        #{atstoreway,jdbcType=VARCHAR},
+      </if>
+      <if test="procurementcontractno != null" >
+        #{procurementcontractno,jdbcType=VARCHAR},
+      </if>
+      <if test="paymentorder != null" >
+        #{paymentorder,jdbcType=VARCHAR},
+      </if>
+      <if test="guideprice != null" >
+        #{guideprice,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.example.xxf.bean.SynergyevolvetableExample" resultType="java.lang.Integer" >
+    select count(*) from synergyEvolveTable
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update synergyEvolveTable
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.oldid != null" >
+        OldID = #{record.oldid,jdbcType=INTEGER},
+      </if>
+      <if test="record.area != null" >
+        area = #{record.area,jdbcType=VARCHAR},
+      </if>
+      <if test="record.caraffiliation != null" >
+        carAffiliation = #{record.caraffiliation,jdbcType=VARCHAR},
+      </if>
+      <if test="record.purchaseorder != null" >
+        purchaseOrder = #{record.purchaseorder,jdbcType=VARCHAR},
+      </if>
+      <if test="record.vin != null" >
+        VIN = #{record.vin,jdbcType=VARCHAR},
+      </if>
+      <if test="record.carnum != null" >
+        carNum = #{record.carnum,jdbcType=VARCHAR},
+      </if>
+      <if test="record.purchasetrackingnum != null" >
+        purchaseTrackingNum = #{record.purchasetrackingnum,jdbcType=VARCHAR},
+      </if>
+      <if test="record.cartype != null" >
+        carType = #{record.cartype,jdbcType=VARCHAR},
+      </if>
+      <if test="record.specification != null" >
+        specification = #{record.specification,jdbcType=VARCHAR},
+      </if>
+      <if test="record.color != null" >
+        color = #{record.color,jdbcType=VARCHAR},
+      </if>
+      <if test="record.paymentenddate != null" >
+        paymentEndDate = #{record.paymentenddate,jdbcType=VARCHAR},
+      </if>
+      <if test="record.predictsendcar != null" >
+        predictSendCar = #{record.predictsendcar,jdbcType=VARCHAR},
+      </if>
+      <if test="record.invoicesendoff != null" >
+        invoiceSendoff = #{record.invoicesendoff,jdbcType=VARCHAR},
+      </if>
+      <if test="record.conformitycertificationsendoff != null" >
+        conformityCertificationSendoff = #{record.conformitycertificationsendoff,jdbcType=VARCHAR},
+      </if>
+      <if test="record.commerceinsurance != null" >
+        commerceInsurance = #{record.commerceinsurance,jdbcType=VARCHAR},
+      </if>
+      <if test="record.trafficinsurance != null" >
+        trafficInsurance = #{record.trafficinsurance,jdbcType=VARCHAR},
+      </if>
+      <if test="record.at4sstore != null" >
+        at4Sstore = #{record.at4sstore,jdbcType=VARCHAR},
+      </if>
+      <if test="record.atstoredate != null" >
+        atStoreDate = #{record.atstoredate,jdbcType=VARCHAR},
+      </if>
+      <if test="record.atticketdate != null" >
+        atTicketDate = #{record.atticketdate,jdbcType=VARCHAR},
+      </if>
+      <if test="record.atcertificatedate != null" >
+        atCertificateDate = #{record.atcertificatedate,jdbcType=VARCHAR},
+      </if>
+      <if test="record.gpsinstalldate != null" >
+        GPSInstallDate = #{record.gpsinstalldate,jdbcType=VARCHAR},
+      </if>
+      <if test="record.installlicenceplate != null" >
+        installLicencePlate = #{record.installlicenceplate,jdbcType=VARCHAR},
+      </if>
+      <if test="record.physicalstate != null" >
+        physicalState = #{record.physicalstate,jdbcType=VARCHAR},
+      </if>
+      <if test="record.atstoreway != null" >
+        atStoreWay = #{record.atstoreway,jdbcType=VARCHAR},
+      </if>
+      <if test="record.procurementcontractno != null" >
+        procurementContractNo = #{record.procurementcontractno,jdbcType=VARCHAR},
+      </if>
+      <if test="record.paymentorder != null" >
+        paymentOrder = #{record.paymentorder,jdbcType=VARCHAR},
+      </if>
+      <if test="record.guideprice != null" >
+        guidePrice = #{record.guideprice,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update synergyEvolveTable
+    set id = #{record.id,jdbcType=INTEGER},
+      OldID = #{record.oldid,jdbcType=INTEGER},
+      area = #{record.area,jdbcType=VARCHAR},
+      carAffiliation = #{record.caraffiliation,jdbcType=VARCHAR},
+      purchaseOrder = #{record.purchaseorder,jdbcType=VARCHAR},
+      VIN = #{record.vin,jdbcType=VARCHAR},
+      carNum = #{record.carnum,jdbcType=VARCHAR},
+      purchaseTrackingNum = #{record.purchasetrackingnum,jdbcType=VARCHAR},
+      carType = #{record.cartype,jdbcType=VARCHAR},
+      specification = #{record.specification,jdbcType=VARCHAR},
+      color = #{record.color,jdbcType=VARCHAR},
+      paymentEndDate = #{record.paymentenddate,jdbcType=VARCHAR},
+      predictSendCar = #{record.predictsendcar,jdbcType=VARCHAR},
+      invoiceSendoff = #{record.invoicesendoff,jdbcType=VARCHAR},
+      conformityCertificationSendoff = #{record.conformitycertificationsendoff,jdbcType=VARCHAR},
+      commerceInsurance = #{record.commerceinsurance,jdbcType=VARCHAR},
+      trafficInsurance = #{record.trafficinsurance,jdbcType=VARCHAR},
+      at4Sstore = #{record.at4sstore,jdbcType=VARCHAR},
+      atStoreDate = #{record.atstoredate,jdbcType=VARCHAR},
+      atTicketDate = #{record.atticketdate,jdbcType=VARCHAR},
+      atCertificateDate = #{record.atcertificatedate,jdbcType=VARCHAR},
+      GPSInstallDate = #{record.gpsinstalldate,jdbcType=VARCHAR},
+      installLicencePlate = #{record.installlicenceplate,jdbcType=VARCHAR},
+      physicalState = #{record.physicalstate,jdbcType=VARCHAR},
+      atStoreWay = #{record.atstoreway,jdbcType=VARCHAR},
+      procurementContractNo = #{record.procurementcontractno,jdbcType=VARCHAR},
+      paymentOrder = #{record.paymentorder,jdbcType=VARCHAR},
+      guidePrice = #{record.guideprice,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+
+  <insert id="batchSave" parameterType="java.util.List">
+    INSERT INTO synergyEvolveTable(OldID, area,
+    carAffiliation, purchaseOrder, VIN,
+    carNum, purchaseTrackingNum, carType,
+    specification, color, paymentEndDate,
+    predictSendCar, invoiceSendoff, conformityCertificationSendoff,
+    commerceInsurance, trafficInsurance, at4Sstore,
+    atStoreDate, atTicketDate, atCertificateDate,
+    GPSInstallDate, installLicencePlate, physicalState,
+    atStoreWay, procurementContractNo, paymentOrder,
+    guidePrice,ftime_i,fBrand)
+    values
+    <foreach item="item" index="index" collection="list" separator=",">
+      ( #{item.oldid,jdbcType=INTEGER}, #{item.area,jdbcType=VARCHAR},
+      #{item.caraffiliation,jdbcType=VARCHAR}, #{item.purchaseorder,jdbcType=VARCHAR}, #{item.vin,jdbcType=VARCHAR},
+      #{item.carnum,jdbcType=VARCHAR}, #{item.purchasetrackingnum,jdbcType=VARCHAR}, #{item.cartype,jdbcType=VARCHAR},
+      #{item.specification,jdbcType=VARCHAR}, #{item.color,jdbcType=VARCHAR}, #{item.paymentenddate,jdbcType=VARCHAR},
+      #{item.predictsendcar,jdbcType=VARCHAR}, #{item.invoicesendoff,jdbcType=VARCHAR}, #{item.conformitycertificationsendoff,jdbcType=VARCHAR},
+      #{item.commerceinsurance,jdbcType=VARCHAR}, #{item.trafficinsurance,jdbcType=VARCHAR}, #{item.at4sstore,jdbcType=VARCHAR},
+      #{item.atstoredate,jdbcType=VARCHAR}, #{item.atticketdate,jdbcType=VARCHAR}, #{item.atcertificatedate,jdbcType=VARCHAR},
+      #{item.gpsinstalldate,jdbcType=VARCHAR}, #{item.installlicenceplate,jdbcType=VARCHAR}, #{item.physicalstate,jdbcType=VARCHAR},
+      #{item.atstoreway,jdbcType=VARCHAR}, #{item.procurementcontractno,jdbcType=VARCHAR}, #{item.paymentorder,jdbcType=VARCHAR},
+      #{item.guideprice,jdbcType=VARCHAR},#{item.ftime_i,jdbcType=VARCHAR},#{item.fBrand,jdbcType=VARCHAR})
+    </foreach>
+  </insert>
+  <select id="selectByExampleAndPage" resultType="com.example.xxf.bean.Synergyevolvetable" parameterType="java.util.Map"  >
+    SELECT
+    *
+    FROM(
+    SELECT  ROW_NUMBER() OVER(ORDER BY oldid) AS rowid,*
+    from
+    (
+    select
+   *
+    from synergyEvolveTable
+    where 1=1
+
+    <if test="areaList != null and areaList.size >0" >
+      and area in
+      <foreach collection="areaList" index="index" item="area" open="(" separator="," close=")">
+        #{area}
+      </foreach>
+    </if>
+
+    <if test="brandList != null and brandList.size >0" >
+      and fBrand in
+      <foreach collection="brandList" index="index" item="brand" open="(" separator="," close=")">
+        #{brand}
+      </foreach>
+    </if>
+
+    <if test="carTypeList != null and carTypeList.size >0" >
+      and carType in
+      <foreach collection="carTypeList" index="index" item="carType" open="(" separator="," close=")">
+        #{carType}
+      </foreach>
+    </if>
+
+    <if test="phyStatusList != null and phyStatusList.size >0" >
+      and physicalState in
+      <foreach collection="phyStatusList" index="index" item="phyStatus" open="(" separator="," close=")">
+        #{phyStatus}
+      </foreach>
+    </if>
+    <if test="ownerList != null and ownerList.size >0" >
+      and carAffiliation in
+      <foreach collection="ownerList" index="index" item="owner" open="(" separator="," close=")">
+        #{owner}
+      </foreach>
+    </if>
+
+    <if test="arriveWayList != null and arriveWayList.size >0" >
+      and atStoreWay in
+      <foreach collection="arriveWayList" index="index" item="arriveWay" open="(" separator="," close=")">
+        #{arriveWayList}
+      </foreach>
+    </if>
+
+    <if test="pluginVal =='sAndUGPS_span'" >
+      and ISNULL(atStoreDate,at4Sstore) is not null and GPSInstallDate is null
+    </if>
+    <if test="pluginVal =='fpjcjqxwm_span'" >
+      and invoiceSendoff is not null and trafficInsurance is null and Ftime_i  &lt;= GETDATE()
+    </if>
+    <if test="pluginVal =='yspwjsyx_span'" >
+      and trafficInsurance is not null and carNum != '' and commerceInsurance is null
+    </if>
+    <if test="pluginVal =='zpqqwsp_span'" >
+      and ISNULL(atStoreDate,at4Sstore) is not null and atTicketDate is not null and atCertificateDate is not null and trafficInsurance is not null and installLicencePlate is null
+    </if>
+    <if test="pluginVal =='ztcl_span'" >
+      and physicalState = '在途车辆'
+    </if>
+    )b
+    ) AS sys_roles
+    WHERE ROWID BETWEEN  #{startRow} and #{endRow}
+  </select>
+  <select id="selectByExampleAndPageCount" resultType="int" parameterType="java.util.Map" >
+
+    select
+      count(1)
+    from synergyEvolveTable
+    where 1=1
+
+    <if test="areaList != null and areaList.size >0" >
+      and area in
+      <foreach collection="areaList" index="index" item="area" open="(" separator="," close=")">
+        #{area}
+      </foreach>
+    </if>
+
+    <if test="brandList != null and brandList.size >0" >
+      and fBrand in
+      <foreach collection="brandList" index="index" item="brand" open="(" separator="," close=")">
+        #{brand}
+      </foreach>
+    </if>
+
+    <if test="carTypeList != null and carTypeList.size >0" >
+      and carType in
+      <foreach collection="carTypeList" index="index" item="carType" open="(" separator="," close=")">
+        #{carType}
+      </foreach>
+    </if>
+
+    <if test="phyStatusList != null and phyStatusList.size >0" >
+      and physicalState in
+      <foreach collection="phyStatusList" index="index" item="phyStatus" open="(" separator="," close=")">
+        #{phyStatus}
+      </foreach>
+    </if>
+    <if test="ownerList != null and ownerList.size >0" >
+      and carAffiliation in
+      <foreach collection="ownerList" index="index" item="owner" open="(" separator="," close=")">
+        #{owner}
+      </foreach>
+    </if>
+
+    <if test="arriveWayList != null and arriveWayList.size >0" >
+      and atStoreWay in
+      <foreach collection="arriveWayList" index="index" item="arriveWay" open="(" separator="," close=")">
+        #{arriveWay}
+      </foreach>
+    </if>
+
+    <if test="pluginVal =='sAndUGPS_span'" >
+      and ISNULL(atStoreDate,at4Sstore) is not null and GPSInstallDate is null
+    </if>
+    <if test="pluginVal =='fpjcjqxwm_span'" >
+      and invoiceSendoff is not null and trafficInsurance is null and Ftime_i  &lt;= GETDATE()
+    </if>
+    <if test="pluginVal =='yspwjsyx_span'" >
+      and trafficInsurance is not null and carNum != '' and commerceInsurance is null
+    </if>
+    <if test="pluginVal =='zpqqwsp_span'" >
+      and ISNULL(atStoreDate,at4Sstore) is not null and atTicketDate is not null and atCertificateDate is not null and trafficInsurance is not null and installLicencePlate is null
+    </if>
+    <if test="pluginVal =='ztcl_span'" >
+      and physicalState = '在途车辆'
+    </if>
+  </select>
+  
+  <select id="pluginsBtn" resultType="com.example.xxf.bean.synergyEvolvePlug" parameterType="java.util.Map">
+    select
+    count(case when ISNULL(atStoreDate,at4Sstore) is not null and GPSInstallDate is null then 1 end) 'yddwzGPS'
+    ,count(case when trafficInsurance is not null and carNum != '' and commerceInsurance is null then 1 end) 'yspwmsyx'
+    ,count(case when invoiceSendoff is not null and trafficInsurance is null and Ftime_i &lt;= GETDATE() then 1 end) 'fpjcjqxwm'
+    ,count(
+    case when ISNULL(atStoreDate,at4Sstore) is not null and atTicketDate is not null
+    and atCertificateDate is not null and trafficInsurance is not null and installLicencePlate is null then 1 end
+    ) 'zpqqwsp'
+    ,count(case when physicalState = '在途车辆' then 1 end) 'ztcl'
+    from dbo.synergyEvolveTable
+    where 1=1
+    <if test="areaList != null and areaList.size >0" >
+      and area in
+      <foreach collection="areaList" index="index" item="area" open="(" separator="," close=")">
+        #{area}
+      </foreach>
+    </if>
+
+    <if test="brandList != null and brandList.size >0" >
+      and fBrand in
+      <foreach collection="brandList" index="index" item="brand" open="(" separator="," close=")">
+        #{brand}
+      </foreach>
+    </if>
+
+    <if test="carTypeList != null and carTypeList.size >0" >
+      and carType in
+      <foreach collection="carTypeList" index="index" item="carType" open="(" separator="," close=")">
+        #{carType}
+      </foreach>
+    </if>
+
+    <if test="phyStatusList != null and phyStatusList.size >0" >
+      and physicalState in
+      <foreach collection="phyStatusList" index="index" item="phyStatus" open="(" separator="," close=")">
+        #{phyStatus}
+      </foreach>
+    </if>
+    <if test="ownerList != null and ownerList.size >0" >
+      and carAffiliation in
+      <foreach collection="ownerList" index="index" item="owner" open="(" separator="," close=")">
+        #{owner}
+      </foreach>
+    </if>
+
+    <if test="arriveWayList != null and arriveWayList.size >0" >
+      and atStoreWay in
+      <foreach collection="arriveWayList" index="index" item="arriveWay" open="(" separator="," close=")">
+        #{arriveWayList}
+      </foreach>
+    </if>
+
+  </select>
+
+  
+  <select id="getSynergyevolvetableExportExcel" resultType="java.util.LinkedHashMap" parameterType="java.util.Map">
+    select
+      area,
+      OldID,
+      carAffiliation, purchaseOrder, VIN,
+      carNum, purchaseTrackingNum, carType,
+      specification, color, paymentEndDate,
+      predictSendCar, invoiceSendoff, conformityCertificationSendoff,
+      commerceInsurance, trafficInsurance, at4Sstore,
+      atStoreDate, atTicketDate, atCertificateDate,
+      GPSInstallDate, installLicencePlate, physicalState,
+      atStoreWay, procurementContractNo, paymentOrder,
+      guidePrice
+    from synergyEvolveTable
+    where 1=1
+
+    <if test="areaList != null and areaList.size >0" >
+      and area in
+      <foreach collection="areaList" index="index" item="area" open="(" separator="," close=")">
+        #{area}
+      </foreach>
+    </if>
+
+    <if test="brandList != null and brandList.size >0" >
+      and fBrand in
+      <foreach collection="brandList" index="index" item="brand" open="(" separator="," close=")">
+        #{brand}
+      </foreach>
+    </if>
+
+    <if test="carTypeList != null and carTypeList.size >0" >
+      and carType in
+      <foreach collection="carTypeList" index="index" item="carType" open="(" separator="," close=")">
+        #{carType}
+      </foreach>
+    </if>
+
+    <if test="phyStatusList != null and phyStatusList.size >0" >
+      and physicalState in
+      <foreach collection="phyStatusList" index="index" item="phyStatus" open="(" separator="," close=")">
+        #{phyStatus}
+      </foreach>
+    </if>
+    <if test="ownerList != null and ownerList.size >0" >
+      and carAffiliation in
+      <foreach collection="ownerList" index="index" item="owner" open="(" separator="," close=")">
+        #{owner}
+      </foreach>
+    </if>
+
+    <if test="arriveWayList != null and arriveWayList.size >0" >
+      and atStoreWay in
+      <foreach collection="arriveWayList" index="index" item="arriveWay" open="(" separator="," close=")">
+        #{arriveWayList}
+      </foreach>
+    </if>
+
+    <if test="pluginVal =='sAndUGPS_span'" >
+      and ISNULL(atStoreDate,at4Sstore) is not null and GPSInstallDate is null
+    </if>
+    <if test="pluginVal =='fpjcjqxwm_span'" >
+      and invoiceSendoff is not null and trafficInsurance is null and Ftime_i  &lt;= GETDATE()
+    </if>
+    <if test="pluginVal =='yspwjsyx_span'" >
+      and trafficInsurance is not null and carNum != '' and commerceInsurance is null
+    </if>
+    <if test="pluginVal =='zpqqwsp_span'" >
+      and ISNULL(atStoreDate,at4Sstore) is not null and atTicketDate is not null and atCertificateDate is not null and trafficInsurance is not null and installLicencePlate is null
+    </if>
+    <if test="pluginVal =='ztcl_span'" >
+      and physicalState = '在途车辆'
+    </if>
+  </select>
+
+
+</mapper>

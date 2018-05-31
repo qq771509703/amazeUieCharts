@@ -145,4 +145,15 @@ public class DataScreenServiceImp implements DataScreenService {
         }
         return listMap;
     }
+
+    @Override
+    public List<Map<String, Object>> year_financing_amoun() {
+        List<Map<String, Object>> listMap = new ArrayList<>();
+        try{
+            listMap = dataScreenMapper.year_financing_amoun();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return listMap;
+    }
 }

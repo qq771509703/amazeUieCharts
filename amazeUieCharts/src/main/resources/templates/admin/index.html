@@ -15,9 +15,7 @@
     <meta name="apple-mobile-web-app-title" content="Amaze UI" />
     <link rel="stylesheet" th:href="@{/assets/css/amazeui.min.css}" />
     <link rel="stylesheet" th:href="@{/assets/layui/css/layui.css}" />
-    <link rel="stylesheet" th:href="@{/assets/css/amazeui.datatables.min.css}" />
     <link rel="stylesheet" th:href="@{/assets/css/app.css}">
-    <link rel="stylesheet" th:href="@{/assets/css/amazeui.page.css}">
     <script th:src="@{/assets/js/jquery.min.js}"></script>
     <script th:src="@{/assets/layui/layui.js}"></script>
 
@@ -75,10 +73,10 @@
                 </div>
                 <!-- 搜索 -->
                 <div class="am-fl tpl-header-search">
-                    <form class="tpl-header-search-form" action="javascript:;">
-                        <button class="tpl-header-search-btn am-icon-search"></button>
-                        <input class="tpl-header-search-box" type="text" placeholder="搜索内容...">
-                    </form>
+                    <!--<form class="tpl-header-search-form" action="javascript:;">-->
+                        <!--<button class="tpl-header-search-btn am-icon-search"></button>-->
+                        <!--<input class="tpl-header-search-box" type="text" placeholder="搜索内容...">-->
+                    <!--</form>-->
                 </div>
                 <!-- 其它功能-->
                 <div class="am-fr tpl-header-navbar">
@@ -116,13 +114,15 @@
                         <ul class="sidebar-nav sidebar-nav-sub">
                             <ul th:each="cmenu,cmenuStat : ${menus.children}">
                                 <li class="sidebar-nav-link">
-                                    <a href="javascript:void(0)"  th:rel="${cmenu.attributes.url}" onclick="menuBox(this)">
+                                    <a th:href="${cmenu.hasHref}=='1'?${cmenu.attributes.url}:'javascript:void(0)'" th:rel="${cmenu.attributes.url}" onclick="menuBox(this)">
                                         <span class="am-icon-angle-right sidebar-nav-link-logo"></span>
                                         <span th:text="${cmenu.text}"></span>
                                     </a>
                                 </li>
                             </ul>
                         </ul>
+
+
                     </li>
                  </ul>
             </ul>
@@ -136,8 +136,9 @@
 
     </div>
     <script th:src="@{/assets/js/amazeui.min.js}"></script>
-    <script th:src="@{/assets/js/amazeui.datatables.min.js}" ></script>
+    <script th:src="@{/assets/js/amazeui.datatables.min.js}"></script>
     <script th:src="@{/assets/js/dataTables.responsive.min.js}"></script>
+    <script th:src="@{/assets/js/amazeui.page.js}"></script>
     <script th:src="@{/assets/js/app.js}"></script>
 
     </div>

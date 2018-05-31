@@ -1,5 +1,6 @@
 package com.example.xxf.mapper;
 
+import com.example.xxf.bean.Synergyevolvetable;
 import com.example.xxf.bean.synergyEvolvePlug;
 import org.apache.ibatis.annotations.Param;
 
@@ -39,5 +40,11 @@ public interface SynergyEvolveMapper {
     List<LinkedHashMap<String,Object>> getSynergyEvolveTable(Map <String,Object> param);
 
     long getSynergyEvolveTableCount(Map <String,Object> param);
+
+
+    List<Synergyevolvetable> getSynergyEvolveTableByBase(@Param("startRow")int offset, @Param("endRow")int end);
+    long getSynergyEvolveTableByBaseCount();
+
+
 
 }

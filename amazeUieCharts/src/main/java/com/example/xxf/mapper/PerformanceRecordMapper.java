@@ -13,7 +13,7 @@ public interface PerformanceRecordMapper {
 
    long getPerformanceRecordCount(@Param("s_date")String s_date,@Param("e_date")String e_date);
 
-    List<PerformanceRecord> getRegionPerformanceRecord(@Param("s_date")String s_date,@Param("e_date")String e_date,@Param("startRow")int offset, @Param("endRow")int end);
+        List<PerformanceRecord> getRegionPerformanceRecord(@Param("s_date")String s_date,@Param("e_date")String e_date,@Param("startRow")int offset, @Param("endRow")int end);
 
     long getRegionPerformanceRecordCount(@Param("s_date")String s_date,@Param("e_date")String e_date);
 

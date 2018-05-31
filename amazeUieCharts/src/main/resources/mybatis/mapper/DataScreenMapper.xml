@@ -21,13 +21,51 @@
             and YEAR(b.FContractTime) >= 2017;
     </select>
 
-
     <select id="getYear_sales_count" resultType="java.lang.Integer">
-      select COUNT(1)
-        from FM_ConAcc a
-        where isnull(a.FIsDrop,0)!=1
-        and a.FDocCate = '101'
-        and year(a.FContractTime) > 2017
+        /*2018年销售量*/
+
+        select
+        COUNT(1) 'Sales'
+        from FinLease_Contract a
+        join FM_ConAcc b on a.FContractID = b.ID
+        /*换车换方案--判断非废弃合同*/
+        left join (
+        select a.id
+        ,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车' else '跨月换车' end '换车类型'
+        from FinLease_Contract a
+        left join FM_ConAcc b on a.FContractID = b.ID
+        left join FinLease_Contract c on a.FContract_Old = c.ID
+        where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+        and a.FContract_Old is not null
+        ) hc on a.ID = hc.ID
+        /*换车换方案--判断废弃合同*/
+        left join (
+        select a.id
+        ,a.FContract_Old  'old_ID'
+        ,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车' else '跨月换车' end '换车类型'
+        from FinLease_Contract a
+        left join FM_ConAcc b on a.FContractID = b.ID
+        left join FinLease_Contract c on a.FContract_Old = c.ID
+        where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+        and a.FContract_Old is not null
+        ) hf on a.ID = hf.old_ID
+        where
+        (
+        /*废弃，终止的合同，是跨月换车的原合同*/
+        (b.FIsDrop = 1 and a.WFState = 1 and hf.old_ID is not null and hf.换车类型 = '跨月换车')
+        or
+        /*非废弃，非终止，非换车的合同*/
+        (isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and isnull(a.Fhc,0) != 1)
+        or
+        /*非废弃，非终止，当月换车的新合同*/
+        (isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and a.Fhc = 1 and hc.ID is not null and hc.换车类型 = '当月换车')
+        or
+        /*SX_2017010002换车换方案未能有效管理旧合同*/
+        a.ID = '4290'
+        )
+        /*剔除不算业绩的换车换方案*/
+        and a.ID not in ('6169','8194','10591')
+        and YEAR(a.FContractTime) > 2017
 
     </select>
 
@@ -41,81 +79,150 @@
             and YEAR(b.FContractTime) >= 2018;
     </select>
 
-
     <select id="region_performance" resultType="map">
 
           select a.大区
-            ,SUM(a.分红比例) 'sum'
-            from (
-            select
-            b.FContractTime
-            ,a.FContract
-            ,x.Name '业务员'
-            ,c.FDividendRatio '分红比例'
-            ,f.FPlateNum '车牌'
-            ,case when d.Name = '苏州上海办事处' then '上海营销一部' when d.Name = '湘潭营销一部' then '湖南营销一部' else d.Name end  '部'
-            ,case when d.Name = '苏州上海办事处' then '上海' when d.Name = '湘潭营销一部' then '湖南' else left(hh.Name,2) end '城市'
-            ,case when d.Name = '苏州上海办事处' then '苏沪省区' when d.Name = '湘潭营销一部' then '湘赣省区' else jh.Name end '省级'
-            ,case when d.Name = '苏州上海办事处' then '长三角战区' when d.Name = '湘潭营销一部' then '华南战区'  else j.Name end '大区'
-            from FinLease_Contract a
-            join FM_ConAcc b on a.FContractID = b.ID
-            join FinLease_Contract_FClerkList c on a.ID = c.FinLease_Contract_ID
-            join lbOrganization d on c.FOrga = d.ID
-            join Fcar f on a.FCar = f.ID
-            join Entity_YJSJB h ON b.ID = h.FConAcc
-            left join Entity_YJSJB e on b.ID = e.FConAcc
-            left join tUser x on x.ID = c.FYWYMD
-            left join lbOrganization g on d.FID = g.ID
-            left join lbOrganization hh on g.FID = hh.ID
-            left join lbOrganization jh on hh.FID = jh.ID
-            left join lbOrganization j on jh.FID = j.ID
-            where isnull(b.FIsDrop,0)!=1
-            and e.FQuoType in (1,2)
-            and isnull(a.WFState,0) != 3
-            and c.FDividendRatio != 0
-            and case when d.Name = '苏州上海办事处' then '上海' else LEFT(d.Name,2) end != '淘汽'
-            and d.Name not like '%营销部%'
-            and CONVERT(varchar(4),b.FContractTime,120) >= #{s_year}
+,SUM(a.分红比例) 'sum'
+from (
+select
+b.FContractTime
+,a.FContract
+,x.Name '业务员'
+,c.FDividendRatio '分红比例'
+,f.FPlateNum '车牌'
+,case when d.Name = '苏州上海办事处' then '上海营销一部' when d.Name = '湘潭营销一部' then '湖南营销一部' else d.Name end  '部'
+,case when d.Name = '苏州上海办事处' then '上海' when d.Name = '湘潭营销一部' then '湖南' else left(hh.Name,2) end '城市'
+,case when d.Name = '苏州上海办事处' then '苏沪省区' when d.Name = '湘潭营销一部' then '湘赣省区' else jh.Name end '省级'
+,case when d.Name = '苏州上海办事处' then '长三角战区' when d.Name = '湘潭营销一部' then '华南战区'  else j.Name end '大区'
+from FinLease_Contract a
+join FM_ConAcc b on a.FContractID = b.ID
+join FinLease_Contract_FClerkList c on a.ID = c.FinLease_Contract_ID
+join lbOrganization d on c.FOrga = d.ID
+join Fcar f on a.FCar = f.ID
+join Entity_YJSJB h ON b.ID = h.FConAcc
+left join Entity_YJSJB e on b.ID = e.FConAcc
+left join tUser x on x.ID = c.FYWYMD
+left join lbOrganization g on d.FID = g.ID
+left join lbOrganization hh on g.FID = hh.ID
+left join lbOrganization jh on hh.FID = jh.ID
+left join lbOrganization j on jh.FID = j.ID
+/*换车换方案--判断非废弃合同*/
+left join (
+	select a.id
+	,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车' else '跨月换车' end '换车类型'
+	from FinLease_Contract a
+	left join FM_ConAcc b on a.FContractID = b.ID
+	left join FinLease_Contract c on a.FContract_Old = c.ID
+	where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+	and a.FContract_Old is not null
+	) hc on a.ID = hc.ID
+/*换车换方案--判断废弃合同*/
+left join (
+	select a.id
+	,a.FContract_Old  'old_ID'
+	,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车' else '跨月换车' end '换车类型'
+	from FinLease_Contract a
+	left join FM_ConAcc b on a.FContractID = b.ID
+	left join FinLease_Contract c on a.FContract_Old = c.ID
+	where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+	and a.FContract_Old is not null
+	) hf on a.ID = hf.old_ID
+where e.FQuoType in (1,2)
+and
+(
+	/*废弃，终止的合同，是跨月换车的原合同*/
+	(b.FIsDrop = 1 and a.WFState = 1 and hf.old_ID is not null and hf.换车类型 = '跨月换车')
+	or
+	/*非废弃，非终止，非换车的合同*/
+	(isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and isnull(a.Fhc,0) != 1)
+	or
+	/*非废弃，非终止，当月换车的新合同*/
+	(isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and a.Fhc = 1 and hc.ID is not null and hc.换车类型 = '当月换车')
+	or
+	  /*SX_2017010002换车换方案未能有效管理旧合同*/
+    a.ID = '4290'
+)
+/*剔除不算业绩的换车换方案*/
+and a.ID not in ('6169','8194','10591')
+and c.FDividendRatio != 0
+and case when d.Name = '苏州上海办事处' then '上海' else LEFT(d.Name,2) end != '淘汽'
+and d.Name not like '%营销部%'
+and CONVERT(varchar(4),b.FContractTime,120) > 2017
 
-            union all
+union all
 
-            select
-            b.FContractTime
-            ,a.FContract
-            ,x.Name '业务员'
-            ,c.FDividendRatio '分红比例'
-            ,f.FPlateNum '车牌'
-            ,d.Name '部'
-            ,left(g.Name,2) '城市'
-            ,hh.Name '省级'
-            ,jh.Name '大区'
-            from FinLease_Contract a
-            join FM_ConAcc b on a.FContractID = b.ID
-            join FinLease_Contract_FClerkList c on a.ID = c.FinLease_Contract_ID
-            join lbOrganization d on c.FOrga = d.ID
-            join Fcar f on a.FCar = f.ID
-            join Entity_YJSJB h ON b.ID = h.FConAcc
-            left join Entity_YJSJB e on b.ID = e.FConAcc
-            left join tUser x on x.ID = c.FYWYMD
-            left join lbOrganization g on d.FID = g.ID
-            left join lbOrganization hh on g.FID = hh.ID
-            left join lbOrganization jh on hh.FID = jh.ID
-            where isnull(b.FIsDrop,0)!=1
-            and e.FQuoType in (1,2)
-            and isnull(a.WFState,0) != 3
-            and c.FDividendRatio != 0
-            and case when d.Name = '苏州上海办事处' then '上海' else LEFT(d.Name,2) end != '淘汽'
-            and d.Name like '%营销部%'
-            and CONVERT(varchar(4),b.FContractTime,120) >= #{s_year}
-            ) a
-            where a.大区 like '%战区%'
-            group by a.大区
-            order by SUM(a.分红比例) desc
+select
+b.FContractTime
+,a.FContract
+,x.Name '业务员'
+,c.FDividendRatio '分红比例'
+,f.FPlateNum '车牌'
+,d.Name '部'
+,left(g.Name,2) '城市'
+,hh.Name '省级'
+,jh.Name '大区'
+from FinLease_Contract a
+join FM_ConAcc b on a.FContractID = b.ID
+join FinLease_Contract_FClerkList c on a.ID = c.FinLease_Contract_ID
+join lbOrganization d on c.FOrga = d.ID
+join Fcar f on a.FCar = f.ID
+join Entity_YJSJB h ON b.ID = h.FConAcc
+left join Entity_YJSJB e on b.ID = e.FConAcc
+left join tUser x on x.ID = c.FYWYMD
+left join lbOrganization g on d.FID = g.ID
+left join lbOrganization hh on g.FID = hh.ID
+left join lbOrganization jh on hh.FID = jh.ID
+/*换车换方案--判断非废弃合同*/
+left join (
+	select a.id
+	,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车' else '跨月换车' end '换车类型'
+	from FinLease_Contract a
+	left join FM_ConAcc b on a.FContractID = b.ID
+	left join FinLease_Contract c on a.FContract_Old = c.ID
+	where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+	and a.FContract_Old is not null
+	) hc on a.ID = hc.ID
+/*换车换方案--判断废弃合同*/
+left join (
+	select a.id
+	,a.FContract_Old  'old_ID'
+	,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车' else '跨月换车' end '换车类型'
+	from FinLease_Contract a
+	left join FM_ConAcc b on a.FContractID = b.ID
+	left join FinLease_Contract c on a.FContract_Old = c.ID
+	where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+	and a.FContract_Old is not null
+	) hf on a.ID = hf.old_ID
+where e.FQuoType in (1,2)
+and
+(
+	/*废弃，终止的合同，是跨月换车的原合同*/
+	(b.FIsDrop = 1 and a.WFState = 1 and hf.old_ID is not null and hf.换车类型 = '跨月换车')
+	or
+	/*非废弃，非终止，非换车的合同*/
+	(isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and isnull(a.Fhc,0) != 1)
+	or
+	/*非废弃，非终止，当月换车的新合同*/
+	(isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and a.Fhc = 1 and hc.ID is not null and hc.换车类型 = '当月换车')
+	or
+	  /*SX_2017010002换车换方案未能有效管理旧合同*/
+    a.ID = '4290'
+)
+/*剔除不算业绩的换车换方案*/
+and a.ID not in ('6169','8194','10591')
+and c.FDividendRatio != 0
+and case when d.Name = '苏州上海办事处' then '上海' else LEFT(d.Name,2) end != '淘汽'
+and d.Name like '%营销部%'
+and CONVERT(varchar(4),b.FContractTime,120) > 2017
+) a
+where a.大区 like '%战区%'
+group by a.大区
+order by SUM(a.分红比例)
     </select>
 
     <select id="getNewDealCity" resultType="string">
         select distinct
-        left(y.FName,2) 'area'
+        replace(y.FName,'分公司','') 'area'
         from FinLease_Contract a
         join FM_ConAcc b on a.FContractID = b.ID
         join Fcar f on a.FCar = f.ID
@@ -127,12 +234,47 @@
         select a.FContract,ROW_NUMBER() over(order by b.FContractTime desc) rw
         from FinLease_Contract a
         join FM_ConAcc b on a.FContractID = b.ID
-        where isnull(b.FIsDrop,0)!= 1
-        and isnull(a.WFState,0) != 3
+        /*换车换方案--判断非废弃合同*/
+        left join (
+        select a.id
+        ,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车' else '跨月换车' end '换车类型'
+        from FinLease_Contract a
+        left join FM_ConAcc b on a.FContractID = b.ID
+        left join FinLease_Contract c on a.FContract_Old = c.ID
+        where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+        and a.FContract_Old is not null
+        ) hc on a.ID = hc.ID
+        /*换车换方案--判断废弃合同*/
+        left join (
+        select a.id
+        ,a.FContract_Old  'old_ID'
+        ,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车' else '跨月换车' end '换车类型'
+        from FinLease_Contract a
+        left join FM_ConAcc b on a.FContractID = b.ID
+        left join FinLease_Contract c on a.FContract_Old = c.ID
+        where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+        and a.FContract_Old is not null
+        ) hf on a.ID = hf.old_ID
+        where
+        (
+        /*废弃，终止的合同，是跨月换车的原合同*/
+        (b.FIsDrop = 1 and a.WFState = 1 and hf.old_ID is not null and hf.换车类型 = '跨月换车')
+        or
+        /*非废弃，非终止，非换车的合同*/
+        (isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and isnull(a.Fhc,0) != 1)
+        or
+        /*非废弃，非终止，当月换车的新合同*/
+        (isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and a.Fhc = 1 and hc.ID is not null and hc.换车类型 = '当月换车')
+        or
+        /*SX_2017010002换车换方案未能有效管理旧合同*/
+        a.ID = '4290'
+        )
+        /*剔除不算业绩的换车换方案*/
+        and a.ID not in ('6169','8194','10591')
         and YEAR(b.FContractTime) >= '2018'
         and a.FAgentDep != '593'
         ) a
-        where a.rw  &lt; 11
+        where a.rw &lt; 11
         )
     </select>
 
@@ -147,23 +289,57 @@
         order by COUNT(1) desc
     </select>
 
-
     <select id="getSalesBrand" resultType="map">
         /*品牌英雄榜TOP5*/
+       /*2017年以来品牌英雄榜TOP5*/
         select
-            top 5
-            f.FBrand 'name'
-            ,COUNT(1) 'value'
+        top 5
+        f.FBrand 'name'
+        ,COUNT(1) 'value'
+        from FinLease_Contract a
+        join FM_ConAcc b on a.FContractID = b.ID
+        join Fcar f on a.FCar = f.ID
+        /*换车换方案--判断非废弃合同*/
+        left join (
+            select a.id
+            ,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车' else '跨月换车' end '换车类型'
             from FinLease_Contract a
-            join FM_ConAcc b on a.FContractID = b.ID
-            join Fcar f on a.FCar = f.ID
-            where isnull(b.FIsDrop,0)!= 1
-            and isnull(a.WFState,0) != 3
-            and YEAR(b.FContractTime) >= 2017
-            group by f.FBrand
-            order by COUNT(1) desc
+            left join FM_ConAcc b on a.FContractID = b.ID
+            left join FinLease_Contract c on a.FContract_Old = c.ID
+            where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+            and a.FContract_Old is not null
+            ) hc on a.ID = hc.ID
+        /*换车换方案--判断废弃合同*/
+        left join (
+            select a.id
+            ,a.FContract_Old  'old_ID'
+            ,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车' else '跨月换车' end '换车类型'
+            from FinLease_Contract a
+            left join FM_ConAcc b on a.FContractID = b.ID
+            left join FinLease_Contract c on a.FContract_Old = c.ID
+            where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+            and a.FContract_Old is not null
+            ) hf on a.ID = hf.old_ID
+        where
+        (
+            /*废弃，终止的合同，是跨月换车的原合同*/
+            (b.FIsDrop = 1 and a.WFState = 1 and hf.old_ID is not null and hf.换车类型 = '跨月换车')
+            or
+            /*非废弃，非终止，非换车的合同*/
+            (isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and isnull(a.Fhc,0) != 1)
+            or
+            /*非废弃，非终止，当月换车的新合同*/
+            (isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and a.Fhc = 1 and hc.ID is not null and hc.换车类型 = '当月换车')
+            or
+              /*SX_2017010002换车换方案未能有效管理旧合同*/
+            a.ID = '4290'
+        )
+        /*剔除不算业绩的换车换方案*/
+        and a.ID not in ('6169','8194','10591')
+        and YEAR(b.FContractTime) >= 2017
+        group by f.FBrand
+        order by COUNT(1) desc
     </select>
-
 
     <select id="getSalesStaffDistribution" resultType="map">
         select
@@ -192,38 +368,86 @@
 
     <select id="getHQDistribution" resultType="map">
       /*排除营销部、风控*/
-        select
-        case when year(a.FBirthday) >= 2000 then '00后'
-             when year(a.FBirthday) >= 1990 then '90后'
-             when year(a.FBirthday) >= 1980 then '80后'
-             when year(a.FBirthday) >= 1970 then '70后'
-             when year(a.FBirthday) >= 1960 then '60后'
-             when year(a.FBirthday) >= 1950 then '50后'
-             else ''
-             end 'name'
-        ,count(1) 'value'
-        from T_BD_Person a  --人员表
-        left join T_ORG_PositionMember c on c.FPersonID = a.fid  --人员岗位对应表
-        left join T_ORG_Position d on c.FPositionID = d.FID  --岗位表
-        left join T_HR_JobLevel h on d.FJobLevelID = h.fID  --职层表
-        left join T_HR_PERSONPOSITION j on j.fpersonid = a.fid  --入离职日期表
-        left join T_ORG_Admin k on k.fid = d.FAdminOrgUnitID  --架构表
-        /*在职*/
-        where j.fleftdate is null
-        /*融资租赁事业部--营销部*/
-        and k.FDisplayName_L2 not like '%喜相逢_股东大会_总裁_常务副总裁_融资性租赁事业部%'
-        and k.FDisplayName_L2 not like '%喜相逢_股东大会_总裁_常务副总裁_福建喜盾资产管理有限公司%'
-        and a.FBirthday is not null
-        group by case when year(a.FBirthday) >= 2000 then '00后'
-              when year(a.FBirthday) >= 1990 then '90后'
-              when year(a.FBirthday) >= 1980 then '80后'
-              when year(a.FBirthday) >= 1970 then '70后'
-              when year(a.FBirthday) >= 1960 then '60后'
-              when year(a.FBirthday) >= 1950 then '50后'
-              else ''
-              end
+            select
+            case when year(a.FBirthday) > 1994 then '95后'
+                 when year(a.FBirthday) > 1989 then '90后'
+                 when year(a.FBirthday) > 1984 then '85后'
+                 when year(a.FBirthday) > 1979 then '80后'
+                 else '80前'
+                 end 'name'
+            ,count(1) 'value'
+            from T_BD_Person a  --人员表
+            left join T_ORG_PositionMember c on c.FPersonID = a.fid  --人员岗位对应表
+            left join T_ORG_Position d on c.FPositionID = d.FID  --岗位表
+            left join T_HR_JobLevel h on d.FJobLevelID = h.fID  --职层表
+            left join T_HR_PERSONPOSITION j on j.fpersonid = a.fid  --入离职日期表
+            left join T_ORG_Admin k on k.fid = d.FAdminOrgUnitID  --架构表
+            /*在职*/
+            where j.fleftdate is null
+            /*融资租赁事业部--营销部*/
+            and k.FDisplayName_L2 not like '%喜相逢_股东大会_总裁_常务副总裁_融资性租赁事业部%'
+            and a.FBirthday is not null
+            group by
+            case when year(a.FBirthday) > 1994 then '95后'
+                 when year(a.FBirthday) > 1989 then '90后'
+                 when year(a.FBirthday) > 1984 then '85后'
+                 when year(a.FBirthday) > 1979 then '80后'
+                 else '80前'
+                 end
 
 
     </select>
+
+    <select id="year_financing_amoun" resultType="map">
+        /*最近12个月的销售量*/
+
+        select top 12
+        CONVERT(varchar(7),a.FContractTime,120) 'month'
+        ,COUNT(1) 'Sales'
+        from FinLease_Contract a
+        join FM_ConAcc b on a.FContractID = b.ID
+        /*换车换方案--判断非废弃合同*/
+        left join (
+        select a.id
+        ,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车' else '跨月换车' end '换车类型'
+        from FinLease_Contract a
+        left join FM_ConAcc b on a.FContractID = b.ID
+        left join FinLease_Contract c on a.FContract_Old = c.ID
+        where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+        and a.FContract_Old is not null
+        ) hc on a.ID = hc.ID
+        /*换车换方案--判断废弃合同*/
+        left join (
+        select a.id
+        ,a.FContract_Old  'old_ID'
+        ,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车' else '跨月换车' end '换车类型'
+        from FinLease_Contract a
+        left join FM_ConAcc b on a.FContractID = b.ID
+        left join FinLease_Contract c on a.FContract_Old = c.ID
+        where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+        and a.FContract_Old is not null
+        ) hf on a.ID = hf.old_ID
+        where
+        (
+        /*废弃，终止的合同，是跨月换车的原合同*/
+        (b.FIsDrop = 1 and a.WFState = 1 and hf.old_ID is not null and hf.换车类型 = '跨月换车')
+        or
+        /*非废弃，非终止，非换车的合同*/
+        (isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and isnull(a.Fhc,0) != 1)
+        or
+        /*非废弃，非终止，当月换车的新合同*/
+        (isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and a.Fhc = 1 and hc.ID is not null and hc.换车类型 = '当月换车')
+        or
+        /*SX_2017010002换车换方案未能有效管理旧合同*/
+        a.ID = '4290'
+        )
+        /*剔除不算业绩的换车换方案*/
+        and a.ID not in ('6169','8194','10591')
+        and YEAR(a.FContractTime) >= 2017
+        group by CONVERT(varchar(7),a.FContractTime,120)
+        order by CONVERT(varchar(7),a.FContractTime,120) desc
+
+    </select>
+
 
 </mapper>

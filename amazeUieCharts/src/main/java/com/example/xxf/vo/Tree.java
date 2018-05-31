@@ -1,6 +1,6 @@
 package com.example.xxf.vo;
 
-import com.alibaba.fastjson.JSON;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +51,11 @@ public class Tree<T> {
 	 * 是否有子节点
 	 */
 	private boolean hasChildren = false;
+
+	/**
+	 * 是否可以跳转
+	 */
+	private String hasHref = "1";
 
 	public String getId() {
 		return id;
@@ -124,8 +129,16 @@ public class Tree<T> {
 		this.parentId = parentId;
 	}
 
+	public String getHasHref() {
+		return hasHref;
+	}
+
+	public void setHasHref(String hasHref) {
+		this.hasHref = hasHref;
+	}
+
 	public Tree(String id, String text, Map<String, Object> state, boolean checked, Map<String, Object> attributes,
-                List<Tree<T>> children, boolean isParent, boolean isChildren, String parentID) {
+				List<Tree<T>> children, boolean isParent, boolean isChildren, String parentID) {
 		super();
 		this.id = id;
 		this.text = text;
@@ -142,10 +155,6 @@ public class Tree<T> {
 		super();
 	}
 
-	@Override
-	public String toString() {
 
-		return JSON.toJSONString(this);
-	}
 
 }

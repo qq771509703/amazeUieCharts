@@ -1,5 +1,6 @@
 package com.example.xxf.service.Impl;
 
+import com.example.xxf.annotation.DBSource;
 import com.example.xxf.bean.perCapitaCapacity;
 import com.example.xxf.bean.perCapitaCapacityDetail;
 import com.example.xxf.mapper.PerCapitaCapacityMapper;
@@ -83,5 +84,89 @@ public class PerCapitaCapacityServiceImpl implements PerCapitaCapacityService {
         return listMap;
     }
 
+    @Override
+    public List<perCapitaCapacity> getPerCapitaCapacityListByBase(int start,int end) {
+        List<perCapitaCapacity> list = null;
+        try {
+            list =  perCapitaCapacityMapper.getPerCapitaCapacityListByBase(start,end);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    @DBSource(source = "local")
+    @Override
+    public int batchSave(List<perCapitaCapacity> list) {
+        int count = 0;
+        try {
+            count =  perCapitaCapacityMapper.batchSave(list);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+    @DBSource(source = "local")
+    @Override
+    public void deletePerCapitaCapacity() {
+        perCapitaCapacityMapper.deletePerCapitaCapacity();
+    }
+
+    @Override
+    public int getPerCapitaCapacityListByBaseCount() {
+        int count = 0;
+        try {
+            count =  perCapitaCapacityMapper.getPerCapitaCapacityListByBaseCount();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return count;
+    }
+    @DBSource(source = "local")
+    @Override
+    public List<perCapitaCapacity> getPerCapitaCapacityListByLocal(Map<String, Object> map) {
+        List<perCapitaCapacity> list = null;
+        try {
+            list =  perCapitaCapacityMapper.getPerCapitaCapacityListByLocal(map);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return list;
+    }
+    @DBSource(source = "local")
+    @Override
+    public int getPerCapitaCapacityListByLocalCount(Map<String, Object> map) {
+        int count = 0;
+        try {
+            count =  perCapitaCapacityMapper.getPerCapitaCapacityListByLocalCount(map);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+    @DBSource(source = "local")
+    @Override
+    public List<LinkedHashMap<String, Object>> getPerCapitaCapacityListByLocalTOExcel(Map<String,Object> map) {
+        List<LinkedHashMap<String, Object>> list = null;
+        try {
+            list =  perCapitaCapacityMapper.getPerCapitaCapacityListByLocalTOExcel(map);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return list;
+    }
+    @DBSource(source = "local")
+    @Override
+    public List<String> getDepartmentInitialize_select() {
+        List<String> list = null;
+        try {
+            list =  perCapitaCapacityMapper.getDepartmentInitialize_select();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return list;
+    }
 
 }

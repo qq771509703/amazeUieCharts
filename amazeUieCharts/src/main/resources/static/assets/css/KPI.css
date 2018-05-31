@@ -1,0 +1,132 @@
+.highcharts-background {
+    opacity: 0
+}
+
+body {
+    background: url(../img/FS.jpg) no-repeat;
+    background-size: 100%;
+}
+
+.first {
+    position: relative;
+    top: 9vw;
+    padding-left: 58px;
+    width: 95%;
+}
+
+.fb {
+    background: url(../img/line.png) no-repeat 100% 100%;
+    width: 4px;
+    height: 136px;
+    margin-right: 20px;
+    margin-left: 20px
+}
+
+.ib {
+    display: inline-block;
+}
+
+h1 {
+    color: #fff;
+    font-weight: 100;
+}
+
+.highcharts-text-outline {
+    opacity: 0;
+}
+
+.now {
+    vertical-align: top;
+}
+
+.animate {
+    background-image: -webkit-gradient(linear, 0 0, 0 bottom, from(rgba(255, 255, 255, 1)), to(rgba(135, 206, 235, 1)));
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -moz-text-fill-color: transparent;
+
+}
+
+.progress {
+    background: url(../img/program_bg.png)
+}
+
+.top {
+    background: url(../img/pw.png) no-repeat 100% 0%;
+    width: 25.5vh;
+    font-size: 1.5rem;
+    color: skyblue;
+    height: 44px;
+}
+
+h1 {
+    font-size: 2.5rem;
+}
+
+.mid {
+    position: relative;
+    bottom: -10vw;
+    width: 90%;
+    left: -7px;
+}
+
+.clearfloat:after {
+    display: block;
+    clear: both;
+    content: "";
+    visibility: hidden;
+    height: 0
+}
+
+.clearfloat {
+    zoom: 1
+}
+
+.bzt {
+    background: url(../img/border11.png);
+    width: 432px;
+    height: 278px;
+    margin-left: -15px;
+}
+
+footer {
+    position: relative;
+    bottom: -10vw;
+}
+
+.rose_pie {
+    position: relative;
+    left: 20px;
+}
+
+.rose_pie1 {
+    position: relative;
+    bottom: 5px;
+    right: 40px;
+    float: right;
+}
+
+#map {
+    position: absolute;
+    top: -110px;
+    left: 30%;
+}
+
+#container {
+    position: relative;
+    left: -11px;
+    top: -7px
+}
+
+#container1 {
+    position: relative;
+    top: -7px;
+    left: 11px;
+}
+
+.second{
+    position: relative;
+    top: 9vw;
+}

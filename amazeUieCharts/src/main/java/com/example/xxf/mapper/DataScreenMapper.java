@@ -42,4 +42,10 @@ public interface DataScreenMapper {
     List<Map<String,Object>> getHQDistribution();
 
 
+    /**
+     * 最近12个月的销售金额
+     * @return
+     */
+    List<Map<String,Object>> year_financing_amoun();
+
 }

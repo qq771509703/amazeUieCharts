@@ -13,12 +13,9 @@
     <link rel="icon" type="image/png" href="assets/i/favicon.png">
     <link rel="apple-touch-icon-precomposed" href="assets/i/app-icon72x72@2x.png">
     <meta name="apple-mobile-web-app-title" content="I" />
-    <script th:src="@{/assets/js/echarts.min.js}"></script>
-    <link rel="stylesheet" th:href="@{/assets/css/amazeui.min.css}" />
-    <link rel="stylesheet" th:href="@{/assets/layui/css/layui.css}" />
-    <link rel="stylesheet" th:href="@{/assets/css/amazeui.datatables.min.css}" />
-    <link rel="stylesheet" th:href="@{/assets/css/app.css}">
-    <link rel="stylesheet" th:href="@{/assets/css/amazeui.page.css}">
+    <!--<link rel="stylesheet" th:href="@{/assets/css/amazeui.min.css}" />-->
+    <!--<link rel="stylesheet" th:href="@{/assets/layui/css/layui.css}" />-->
+    <!--<link rel="stylesheet" th:href="@{/assets/css/app.css}">-->
     <script th:src="@{/assets/js/jquery.min.js}"></script>
     <!--<script th:src="@{/assets/layui/layui.js}"></script>-->
 
@@ -96,6 +93,14 @@
         .layui-table[lay-even] tr:nth-child(even) {
             background-color: rgba(84, 94, 99,0);
         }
+        .layui-table-page a{
+            font-size: -0.2em;
+            color: #ffffff;
+        }
+        .layui-table-page span[class=layui-laypage-count]{
+            color: #ffffff;
+        }
+
     </style>
 
 
@@ -267,7 +272,7 @@
                 ,url:'getRegionPerformanceRecord'
                 ,where: param
                 ,page: true
-                ,limit: 16 //默认采用10条
+                ,limit: 20 //默认采用10条
                 ,loading: true
                 ,cols: colss_region
                 ,request: {
@@ -352,9 +357,7 @@
 </script>
 
 <script th:src="@{/assets/js/amazeui.min.js}"></script>
-<script th:src="@{/assets/js/amazeui.datatables.min.js}"></script>
-<script th:src="@{/assets/js/dataTables.responsive.min.js}"></script>
-<script th:src="@{/assets/js/amazeui.page.js}"></script>
+
 
 </body>
 

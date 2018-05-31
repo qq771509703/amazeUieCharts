@@ -4,6 +4,7 @@ import com.example.xxf.bean.TBaseDataAnalyzeMenu;
 import com.example.xxf.bean.Tuser;
 import com.example.xxf.vo.Tree;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public interface LoginService {
@@ -17,5 +18,8 @@ public interface LoginService {
     Tuser getUserByAccount(String account);
 
     List<Tree<TBaseDataAnalyzeMenu>> getAccountMenu(Tuser user);
+
+
+    List<LinkedHashMap<String,Object>> listMap();
 
 }

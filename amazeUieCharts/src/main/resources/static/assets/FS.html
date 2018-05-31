@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+     <meta http-equiv="refresh" content="30">
+    <link rel="stylesheet" href="layui/css/layui.css">
+    <link rel="stylesheet" href="css/FS.css">
+    <script src="./js/jquery.min.js"></script>
+    <script src="./js/echarts.min.js"></script>
+    <script src="./js/china.js"></script>
+    <title>数据大屏</title>
+</head>
+
+<body class="clearfloat">
+    <div class="first clearfloat">
+        <div class="ib">
+            <div class="fb ib"></div>
+            <div class="now ib">
+                <h2 class="animate">当前总销量</h2>
+                <div>
+                    <h1 class="getGross_sales_performance ib" style="margin: 15px 0"></h1>
+                    <span style="color: dodgerblue;font-size: 2rem;vertical-align: text-bottom;">元</span>
+                </div>
+
+                <div>
+                    <h1 class="getGross_sales_count ib" style="margin: 15px 0"></h1>
+                    <span style="color: dodgerblue;font-size: 2rem;vertical-align: text-bottom;">台</span>
+                </div>
+            </div>
+        </div>
+        <!-- 进度条 -->
+        <div class="ib" style="margin-left: 100px">
+            <div id="progress" style="width: 700px;height: 180px;left: 12%;"></div>
+        </div>
+        <!-- 进度条 -->
+        <div class="ib" style="float: right;margin-right: 126px">
+            <div class="fb ib"></div>
+            <div class="now ib">
+                <h2 class="animate">当年总销量</h2>
+                <div>
+                    <h1 class="getYear_sales_performance ib" style="margin: 15px 0"></h1>
+                    <span style="color: dodgerblue;font-size: 2rem;vertical-align: text-bottom;">元</span>
+                </div>
+
+                <div>
+                    <h1 class="getYear_sales_count ib" style="margin: 15px 0"></h1>
+                    <span style="color: dodgerblue;font-size: 2rem;vertical-align: text-bottom;">台</span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- ******************** -->
+    <div class="mid">
+        <div class="sale_people ib">
+            <div class="top">
+                营销人员分布
+            </div>
+            <div class="bzt clearfloat">
+                <div id="container" style="min-width:370px;height:270px;"></div>
+            </div>
+        </div>
+        <!-- map_div -->
+        <div class="ib">
+            <div id="map" style="width: 700px;height: 550px;"></div>
+            <!-- <div id="mmap" style="width: 600px;height: 400px;"></div> -->
+        </div>
+
+        <div class="headquarters_people ib" style="float: right">
+            <div class="top">
+                总部人员分布
+            </div>
+            <div class="bzt ">
+                <div id="container1" style="min-width:370px;height:270px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="rose_pie ib">
+            <div id="rose_pie" style="width: 500px;height:280px;"></div>
+        </div>
+        <div class="ib" style="position: relative;left: 10%;">
+            <div id="line" style="width: 760px;height: 180px;top: -20px;left: -118px;"></div>
+        </div>
+        <div class="rose_pie1 ib">
+            <div id="rose_pie1" style="width: 500px;height:280px;"></div>
+        </div>
+    </footer>
+</body>
+<!-- 营销人员 -->
+<script>
+    var Sales_myChart = echarts.init(document.getElementById('container'));
+    Sales_myChart.setOption({
+        color: ['#4dd3b9', '#fdd67f', '#ffaca8', '#64bcec'],
+        legend: {
+            x: 'center',
+            y: 'bottom',
+            data: ['90后', '80后', '00后'],
+            textStyle: {
+                color: ['#4dd3b9', '#fdd67f', '#ffaca8']
+            }
+        },
+        series: [
+            {
+                name: '',
+                radius: ['52%', '70%'],
+                type: 'pie',
+                center: ['55%', '50%'],
+            }
+        ]
+    })
+    $.get('./getSales_staff_distribution').done(function (data) {
+
+        var sum = 0;
+        function getsum(item, index, array) {
+            sum += item;
+        }
+        var total = [];
+        for (var i = 0; i < data.data.ssdListMap.length; i++) {
+
+            total.push(data.data.ssdListMap[i].value);
+            var sum = 0;
+            total.some(getsum);
+        }
+        Sales_myChart.setOption({
+            title: {
+                text: sum + '人',
+                left: '48%',
+                bottom: '45%',
+                textStyle: {
+                    color: '#fff'
+                }
+            },
+            series: {
+                label: {
+                    normal: {
+                        formatter: '{a|{a}}{b|{b}：}{c}\n  {per|{d}%}',
+                        borderColor: '#aaa',
+                        rich: {
+                            a: {
+                                color: '#999',
+                                lineHeight: 22,
+                                align: 'center'
+                            },
+
+                            b: {
+                                fontSize: 15,
+                            },
+                            per: {
+                                color: '#eee',
+                                backgroundColor: '#334455',
+                                padding: [2, 4],
+                                borderRadius: 2
+                            }
+                        }
+                    }
+                },
+                data: [
+                    data.data.ssdListMap[0],
+                    data.data.ssdListMap[1],
+                    data.data.ssdListMap[2],
+
+                ]
+            }
+        })
+    });
+
+    $.get('./getGross_sales_count', {}).done(function (data) {
+        $('.getGross_sales_count').text(data.data)
+    });
+
+    $.get('./getGross_sales_performance', {}).done(function (data) {
+        $('.getGross_sales_performance').text(data.data)
+    });
+
+    $.get('./getYear_sales_count', {}).done(function (data) {
+        $('.getYear_sales_count').text(data.data)
+    });
+    $.get('./getYear_sales_performance', {}).done(function (data) {
+        $('.getYear_sales_performance').text(data.data)
+    });    
+</script>
+<!-- 总部人员 -->
+<script>
+    var HQ_myChart = echarts.init(document.getElementById('container1'));
+    HQ_myChart.setOption({
+        title: {
+            left: '43%',
+            bottom: '45%',
+            textStyle: {
+                color: '#fff'
+            }
+        },
+        color: ['#4dd3b9', '#fdd67f', '#ffaca8', '#64bcec'],
+
+        series: [
+            {
+                name: '',
+                radius: ['52%', '70%'],
+                type: 'pie',
+                center: ['50%', '50%'],
+            }
+        ]
+    })
+    $.get('./getHQ_staff_distribution').done(function (data) {
+
+        var sum = 0;
+        function getSum(item, index, array) {
+            sum += item;
+        }
+        var co = [];
+        var name = [];
+        // var data = []
+        for (var i = 0; i < data.data.hqdListMap.length; i++) {
+            name.push(data.data.hqdListMap[i].name)
+            co.push(data.data.hqdListMap[i].value)
+            // data.push(data.data.hqdListMap[i])
+            var sum = 0;
+            co.some(getSum)
+        }
+
+        HQ_myChart.setOption({
+            title: {
+                text: sum + '人'
+            },
+            legend: {
+                bottom: -5,
+                left: 'center',
+                data: name,
+                textStyle: {
+                    color: ['#4dd3b9', '#fdd67f','#ffaca8','#64bcec'],
+                }
+            },
+            series:
+                {
+                    label: {
+                        normal: {
+                            formatter: '{a|{a}}{b|{b}：}{c}\n  {per|{d}%}',
+                            borderColor: '#aaa',
+                            rich: {
+                                a: {
+                                    color: '#999',
+                                    lineHeight: 22,
+                                    align: 'center'
+                                },
+
+                                b: {
+                                    fontSize: 15,
+                                },
+                                per: {
+                                    color: '#eee',
+                                    backgroundColor: '#334455',
+                                    padding: [2, 4],
+                                    borderRadius: 2
+                                }
+                            }
+                        }
+                    },
+                    // data: [
+                    //     data.data.hqdListMap[3], //90
+                    //     // data.data.hqdListMap[2], //80
+                    //     // data.data.hqdListMap[1], //80
+                    //     // data.data.hqdListMap[0], //80
+                    //     // data.data.hqdListMap[4]
+                    // ]
+                    data: [data.data.hqdListMap[0],data.data.hqdListMap[1],data.data.hqdListMap[2],data.data.hqdListMap[3],data.data.hqdListMap[4]]
+                }
+        })
+    });
+</script>
+<!-- 销售+采购 -->
+<script>
+    var myChart = echarts.init(document.getElementById('rose_pie'));
+    myChart.setOption({
+        color: ['#4dd3b9', '#fdd67f', '#ffaca8', '#64bcec', '#d48265'],
+        title: {
+            subtext: '销售品牌',
+            // subtextStyle:{
+            //     align:center
+            // },
+            subtextStyle: {
+                color: '#02F9CC',
+                fontSize: '15'
+            },
+            x: 'center'
+        },
+        tooltip: {
+            trigger: 'item',
+            formatter: "{a} <br/>{b} : {c} ({d}%)"
+        },
+
+        calculable: true,
+        series: [
+            {
+                name: '销售品牌',
+                type: 'pie',
+                radius: [10, 80],
+                roseType: 'area',
+                label: {
+                    normal: {
+                        formatter: '{b|{b}：}\n{hr|}\n{c}  {per|{d}%}  ',
+                        backgroundColor: 'rgba(0,0,0,0)',
+                        borderColor: '#aaa',
+                        borderWidth: 1,
+                        borderRadius: 4,
+                        shadowBlur: 3,
+                        shadowOffsetX: 2,
+                        shadowOffsetY: 2,
+                        shadowColor: '#999',
+                        padding: [0, 7],
+                        rich: {
+                            a: {
+                                color: '#999',
+                                lineHeight: 16,
+                                align: 'center',
+                                backgroundColor: 'rgba(11,111,167,0)'
+                            },
+                            hr: {
+                                borderColor: '#aaa',
+                                width: '100%',
+                                borderWidth: 0.5,
+                                height: 0
+                            },
+                            b: {
+                                fontSize: 11,
+                                lineHeight: 23,
+                                align: 'center'
+                            },
+
+                        }
+                    }
+                }
+            }
+        ]
+    });
+
+    $.get('./getSales_brand').done(function (data) {
+
+        for (x in data.data.sbListMap) {
+            myChart.setOption({
+                series: [
+                    {
+                        data:
+                            [
+                                data.data.sbListMap[0],
+                                data.data.sbListMap[1],
+                                data.data.sbListMap[2],
+                                data.data.sbListMap[3],
+                                data.data.sbListMap[4]
+                            ]
+                    }
+                ]
+            })
+        }
+    })
+
+    //***********************
+    // 采购
+    var rose_pie1_myChart = echarts.init(document.getElementById('rose_pie1'));
+    rose_pie1_myChart.setOption({
+        color: ['#4dd3b9', '#fdd67f', '#ffaca8', '#64bcec', '#d48265'],
+        title: {
+            subtext: '采购品牌',
+            subtextStyle: {
+                color: '#02F9CC',
+                fontSize: '15'
+            },
+            x: 'center'
+        },
+        tooltip: {
+            trigger: 'item',
+            formatter: "{a} <br/>{b} : {c} ({d}%)"
+        },
+
+        calculable: true,
+        series: [
+            {
+                name: '采购品牌',
+                type: 'pie',
+                radius: [10, 80],
+                roseType: 'area',
+                label: {
+                    normal: {
+                        formatter: '{b|{b}：}\n{hr|}\n{c}  {per|{d}%}  ',
+                        backgroundColor: 'rgba(0,0,0,0)',
+                        borderColor: '#aaa',
+                        borderWidth: 1,
+                        borderRadius: 4,
+                        shadowBlur: 3,
+                        shadowOffsetX: 2,
+                        shadowOffsetY: 2,
+                        shadowColor: '#999',
+                        padding: [0, 7],
+                        rich: {
+                            a: {
+                                color: '#999',
+                                lineHeight: 16,
+                                align: 'center',
+                                backgroundColor: 'rgba(11,111,167,0)'
+                            },
+
+                            hr: {
+                                borderColor: '#aaa',
+                                width: '100%',
+                                borderWidth: 0.5,
+                                height: 0
+                            },
+                            b: {
+                                fontSize: 11,
+                                lineHeight: 23,
+                                align: 'center'
+                            },
+
+                        }
+                    }
+                }
+
+            }
+        ]
+    });
+    $.get('./getPurchase_brand').done(function (data) {
+        // console.log(data.data.pbListMap[0])
+        for (x in data.data.pbListMap) {
+            rose_pie1_myChart.setOption({
+                series: [
+                    {
+                        data:
+                            [
+                                data.data.pbListMap[0],
+                                data.data.pbListMap[1],
+                                data.data.pbListMap[2],
+                                data.data.pbListMap[3],
+                                data.data.pbListMap[4]
+                            ]
+
+                    }
+                ]
+            })
+        }
+    })
+
+</script>
+<!-- 战区 -->
+<script>
+    var zq_myChart = echarts.init(document.getElementById('progress'));
+    zq_myChart.setOption(
+        {
+            title: {
+                text: '大区战绩',
+                x: 'center',
+                textStyle: {
+                    color: "#fff"
+                }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                show: false
+            },
+            yAxis: [
+                {
+                    splitLine: {
+                        show: false
+                    },
+
+                    splitLine: {
+                        show: false
+                    },
+                    nameTextStyle: {
+                        color: '#fff',
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            color: '#fff',
+                        },
+                        show: false
+                    },
+                    type: 'category',
+                    axisTick: {
+                        show: false
+                    },
+                    data: ['华南战区', '西南战区', '长三角战区', '西北战区', '华东战区']
+                }],
+            series: [
+
+            ]
+        })
+
+    $.get('./getRegion_performance', { "obj": 2018 }).done(function (data) {
+        var yMax = data.data.targetVal;
+        var dataShadow = [];
+        var max_data = [];
+        for (i = 0; i < data.data.listMap.length; i++) {
+            max_data.push(data.data.listMap[i].sum);
+            dataShadow.push(yMax)
+        }
+        // console.log(max_data)
+        zq_myChart.setOption({
+            series: [
+                { // For shadow
+                    type: 'bar',
+                    itemStyle: {
+                        normal: { color: 'rgba(255,255,255,0.1)' }
+                    },
+                    barGap: '-100%',
+                    barCategoryGap: '-10%',
+                    barWidth: '50%',
+                    data: dataShadow,
+                },
+                {
+                    type: 'bar',
+                    itemStyle: {
+                        normal: {
+                            color: new echarts.graphic.LinearGradient(
+                                0, 0, 1, 0,
+                                [
+                                    { offset: 0, color: '#83bff6' },
+                                    { offset: 0.5, color: '#18A4BB' },
+                                    { offset: 1, color: '#02F9CC' }
+                                ]
+                            )
+                        }
+                    },
+                    label: {
+                        normal: {
+                            show: true,
+                            position: 'right',
+                            textStyle: {
+                                color: '#FFF'
+                            }
+                        }
+                    },
+                    data: max_data
+                },
+            ]
+        })
+    })
+
+</script>
+<!--月份 -->
+<script>
+    var line_myChart = echarts.init(document.getElementById('line'));
+    line_myChart.setOption({
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross',
+                label: {
+                    backgroundColor: '#6a7985'
+                }
+            }
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        xAxis: [
+            {
+                offset: 2,
+                axisTick: {
+                    show: false
+                },
+                type: 'category',
+                boundaryGap: false,
+                data: [],
+                axisLabel: {
+                    rotate: 30,
+                    color: '#87CEEB'
+                },
+                axisLine: {
+                    lineStyle: {
+                        color: '#87CEEB'
+                    }
+                }
+            }
+        ],
+        yAxis: {
+            offset: 20,
+            axisLine: {
+                lineStyle: {
+                    color: '#87CEEB',
+                    width: 2
+                }
+            },
+            // offset:20,
+            splitLine: {
+                show: false
+            },
+            axisTick: {
+                show: false
+            },
+            boundaryGap: false,
+            type: 'value',
+            nameTextStyle: {
+                color: 'red',
+                fontWeight: 'bold'
+            },
+            axisLabel: {
+                textStyle: {
+                    color: '#87CEEB', //数值颜色
+                }
+            }
+        },
+        series: [
+            {
+                data: [],
+                name: '台',
+                type: 'line',
+                stack: '总量',
+                label: {
+                    normal: {
+                        show: true,
+                        position: 'top',
+                        color: 'rgb(128,197,227)'
+                    }
+                },
+                areaStyle: {
+                    normal: {
+                        color: new echarts.graphic.LinearGradient(
+                            0, 0, 0, 1,
+                            [
+                                { offset: 0, color: '#83bff6' },
+                                { offset: 0.5, color: '#18A4BB' },
+                                { offset: 1, color: '#02F9CC' }
+                            ]
+                        )
+                    }
+                },
+                color: '#3c7985'
+            }
+        ]
+    });
+    $.get('./getNearMonth12FinancingAmoun').done(function (data) {
+        var month =[];
+        var sum = [];
+
+        for(var i = 0;i<data.data.length;i++){
+            month.unshift(data.data[i].month)
+            sum.unshift(data.data[i].Sales);
+        }
+
+        line_myChart.setOption({
+            xAxis: [
+                {
+                    data: month
+                }
+            ],
+            series: {
+                data: sum
+            }
+        })
+    })
+
+</script>
+<!-- map -->
+<script>    
+    var map_myChart = echarts.init(document.getElementById('map'));
+    map_myChart.setOption({
+        backgroundColor: 'rgba(0,0,0,0.01)',
+        geo: {
+            zoom: 1.25,
+            map: 'china',
+            silent: true,
+            label: {
+                emphasis: {
+                    show: false
+                }
+            },
+            roam: false,
+            regions: [
+                {
+                    name: '西藏',
+                    itemStyle: {
+                        areaColor: 'rgb(19,32,81)',
+                    }
+                },
+                {
+                    name: '青海',
+                    itemStyle: {
+                        areaColor: 'rgb(19,32,81)',
+                    }
+                },
+                {
+                    name: '甘肃',
+                    itemStyle: {
+                        areaColor: 'rgb(19,32,81)',
+                    }
+                },
+                {
+                    name: '宁夏',
+                    itemStyle: {
+                        areaColor: 'rgb(19,32,81)',
+                    }
+                }, {
+                    name: '山西',
+                    itemStyle: {
+                        areaColor: 'rgb(19,32,81)',
+                    }
+                }, {
+                    name: '陕西',
+                    itemStyle: {
+                        areaColor: 'rgb(19,32,81)',
+                    }
+                }, {
+                    name: '河北',
+                    itemStyle: {
+                        areaColor: 'rgb(19,32,81)',
+                    }
+                }, {
+                    name: '北京',
+                    itemStyle: {
+                        areaColor: 'rgb(19,32,81)',
+                    }
+                }, {
+                    name: '天津',
+                    itemStyle: {
+                        areaColor: 'rgb(19,32,81)',
+                    }
+                }, {
+                    name: '四川',
+                    itemStyle: {
+                        areaColor: 'rgb(19,32,81)',
+                    }
+                }, {
+                    name: '贵州',
+                    itemStyle: {
+                        areaColor: 'rgb(19,32,81)',
+                    }
+                }, {
+                    name: '云南',
+                    itemStyle: {
+                        areaColor: 'rgb(19,32,81)',
+                    }
+                }, {
+                    name: '湖南',
+                    itemStyle: {
+                        areaColor: 'rgb(11,111,186)',
+                    }
+                }, {
+                    name: '湖北',
+                    itemStyle: {
+                        areaColor: 'rgb(11,111,186)',
+                    }
+                }, {
+                    name: '河南',
+                    itemStyle: {
+                        areaColor: 'rgb(11,111,186)',
+                    }
+                }, {
+                    name: '浙江',
+                    itemStyle: {
+                        areaColor: 'rgb(11,111,186)',
+                    }
+                }, {
+                    name: '福建',
+                    itemStyle: {
+                        areaColor: 'rgb(11,111,186)',
+                    }
+                }, {
+                    name: '台湾',
+                    itemStyle: {
+                        areaColor: 'rgb(11,111,186)',
+                    }
+                }, {
+                    name: '吉林',
+                    itemStyle: {
+                        areaColor: 'rgb(11,111,186)',
+                    }
+                }, {
+                    name: '辽宁',
+                    itemStyle: {
+                        areaColor: 'rgb(11,111,186)',
+                    }
+                }, {
+                    name: '重庆',
+                    itemStyle: {
+                        areaColor: 'rgb(19,32,81)',
+                    }
+                }, {
+                    name: '江苏',
+                    itemStyle: {
+                        areaColor: 'rgb(28,48,121)',
+                    }
+                }, {
+                    name: '广西',
+                    itemStyle: {
+                        areaColor: 'rgb(28,48,121)',
+                    }
+                }, {
+                    name: '安徽',
+                    itemStyle: {
+                        areaColor: 'rgb(28,48,121)',
+                    }
+                }, {
+                    name: '广东',
+                    itemStyle: {
+                        areaColor: 'rgb(28,48,121)',
+                    }
+                }, {
+                    name: '山东',
+                    itemStyle: {
+                        areaColor: 'rgb(28,48,121)',
+                    }
+                }, {
+                    name: '江西',
+                    itemStyle: {
+                        areaColor: 'rgb(28,48,121)',
+                    }
+                }, {
+                    name: '海南',
+                    itemStyle: {
+                        areaColor: 'rgb(28,48,121)',
+                    }
+                }, {
+                    name: '新疆',
+                    itemStyle: {
+                        areaColor: 'rgb(20,68,131)',
+                    }
+                }, {
+                    name: '内蒙古',
+                    itemStyle: {
+                        areaColor: 'rgb(28,48,121)',
+                    }
+                }, {
+                    name: '黑龙江',
+                    itemStyle: {
+                        areaColor: 'rgb(28,48,121)',
+                    }
+                },],
+
+            itemStyle: {
+                normal: {
+                    borderColor: '#fff'
+                }
+            }
+        },
+        series: [
+            {
+                name: 'Top 5',
+                type: 'effectScatter',
+                coordinateSystem: 'geo',
+
+                symbolSize: function (val) {
+                    return [10, 10];
+                },
+
+                hoverAnimation: true,
+                label: {
+                    normal: {
+                        formatter: '{b}',
+                        position: 'right',
+                        show: true
+                    }
+                },
+                showEffectOn: 'render',
+                rippleEffect: {
+                    scale: 6,
+                    brushType: 'fill'
+                },
+                itemStyle: {
+                    normal: {
+                        color: '#f4e925',
+                        shadowBlur: 10,
+                        shadowColor: '#333'
+                    }
+                },
+                zlevel: 1
+            }
+        ]
+    })
+
+    $.get('./getInitialize_map', {}).done(function (data) {
+        map_myChart.setOption({
+            series: {
+                data: data.data
+            }
+        })
+    })
+
+
+</script>
+
+</html>

@@ -87,9 +87,9 @@ public class sysControll {
     public String fightScreen(){
         return "admin/fightScreen";
     }
-    @RequestMapping("/fightScreen3")
+    @RequestMapping("/fightScreen2")
     public String fightScreen2(){
-        return "admin/fightScreen3";
+        return "admin/fightScreen2";
     }
 
     @RequestMapping("/performanceRecord")
@@ -100,4 +100,10 @@ public class sysControll {
     public String roleList(){
         return "admin/role/roleEdit";
     }
+
+    @RequestMapping("/forSaleCar")
+    public String forSaleCar(){
+        return "admin/forSaleCar";
+    }
+
 }

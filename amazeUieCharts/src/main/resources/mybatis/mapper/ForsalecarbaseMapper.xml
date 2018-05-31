@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.xxf.mapper.ForsalecarbaseMapper" >
+  <resultMap id="BaseResultMap" type="com.example.xxf.bean.Forsalecarbase" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="area" property="area" jdbcType="VARCHAR" />
+    <result column="forSaleNewCar" property="forsalenewcar" jdbcType="VARCHAR" />
+    <result column="forSaleUsedCar" property="forsaleusedcar" jdbcType="VARCHAR" />
+    <result column="summary" property="summary" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, area, forSaleNewCar, forSaleUsedCar, summary
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.example.xxf.bean.ForsalecarbaseExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from forSaleCarBase
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <delete id="deleteByExample" parameterType="com.example.xxf.bean.ForsalecarbaseExample" >
+    delete from forSaleCarBase
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.example.xxf.bean.Forsalecarbase" >
+    insert into forSaleCarBase (id, area, forSaleNewCar, 
+      forSaleUsedCar, summary)
+    values (#{id,jdbcType=INTEGER}, #{area,jdbcType=VARCHAR}, #{forsalenewcar,jdbcType=VARCHAR}, 
+      #{forsaleusedcar,jdbcType=VARCHAR}, #{summary,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.example.xxf.bean.Forsalecarbase" >
+    insert into forSaleCarBase
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="area != null" >
+        area,
+      </if>
+      <if test="forsalenewcar != null" >
+        forSaleNewCar,
+      </if>
+      <if test="forsaleusedcar != null" >
+        forSaleUsedCar,
+      </if>
+      <if test="summary != null" >
+        summary,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="area != null" >
+        #{area,jdbcType=VARCHAR},
+      </if>
+      <if test="forsalenewcar != null" >
+        #{forsalenewcar,jdbcType=VARCHAR},
+      </if>
+      <if test="forsaleusedcar != null" >
+        #{forsaleusedcar,jdbcType=VARCHAR},
+      </if>
+      <if test="summary != null" >
+        #{summary,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.example.xxf.bean.ForsalecarbaseExample" resultType="java.lang.Integer" >
+    select count(*) from forSaleCarBase
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update forSaleCarBase
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.area != null" >
+        area = #{record.area,jdbcType=VARCHAR},
+      </if>
+      <if test="record.forsalenewcar != null" >
+        forSaleNewCar = #{record.forsalenewcar,jdbcType=VARCHAR},
+      </if>
+      <if test="record.forsaleusedcar != null" >
+        forSaleUsedCar = #{record.forsaleusedcar,jdbcType=VARCHAR},
+      </if>
+      <if test="record.summary != null" >
+        summary = #{record.summary,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update forSaleCarBase
+    set id = #{record.id,jdbcType=INTEGER},
+      area = #{record.area,jdbcType=VARCHAR},
+      forSaleNewCar = #{record.forsalenewcar,jdbcType=VARCHAR},
+      forSaleUsedCar = #{record.forsaleusedcar,jdbcType=VARCHAR},
+      summary = #{record.summary,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+
+
+    <select id="getForsalecarbaseByXXFDB" resultType="com.example.xxf.bean.Forsalecarbase">
+
+  SELECT
+            *
+            FROM(
+            SELECT  ROW_NUMBER() OVER(ORDER BY forSaleNewCar) AS rowid,*
+            from
+            (
+      select
+      a.区域 AS area
+      ,sum(case when a.车辆标识 = '待售新车' then 1 else 0 end) 'forSaleNewCar'
+      ,sum(case when a.车辆标识 = '待售二手车' then 1 else 0 end) 'forSaleUsedCar'
+      ,COUNT(1) 'summary'
+      from (
+      select
+      a.区域
+      ,a.车辆归属
+      ,a.车辆标识
+      from (
+      select
+      replace(i.FName,'分公司','') '区域'
+      ,a.ID
+      ,case when o.Name = '淘汽互联网子公司' then '淘汽'
+      when o.Name != '淘汽互联网子公司' and w.Ftq = '1' then '淘汽'
+      else '喜相逢'
+      end '车辆归属'
+      ,a.FVIN '车架号'
+      ,a.FPlateNum '车牌号'
+      , m.FBrand '品牌'
+      ,case when m.FBrand is null then m.FName else m.FBrand + m.FName end '车型'
+      ,n.FModel '规格'
+      ,case when m.FPrice &lt; 100000 and m.FType = 4 then 'a7-10万以下SUV'
+      when m.FPrice > 100000 and m.FType = 4 then 'a8-10万以上SUV'
+      when m.FPrice &lt; 60000 then 'a1-6万以下'
+      when m.FPrice &lt; 80000 then 'a2-6-8万'
+      when m.FPrice &lt; 100000 then 'a3-8-10万'
+      when m.FPrice &lt; 120000 then 'a4-10-12万'
+      when m.FPrice &lt; 150000 then 'a5-12-15万'
+      when m.FPrice > 150000 then 'a6-15万以上'
+      end '价格区间'
+
+      ,case when (f.FQuoType = 1 and a.FCarPreStatus in (108,107)) and f.FSaleState = 1
+      and a.id not in(select isnull(a.FQuoteLed,0) from WO_RZYZDGSCLC a join OS_WFENTRY f on a.InstID = f.id where f.STATE in(1))
+      then '待售新车'
+      when f.FQuoType = 2 and a.FCarPreStatus in (121,139) and f.FSaleState=1 then '待售二手车'
+      else null
+      end '车辆标识'
+
+      ,case when (f.FQuoType = 1 and a.FCarPreStatus in (108,109,107)) or a.FCarPreStatus = 108 then DATEDIFF(dd,p.FSPSJ,getdate())
+      when (f.FQuoType = 2 and a.FCarPreStatus in (109,121,139)) or a.FCarPreStatus = 121 then DATEDIFF(dd,f.FCreateT,getdate()) end '库存时长'
+
+      from FCar a
+      /*车辆当前状态*/
+      left join tXTDM c on a.FCarPreStatus = c.IBM AND c.FLMC = '车辆当前状态'
+      /*采购明细*/
+      left join (
+      select a.Ftq,a.FCarID
+      from WO_GCCLGLLC_detail a with (nolock)
+      left join WO_GCCLGLLC b with (nolock) on a.WO_GCCLGLLC_ID = b.ID
+      where isnull(b.WFState,0) != 3 and isnull(b.FAppType,0) != 3
+      ) w
+      on w.FCarID = a.ID
+      /*报价种类*/
+      LEFT JOIN FNewCarOffer f on f.FVType = a.ID
+      /*区域*/
+      left join Area i on a.FArea=i.ID
+      /*采购相关信息表*/
+      left join WO_CGSQDLC j on j.ID = a.FPurNo
+      /*请购相关信息表，请购结束时间以流程结束时间为准*/
+      left join (
+      select a.ID,c.Name
+      from WO_QGLC a with (nolock)
+      left join lbOrganization c with (nolock) on a.FOrgid = c.ID
+      where isnull(a.FAppType,0) != 3 and isnull(a.WFState,0) != 3
+      ) o
+      on o.ID = j.FBuying_Requisition
+      /*车型*/
+      left join Vehicle_Mana m on a.FVType = m.ID
+      /*产品信息*/
+      left join GoodsCode n on n.ID = a.FVType1
+      /*购车车辆提车流程*/
+      left join (select a.FVIN,a.FSPSJ from WO_GCCLTCLC a where isnull(a.WFState,0) != 3) p on p.FVIN = a.FVIN
+
+      where a.FUseStatus = 1   /*融资租赁*/
+      and i.FName like '%公司%'   /*区域归属为分公司*/
+      and a.FCarPreStatus != '138'   /*排除放弃采购的车*/
+      ) a
+      where 1 = 1
+      and a.车辆标识 is not null
+      ) a
+      group by a.区域
+      )
+	    t
+	    where 1=1
+	    ) AS sys_roles
+	    WHERE ROWID BETWEEN #{startRow} and #{endRow}
+  </select>
+    <select id="getForsalecarbaseCountByXXFDB" resultType="int">
+        select count(1) from (
+        select
+        a.区域
+        ,sum(case when a.车辆标识 = '待售新车' then 1 else 0 end) '待售新车'
+        ,sum(case when a.车辆标识 = '待售二手车' then 1 else 0 end) '待售二手车'
+        ,COUNT(1) '汇总'
+        from (
+        select
+        a.区域
+        ,a.车辆归属
+        ,a.车辆标识
+        from (
+        select
+        replace(i.FName,'分公司','') '区域'
+        ,a.ID
+        ,case when o.Name = '淘汽互联网子公司' then '淘汽'
+        when o.Name != '淘汽互联网子公司' and w.Ftq = '1' then '淘汽'
+        else '喜相逢'
+        end '车辆归属'
+        ,a.FVIN '车架号'
+        ,a.FPlateNum '车牌号'
+        , m.FBrand '品牌'
+        ,case when m.FBrand is null then m.FName else m.FBrand + m.FName end '车型'
+        ,n.FModel '规格'
+        ,case when m.FPrice &lt; 100000 and m.FType = 4 then 'a7-10万以下SUV'
+        when m.FPrice > 100000 and m.FType = 4 then 'a8-10万以上SUV'
+        when m.FPrice &lt; 60000 then 'a1-6万以下'
+        when m.FPrice &lt; 80000 then 'a2-6-8万'
+        when m.FPrice &lt; 100000 then 'a3-8-10万'
+        when m.FPrice &lt; 120000 then 'a4-10-12万'
+        when m.FPrice &lt; 150000 then 'a5-12-15万'
+        when m.FPrice > 150000 then 'a6-15万以上'
+        end '价格区间'
+
+        ,case when (f.FQuoType = 1 and a.FCarPreStatus in (108,107)) and f.FSaleState = 1
+        and a.id not in(select isnull(a.FQuoteLed,0) from WO_RZYZDGSCLC a join OS_WFENTRY f on a.InstID = f.id where f.STATE in(1))
+        then '待售新车'
+        when f.FQuoType = 2 and a.FCarPreStatus in (121,139) and f.FSaleState=1 then '待售二手车'
+        else null
+        end '车辆标识'
+
+        ,case when (f.FQuoType = 1 and a.FCarPreStatus in (108,109,107)) or a.FCarPreStatus = 108 then DATEDIFF(dd,p.FSPSJ,getdate())
+        when (f.FQuoType = 2 and a.FCarPreStatus in (109,121,139)) or a.FCarPreStatus = 121 then DATEDIFF(dd,f.FCreateT,getdate()) end '库存时长'
+
+        from FCar a
+        /*车辆当前状态*/
+        left join tXTDM c on a.FCarPreStatus = c.IBM AND c.FLMC = '车辆当前状态'
+        /*采购明细*/
+        left join (
+        select a.Ftq,a.FCarID
+        from WO_GCCLGLLC_detail a with (nolock)
+        left join WO_GCCLGLLC b with (nolock) on a.WO_GCCLGLLC_ID = b.ID
+        where isnull(b.WFState,0) != 3 and isnull(b.FAppType,0) != 3
+        ) w
+        on w.FCarID = a.ID
+        /*报价种类*/
+        LEFT JOIN FNewCarOffer f on f.FVType = a.ID
+        /*区域*/
+        left join Area i on a.FArea=i.ID
+        /*采购相关信息表*/
+        left join WO_CGSQDLC j on j.ID = a.FPurNo
+        /*请购相关信息表，请购结束时间以流程结束时间为准*/
+        left join (
+        select a.ID,c.Name
+        from WO_QGLC a with (nolock)
+        left join lbOrganization c with (nolock) on a.FOrgid = c.ID
+        where isnull(a.FAppType,0) != 3 and isnull(a.WFState,0) != 3
+        ) o
+        on o.ID = j.FBuying_Requisition
+        /*车型*/
+        left join Vehicle_Mana m on a.FVType = m.ID
+        /*产品信息*/
+        left join GoodsCode n on n.ID = a.FVType1
+        /*购车车辆提车流程*/
+        left join (select a.FVIN,a.FSPSJ from WO_GCCLTCLC a where isnull(a.WFState,0) != 3) p on p.FVIN = a.FVIN
+
+        where a.FUseStatus = 1   /*融资租赁*/
+        and i.FName like '%公司%'   /*区域归属为分公司*/
+        and a.FCarPreStatus != '138'   /*排除放弃采购的车*/
+        ) a
+        where 1 = 1
+        and a.车辆标识 is not null
+        ) a
+        group by a.区域)c
+    </select>
+    <insert id="batchInsert" parameterType="com.example.xxf.bean.Forsalecarbase">
+      INSERT INTO forSaleCarBase
+      (area, forSaleNewCar, forSaleUsedCar, summary)
+      VALUES
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.area,jdbcType=VARCHAR}, #{item.forsalenewcar,jdbcType=VARCHAR},
+            #{item.forsaleusedcar,jdbcType=VARCHAR}, #{item.summary,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+
+    <select id="getForsalecarbaseByLocal" resultType="com.example.xxf.bean.Forsalecarbase">
+        SELECT
+        *
+        FROM(
+        SELECT  ROW_NUMBER() OVER(ORDER BY forSaleNewCar) AS rowid,*
+        from
+        (
+      SELECT
+        <include refid="Base_Column_List" />
+        from forSaleCarBase WHERE 1 =1
+        <if test="areas !=null and areas.size >0">
+            AND area IN
+            <foreach collection="areas" index="index" item="area" open="(" separator="," close=")">
+                #{area}
+            </foreach>
+        </if>
+        )
+        t
+        where 1=1
+        ) AS sys_roles
+        WHERE ROWID BETWEEN #{startRow} and #{endRow}
+    </select>
+    <select id="getForsalecarbaseCountByLocal" resultType="int">
+        SELECT
+        COUNT(1)
+        from forSaleCarBase WHERE 1 =1
+        <if test="areas !=null and areas.size >0">
+            AND area IN
+            <foreach collection="areas" index="index" item="area" open="(" separator="," close=")">
+                #{area}
+            </foreach>
+        </if>
+
+    </select>
+
+
+
+    <select id="getForsalecarbaseByLocalTOExcel" resultType="java.util.LinkedHashMap">
+
+        SELECT
+        area, forSaleNewCar, forSaleUsedCar, summary
+        from forSaleCarBase WHERE 1 =1
+        <if test="areas !=null and areas.size >0">
+            AND area IN
+            <foreach collection="areas" index="index" item="area" open="(" separator="," close=")">
+                #{area}
+            </foreach>
+        </if>
+    </select>
+</mapper>
