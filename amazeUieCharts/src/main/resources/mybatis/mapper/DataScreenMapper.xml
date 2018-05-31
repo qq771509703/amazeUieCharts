@@ -351,8 +351,8 @@ case when year(a.FBirthday) > 1994 then '95后'
      when year(a.FBirthday) > 1984 then '85后'
      when year(a.FBirthday) > 1979 then '80后'
      else '80前'
-     end 'age'
-,count(1) 'co'
+     end 'name'
+,count(1) 'value'
 from T_BD_Person a  --人员表
 left join T_ORG_PositionMember c on c.FPersonID = a.fid  --人员岗位对应表
 left join T_ORG_Position d on c.FPositionID = d.FID  --岗位表
@@ -372,7 +372,7 @@ case when year(a.FBirthday) > 1994 then '95后'
      else '80前'
      end
 ) a
-order by case a.age when '95后' then 5
+order by case a.name when '95后' then 5
                     when '90后' then 4
                     when '85后' then 3
                     when '80后' then 2
@@ -390,8 +390,8 @@ order by case a.age when '95后' then 5
              when year(a.FBirthday) > 1984 then '85后'
              when year(a.FBirthday) > 1979 then '80后'
              else '80前'
-             end 'age'
-        ,count(1) 'co'
+             end 'name'
+        ,count(1) 'value'
         from T_BD_Person a  --人员表
         left join T_ORG_PositionMember c on c.FPersonID = a.fid  --人员岗位对应表
         left join T_ORG_Position d on c.FPositionID = d.FID  --岗位表
@@ -411,7 +411,7 @@ order by case a.age when '95后' then 5
              else '80前'
              end
         ) a
-        order by case a.age when '95后' then 5
+        order by case a.name when '95后' then 5
                             when '90后' then 4
                             when '85后' then 3
                             when '80后' then 2

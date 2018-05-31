@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-     <meta http-equiv="refresh" content="30">
+    <!-- <meta http-equiv="refresh" content=""> -->
     <link rel="stylesheet" href="layui/css/layui.css">
     <link rel="stylesheet" href="css/FS.css">
     <script src="./js/jquery.min.js"></script>
@@ -114,7 +114,7 @@
         ]
     })
     $.get('./getSales_staff_distribution').done(function (data) {
-
+        console.log(data)
         var sum = 0;
         function getsum(item, index, array) {
             sum += item;
@@ -207,7 +207,7 @@
         ]
     })
     $.get('./getHQ_staff_distribution').done(function (data) {
-
+        console.log(data)
         var sum = 0;
         function getSum(item, index, array) {
             sum += item;
@@ -218,11 +218,11 @@
         for (var i = 0; i < data.data.hqdListMap.length; i++) {
             name.push(data.data.hqdListMap[i].name)
             co.push(data.data.hqdListMap[i].value)
-            // data.push(data.data.hqdListMap[i])
+            // data.push(data.data.hqdListMap[i])            
             var sum = 0;
             co.some(getSum)
         }
-
+        console.log(data)
         HQ_myChart.setOption({
             title: {
                 text: sum + '人'
@@ -264,7 +264,7 @@
                     //     data.data.hqdListMap[3], //90
                     //     // data.data.hqdListMap[2], //80
                     //     // data.data.hqdListMap[1], //80
-                    //     // data.data.hqdListMap[0], //80
+                    //     // data.data.hqdListMap[0], //80                        
                     //     // data.data.hqdListMap[4]
                     // ]
                     data: [data.data.hqdListMap[0],data.data.hqdListMap[1],data.data.hqdListMap[2],data.data.hqdListMap[3],data.data.hqdListMap[4]]
@@ -339,7 +339,7 @@
     });
 
     $.get('./getSales_brand').done(function (data) {
-
+        // console.log(data.data.sbListMap)
         for (x in data.data.sbListMap) {
             myChart.setOption({
                 series: [
@@ -495,6 +495,7 @@
         })
 
     $.get('./getRegion_performance', { "obj": 2018 }).done(function (data) {
+        console.log(data)
         var yMax = data.data.targetVal;
         var dataShadow = [];
         var max_data = [];
@@ -534,7 +535,7 @@
                             show: true,
                             position: 'right',
                             textStyle: {
-                                color: '#FFF'
+                                color: '#fff'
                             }
                         }
                     },
@@ -614,7 +615,7 @@
         series: [
             {
                 data: [],
-                name: '台',
+                name: '万/台',
                 type: 'line',
                 stack: '总量',
                 label: {
@@ -643,12 +644,12 @@
     $.get('./getNearMonth12FinancingAmoun').done(function (data) {
         var month =[];
         var sum = [];
-
+        console.log(data.data);
         for(var i = 0;i<data.data.length;i++){
             month.unshift(data.data[i].month)
             sum.unshift(data.data[i].Sales);
         }
-
+      
         line_myChart.setOption({
             xAxis: [
                 {

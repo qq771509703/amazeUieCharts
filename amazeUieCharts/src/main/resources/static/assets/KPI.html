@@ -60,12 +60,12 @@
                 <div id="left" style="width: 300px;height: 250px;"></div>
             </div>
             <!-- 没有对比就没有伤害1 -->
-            <!-- <div class="tq ib">
+            <div class="tq ib">
                 <div id="right" style="width: 300px;height: 250px;"></div>
-            </div> -->
+            </div>
         </div>
 
-        <div class="ib" style="position: absolute;right: 40px;">
+        <div class="ib" >
             <div id="tq" style="width: 560px;height: 220px"></div>
         </div>
     </div>
@@ -794,8 +794,8 @@
         var month = [];
         var sum = [];
         for (var i = 0; i < data.data.length; i++) {
-            month.push(data.data[i].month)
-            sum.push(data.data[i].sum)
+            month.unshift(data.data[i].month)
+            sum.unshift(data.data[i].sum)
         }
         console.log(month)
         line_myChart.setOption({
@@ -910,8 +910,8 @@
         var month = [];
         var sum = [];
         for (var i = 0; i < data.data.length; i++) {
-            month.push(data.data[i].month)
-            sum.push(data.data[i].sum)
+            month.unshift(data.data[i].month)
+            sum.unshift(data.data[i].sum)
         }
         console.log(month)
         line_myChart1.setOption({
@@ -994,7 +994,7 @@
                     itemStyle: {
                         normal: {
                             color: new echarts.graphic.LinearGradient(
-                                0, 0, 1, 0,
+                                0, 0, 0, 1,
                                 [
                                     { offset: 0, color: '#83bff6' },
                                     { offset: 0.5, color: '#18A4BB' },
@@ -1114,7 +1114,7 @@
                     itemStyle: {
                         normal: {
                             color: new echarts.graphic.LinearGradient(
-                                0, 0, 1, 0,
+                                0, 0, 0,1,
                                 [
                                     { offset: 0, color: '#83bff6' },
                                     { offset: 0.5, color: '#18A4BB' },
@@ -1187,9 +1187,96 @@
                 }],
             series: [{
                 type: 'bar',
+                itemStyle: {
+                    color: new echarts.graphic.LinearGradient(
+                                0, 0, 1, 0,
+                                [
+                                    { offset: 0, color: '#83bff6' },
+                                    { offset: 0.5, color: '#18A4BB' },
+                                    { offset: 1, color: '#bb22bb' }
+                                ]
+                            )
+                    },
+                label: {
+                normal: {
+                    show: true,
+                    position: 'insideLeft'
+                }
+            },
             data: [325, 234, 100, 124, 141, 107,100]
             }]
         })
 </script>
-
+<!-- right -->
+<script>
+        var right_myChart = echarts.init(document.getElementById('right'));
+        right_myChart.setOption(
+            {
+                
+                grid: {
+                    // left: '3%',
+                    // right: '4%',
+                    // bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    position:'top',
+                    // inverse:true,
+                    splitLine: {
+                        show: false
+                    },
+                    type: 'value',
+                    show: true,
+                    axisTick: {
+                        show: false
+                    },
+                   
+                    axisLabel: {
+                        color: 'rgb(11,111,156)'
+                    },
+                },
+                yAxis: [
+                    { type: 'category',
+                    data: [5.11,5.12,5.13,5.20,5,21,5.30,5.02],
+                        splitLine: {
+                            show: false
+                        },
+                        nameTextStyle: {
+                            color: '#ccc',
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                color: 'rgba(0,0,0,0.01)',//控制Y轴值的颜色
+                            },
+                            show: false
+                        },
+                   
+                        // axisTick: {
+                        //     show: false          //刻度线
+                        // },
+    
+                    }],
+                series: [{
+                    type: 'bar',
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(
+                                    0, 0, 1, 0,
+                                    [
+                                        { offset: 0.25, color: '#33FFFF' },
+                                        { offset: 0.5, color: '#0099CC' },
+                                        { offset: 0.75, color: '#3399FF' },                                        
+                                        { offset: 1, color: '#3333FF' }
+                                    ]
+                                )
+                        },
+                    label: {
+                    normal: {
+                        show: true,
+                        position: 'insideLeft'
+                    }
+                },
+                data: [325, 234, 100, 124, 141, 107,0]
+                }]
+            })
+    </script>
 </html>

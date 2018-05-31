@@ -106,4 +106,9 @@ public class sysControll {
         return "admin/forSaleCar";
     }
 
+    @RequestMapping("/purchaseData")
+    public String purchaseData(){
+        return "admin/purchaseData";
+    }
+
 }

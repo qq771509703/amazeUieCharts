@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.xxf.mapper.purchaseDataMapper" >
+
+
+    <select id="getPurchaseDataList" resultType="java.util.LinkedHashMap">
+        SELECT
+        *
+        FROM(
+        SELECT  ROW_NUMBER() OVER(ORDER BY area) AS rowid,*
+        from
+        (
+                select
+        a.AppNo '申请单号'
+        ,a.FSubject '申请主题'
+        ,convert(varchar(10),a.FApplyTime,120) '采购申请时间'
+        ,case a.FAppType when 0 then '未处理' when 1 then '处理中' when 2 then '已结束' when 3 then '已废弃' end '申请状态'
+        ,case a.FirstMType when 0 then '未申请' when 1 then '已申请未支付' when 2 then '已支付' end '首付款状态'
+        ,case a.LastMType when 0 then '未申请' when 1 then '已申请未支付' when 2 then '已支付' end '尾款状态'
+        ,case a.PayType when 0 then '未完成' when 1 then '已完成支付' end '付款状态'
+        ,replace(e.FName,'分公司','') '区域'
+        /*采购明细*/
+        ,j.FModel '车型'
+        ,g.FSupplier '供应商'
+        ,h.FBrand '品牌'
+        ,h.FName '品名'
+        ,case h.FType when 1 then '不限' when 2 then '两厢' when 3 then '三厢' when 4 then 'SUV'
+                      when 5 then 'MPV' when 6 then '微客' when 7 then '新能源' end '类型'
+        ,k.FColor '颜色'
+        ,h.FUsedcarCount '现有库存数'
+        ,h.FEarnest '定金'
+        ,h.FPurMoney '车身价'
+        ,h.FOverPrice '溢价'
+        ,h.FFinalPrice '折后价'
+        ,h.FDisMoney '返利金额'
+        ,h.FOtherDiscount '折价金额'
+        ,case h.FIsLoan when 1 then '是' when 2 then '否' end '是否金融贷'
+        ,convert(varchar(10),a.FloanTime,120) '金融贷付款时间'
+        ,case h.FIsPrepayment when 0 then '不可提前还款' when 1 then '可提前还款(正常)'
+                              when 2 then '可提前8期还款' when 3 then '可提前10期还款' end '是否可提前还款'
+        /*请购单*/
+        ,b.AppNo '请购单号'
+        ,convert(varchar(10),b.CreateT,120) '请购时间'
+        ,c.Name '请购人'
+        ,d.Name '请购人所属部门'
+        ,case b.FAppType when 0 then '未处理' when 1 then '处理中' when 2 then '已结束' when 3 then '已废弃' end '请购申请状态'
+        ,case b.FPurpose when 1 then '融资性租赁' when 2 then '经营性租赁' end '用途'
+        from WO_CGSQDLC a
+        left join WO_QGLC b on a.FBuying_Requisition = b.ID
+        left join tUser c on b.FTuser = c.ID
+        left join lbOrganization d on b.FOrgid = d.ID
+        left join Area e on a.FArea = e.ID
+        left join WO_CGSQDLC_purd h on h.WO_CGSQDLC_ID = a.ID
+        left join Vehicle_Mana i on h.VType = i.ID
+        left join GoodsCode j on i.FVType = j.ID
+        left join FSupplier g on i.FSuppliers = g.ID
+        left join FColor k on h.FColor = k.ID
+        where a.FAppType in (0,1)
+        /*传入参数--区域*/
+        <if test="area!='' and area!=null">
+        and replace(e.FName,'分公司','') in
+            <foreach collection="areas" index="index" item="area" open="(" separator="," close=")">
+                #{area}
+            </foreach>
+        </if>
+        /*传入参数--品牌*/
+        <if test="area!='' and area!=null">
+            and h.FBrand in
+            <foreach collection="brands" index="index" item="brand" open="(" separator="," close=")">
+                #{brand}
+            </foreach>
+        </if>
+        )
+        t
+        where 1=1
+        ) AS sys_roles
+        WHERE ROWID BETWEEN #{startRow} and #{endRow}
+    </select>
+
+    <select id="getPurchaseDataListCount" resultType="int">
+        select count(1) from (
+        select
+        a.AppNo '申请单号'
+        ,a.FSubject '申请主题'
+        ,convert(varchar(10),a.FApplyTime,120) '采购申请时间'
+        ,case a.FAppType when 0 then '未处理' when 1 then '处理中' when 2 then '已结束' when 3 then '已废弃' end '申请状态'
+        ,case a.FirstMType when 0 then '未申请' when 1 then '已申请未支付' when 2 then '已支付' end '首付款状态'
+        ,case a.LastMType when 0 then '未申请' when 1 then '已申请未支付' when 2 then '已支付' end '尾款状态'
+        ,case a.PayType when 0 then '未完成' when 1 then '已完成支付' end '付款状态'
+        ,replace(e.FName,'分公司','') '区域'
+        /*采购明细*/
+        ,j.FModel '车型'
+        ,g.FSupplier '供应商'
+        ,h.FBrand '品牌'
+        ,h.FName '品名'
+        ,case h.FType when 1 then '不限' when 2 then '两厢' when 3 then '三厢' when 4 then 'SUV'
+        when 5 then 'MPV' when 6 then '微客' when 7 then '新能源' end '类型'
+        ,k.FColor '颜色'
+        ,h.FUsedcarCount '现有库存数'
+        ,h.FEarnest '定金'
+        ,h.FPurMoney '车身价'
+        ,h.FOverPrice '溢价'
+        ,h.FFinalPrice '折后价'
+        ,h.FDisMoney '返利金额'
+        ,h.FOtherDiscount '折价金额'
+        ,case h.FIsLoan when 1 then '是' when 2 then '否' end '是否金融贷'
+        ,convert(varchar(10),a.FloanTime,120) '金融贷付款时间'
+        ,case h.FIsPrepayment when 0 then '不可提前还款' when 1 then '可提前还款(正常)'
+        when 2 then '可提前8期还款' when 3 then '可提前10期还款' end '是否可提前还款'
+        /*请购单*/
+        ,b.AppNo '请购单号'
+        ,convert(varchar(10),b.CreateT,120) '请购时间'
+        ,c.Name '请购人'
+        ,d.Name '请购人所属部门'
+        ,case b.FAppType when 0 then '未处理' when 1 then '处理中' when 2 then '已结束' when 3 then '已废弃' end '请购申请状态'
+        ,case b.FPurpose when 1 then '融资性租赁' when 2 then '经营性租赁' end '用途'
+        from WO_CGSQDLC a
+        left join WO_QGLC b on a.FBuying_Requisition = b.ID
+        left join tUser c on b.FTuser = c.ID
+        left join lbOrganization d on b.FOrgid = d.ID
+        left join Area e on a.FArea = e.ID
+        left join WO_CGSQDLC_purd h on h.WO_CGSQDLC_ID = a.ID
+        left join Vehicle_Mana i on h.VType = i.ID
+        left join GoodsCode j on i.FVType = j.ID
+        left join FSupplier g on i.FSuppliers = g.ID
+        left join FColor k on h.FColor = k.ID
+        where a.FAppType in (0,1)
+        /*传入参数--区域*/
+        <if test="area!='' and area!=null">
+            and replace(e.FName,'分公司','') in
+            <foreach collection="areas" index="index" item="area" open="(" separator="," close=")">
+                #{area}
+            </foreach>
+        </if>
+        /*传入参数--品牌*/
+        <if test="area!='' and area!=null">
+            and h.FBrand in
+            <foreach collection="brands" index="index" item="brand" open="(" separator="," close=")">
+                #{brand}
+            </foreach>
+        </if>
+        )c
+    </select>
+
+
+    <!--获取数据初始化页面区域下拉菜单-->
+    <select id="initializeSelect_area" resultType="string">
+        select distinct
+            replace(e.FName,'分公司','') '区域'
+            from WO_CGSQDLC a
+            left join Area e on a.FArea = e.ID
+            where a.FAppType in (0,1)
+    </select>
+
+    <!--获取数据初始化页面品牌下拉菜单-->
+    <select id="initializeSelect_brand" resultType="string">
+        select distinct
+        h.FBrand '品牌'
+        from WO_CGSQDLC a
+        left join WO_CGSQDLC_purd h on h.WO_CGSQDLC_ID = a.ID
+        where a.FAppType in (0,1)
+    </select>
+</mapper>
