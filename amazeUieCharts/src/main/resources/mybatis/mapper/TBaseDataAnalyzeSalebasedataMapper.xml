@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.xxf.mapper.TBaseDataAnalyzeSalebasedataMapper" >
+  <resultMap id="BaseResultMap" type="com.example.xxf.bean.TBaseDataAnalyzeSalebasedata" >
+    <result column="FContractTime" property="fcontracttime" jdbcType="VARCHAR" />
+    <result column="FContract" property="fcontract" jdbcType="VARCHAR" />
+    <result column="saleman" property="saleman" jdbcType="VARCHAR" />
+    <result column="FDividendRatio" property="fdividendratio" jdbcType="VARCHAR" />
+    <result column="salemoney" property="salemoney" jdbcType="VARCHAR" />
+    <result column="FPlateNum" property="fplatenum" jdbcType="VARCHAR" />
+    <result column="FBrand" property="fbrand" jdbcType="VARCHAR" />
+    <result column="cartype" property="cartype" jdbcType="VARCHAR" />
+    <result column="FQuoType" property="fquotype" jdbcType="VARCHAR" />
+    <result column="department" property="department" jdbcType="VARCHAR" />
+    <result column="city" property="city" jdbcType="VARCHAR" />
+    <result column="province" property="province" jdbcType="VARCHAR" />
+    <result column="region" property="region" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    FContractTime, FContract, saleman, FDividendRatio, salemoney, FPlateNum, FBrand, 
+    cartype, FQuoType, department, city, province, region
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.example.xxf.bean.TBaseDataAnalyzeSalebasedataExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from t_base_data_analyze_saleBaseData
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <delete id="deleteByExample" parameterType="com.example.xxf.bean.TBaseDataAnalyzeSalebasedataExample" >
+    delete from t_base_data_analyze_saleBaseData
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.example.xxf.bean.TBaseDataAnalyzeSalebasedata" >
+    insert into t_base_data_analyze_saleBaseData (FContractTime, FContract, saleman, 
+      FDividendRatio, salemoney, FPlateNum, 
+      FBrand, cartype, FQuoType, 
+      department, city, province, 
+      region)
+    values (#{fcontracttime,jdbcType=VARCHAR}, #{fcontract,jdbcType=VARCHAR}, #{saleman,jdbcType=VARCHAR}, 
+      #{fdividendratio,jdbcType=VARCHAR}, #{salemoney,jdbcType=VARCHAR}, #{fplatenum,jdbcType=VARCHAR}, 
+      #{fbrand,jdbcType=VARCHAR}, #{cartype,jdbcType=VARCHAR}, #{fquotype,jdbcType=VARCHAR}, 
+      #{department,jdbcType=VARCHAR}, #{city,jdbcType=VARCHAR}, #{province,jdbcType=VARCHAR}, 
+      #{region,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.example.xxf.bean.TBaseDataAnalyzeSalebasedata" >
+    insert into t_base_data_analyze_saleBaseData
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="fcontracttime != null" >
+        FContractTime,
+      </if>
+      <if test="fcontract != null" >
+        FContract,
+      </if>
+      <if test="saleman != null" >
+        saleman,
+      </if>
+      <if test="fdividendratio != null" >
+        FDividendRatio,
+      </if>
+      <if test="salemoney != null" >
+        salemoney,
+      </if>
+      <if test="fplatenum != null" >
+        FPlateNum,
+      </if>
+      <if test="fbrand != null" >
+        FBrand,
+      </if>
+      <if test="cartype != null" >
+        cartype,
+      </if>
+      <if test="fquotype != null" >
+        FQuoType,
+      </if>
+      <if test="department != null" >
+        department,
+      </if>
+      <if test="city != null" >
+        city,
+      </if>
+      <if test="province != null" >
+        province,
+      </if>
+      <if test="region != null" >
+        region,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="fcontracttime != null" >
+        #{fcontracttime,jdbcType=VARCHAR},
+      </if>
+      <if test="fcontract != null" >
+        #{fcontract,jdbcType=VARCHAR},
+      </if>
+      <if test="saleman != null" >
+        #{saleman,jdbcType=VARCHAR},
+      </if>
+      <if test="fdividendratio != null" >
+        #{fdividendratio,jdbcType=VARCHAR},
+      </if>
+      <if test="salemoney != null" >
+        #{salemoney,jdbcType=VARCHAR},
+      </if>
+      <if test="fplatenum != null" >
+        #{fplatenum,jdbcType=VARCHAR},
+      </if>
+      <if test="fbrand != null" >
+        #{fbrand,jdbcType=VARCHAR},
+      </if>
+      <if test="cartype != null" >
+        #{cartype,jdbcType=VARCHAR},
+      </if>
+      <if test="fquotype != null" >
+        #{fquotype,jdbcType=VARCHAR},
+      </if>
+      <if test="department != null" >
+        #{department,jdbcType=VARCHAR},
+      </if>
+      <if test="city != null" >
+        #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="province != null" >
+        #{province,jdbcType=VARCHAR},
+      </if>
+      <if test="region != null" >
+        #{region,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.example.xxf.bean.TBaseDataAnalyzeSalebasedataExample" resultType="java.lang.Integer" >
+    select count(*) from t_base_data_analyze_saleBaseData
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update t_base_data_analyze_saleBaseData
+    <set >
+      <if test="record.fcontracttime != null" >
+        FContractTime = #{record.fcontracttime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.fcontract != null" >
+        FContract = #{record.fcontract,jdbcType=VARCHAR},
+      </if>
+      <if test="record.saleman != null" >
+        saleman = #{record.saleman,jdbcType=VARCHAR},
+      </if>
+      <if test="record.fdividendratio != null" >
+        FDividendRatio = #{record.fdividendratio,jdbcType=VARCHAR},
+      </if>
+      <if test="record.salemoney != null" >
+        salemoney = #{record.salemoney,jdbcType=VARCHAR},
+      </if>
+      <if test="record.fplatenum != null" >
+        FPlateNum = #{record.fplatenum,jdbcType=VARCHAR},
+      </if>
+      <if test="record.fbrand != null" >
+        FBrand = #{record.fbrand,jdbcType=VARCHAR},
+      </if>
+      <if test="record.cartype != null" >
+        cartype = #{record.cartype,jdbcType=VARCHAR},
+      </if>
+      <if test="record.fquotype != null" >
+        FQuoType = #{record.fquotype,jdbcType=VARCHAR},
+      </if>
+      <if test="record.department != null" >
+        department = #{record.department,jdbcType=VARCHAR},
+      </if>
+      <if test="record.city != null" >
+        city = #{record.city,jdbcType=VARCHAR},
+      </if>
+      <if test="record.province != null" >
+        province = #{record.province,jdbcType=VARCHAR},
+      </if>
+      <if test="record.region != null" >
+        region = #{record.region,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update t_base_data_analyze_saleBaseData
+    set FContractTime = #{record.fcontracttime,jdbcType=VARCHAR},
+      FContract = #{record.fcontract,jdbcType=VARCHAR},
+      saleman = #{record.saleman,jdbcType=VARCHAR},
+      FDividendRatio = #{record.fdividendratio,jdbcType=VARCHAR},
+      salemoney = #{record.salemoney,jdbcType=VARCHAR},
+      FPlateNum = #{record.fplatenum,jdbcType=VARCHAR},
+      FBrand = #{record.fbrand,jdbcType=VARCHAR},
+      cartype = #{record.cartype,jdbcType=VARCHAR},
+      FQuoType = #{record.fquotype,jdbcType=VARCHAR},
+      department = #{record.department,jdbcType=VARCHAR},
+      city = #{record.city,jdbcType=VARCHAR},
+      province = #{record.province,jdbcType=VARCHAR},
+      region = #{record.region,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+
+  <!--插入营销基础数据到本地-->
+  <insert id="insertBaseDataTOLocal" >
+      insert into t_base_data_analyze_saleBaseData
+        select
+        b.FContractTime
+        ,a.FContract
+        ,x.Name 'saleman'
+        ,c.FDividendRatio
+        ,(cast(a.Fnum as int) * a.FMYHKE + a.FFee) * c.FDividendRatio 'salemoney'
+        ,f.FPlateNum
+        ,f.FBrand
+        ,f.FBrand + f.FName 'cartype'
+        ,h.FQuoType
+        ,case when d.Name = '苏州上海办事处' then '上海营销一部' when d.Name = '湘潭营销一部' then '湖南营销一部' else d.Name end  'department'
+        ,case when d.Name = '苏州上海办事处' then '上海' when d.Name = '湘潭营销一部' then '湖南' else left(hh.Name,2) end 'city'
+        ,case when d.Name = '苏州上海办事处' then '苏沪省区' when d.Name = '湘潭营销一部' then '湘赣省区' else jh.Name end 'province'
+        ,case when d.Name = '苏州上海办事处' then '长三角战区' when d.Name = '湘潭营销一部' then '华南战区'  else j.Name end 'region'
+
+
+        from FinLease_Contract a
+        join FM_ConAcc b on a.FContractID = b.ID
+        join FinLease_Contract_FClerkList c on a.ID = c.FinLease_Contract_ID
+        join lbOrganization d on c.FOrga = d.ID
+        join Fcar f on a.FCar = f.ID
+        join Entity_YJSJB h ON b.ID = h.FConAcc
+        left join tUser x on x.ID = c.FYWYMD
+        left join lbOrganization g on d.FID = g.ID
+        left join lbOrganization hh on g.FID = hh.ID
+        left join lbOrganization jh on hh.FID = jh.ID
+        left join lbOrganization j on jh.FID = j.ID
+        /*换车换方案--判断非废弃合同*/
+        left join (
+            select a.id
+            ,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车' else '跨月换车' end '换车类型'
+            from FinLease_Contract a
+            left join FM_ConAcc b on a.FContractID = b.ID
+            left join FinLease_Contract c on a.FContract_Old = c.ID
+            where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+            and a.FContract_Old is not null
+            ) hc on a.ID = hc.ID
+        /*换车换方案--判断废弃合同*/
+        left join (
+            select a.id
+            ,a.FContract_Old  'old_ID'
+            ,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车' else '跨月换车' end '换车类型'
+            from FinLease_Contract a
+            left join FM_ConAcc b on a.FContractID = b.ID
+            left join FinLease_Contract c on a.FContract_Old = c.ID
+            where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+            and a.FContract_Old is not null
+            ) hf on a.ID = hf.old_ID
+        where
+        (
+            /*废弃，终止的合同，是跨月换车的原合同*/
+            (b.FIsDrop = 1 and a.WFState = 1 and hf.old_ID is not null and hf.换车类型 = '跨月换车')
+            or
+            /*非废弃，非终止，非换车的合同*/
+            (isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and isnull(a.Fhc,0) != 1)
+            or
+            /*非废弃，非终止，当月换车的新合同*/
+            (isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and a.Fhc = 1 and hc.ID is not null and hc.换车类型 = '当月换车')
+            or
+              /*SX_2017010002换车换方案未能有效管理旧合同*/
+            a.ID = '4290'
+        )
+        /*剔除不算业绩的换车换方案*/
+        and a.ID not in ('6169','8194','10591')
+        and c.FDividendRatio != 0
+        and d.Name not like '%营销部%'
+        and CONVERT(varchar(4),b.FContractTime,120) > 2016
+
+        union all
+
+        select
+        b.FContractTime
+        ,a.FContract
+        ,x.Name 'saleman'
+        ,c.FDividendRatio
+        ,(cast(a.Fnum as int) * a.FMYHKE + a.FFee) * c.FDividendRatio 'salemoney'
+        ,f.FPlateNum
+        ,f.FBrand
+        ,f.FBrand + f.FName 'cartype'
+        ,h.FQuoType
+        ,d.Name 'department'
+        ,left(g.Name,2) 'city'
+        ,hh.Name 'province'
+        ,jh.Name 'region'
+        from FinLease_Contract a
+        join FM_ConAcc b on a.FContractID = b.ID
+        join FinLease_Contract_FClerkList c on a.ID = c.FinLease_Contract_ID
+        join lbOrganization d on c.FOrga = d.ID
+        join Fcar f on a.FCar = f.ID
+        join Entity_YJSJB h ON b.ID = h.FConAcc
+        left join tUser x on x.ID = c.FYWYMD
+        left join lbOrganization g on d.FID = g.ID
+        left join lbOrganization hh on g.FID = hh.ID
+        left join lbOrganization jh on hh.FID = jh.ID
+        /*换车换方案--判断非废弃合同*/
+        left join (
+            select a.id
+            ,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车' else '跨月换车' end '换车类型'
+            from FinLease_Contract a
+            left join FM_ConAcc b on a.FContractID = b.ID
+            left join FinLease_Contract c on a.FContract_Old = c.ID
+            where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+            and a.FContract_Old is not null
+            ) hc on a.ID = hc.ID
+        /*换车换方案--判断废弃合同*/
+        left join (
+            select a.id
+            ,a.FContract_Old  'old_ID'
+            ,case when CONVERT(varchar(7),a.FContractTime,120) = CONVERT(varchar(7),c.FContractTime,120) then '当月换车' else '跨月换车' end '换车类型'
+            from FinLease_Contract a
+            left join FM_ConAcc b on a.FContractID = b.ID
+            left join FinLease_Contract c on a.FContract_Old = c.ID
+            where isnull(a.Fhc,0) = 1 and isnull(a.WFState,0) != 3 and isnull(b.FIsDrop,0) != 1
+            and a.FContract_Old is not null
+            ) hf on a.ID = hf.old_ID
+        where
+        (
+            /*废弃，终止的合同，是跨月换车的原合同*/
+            (b.FIsDrop = 1 and a.WFState = 1 and hf.old_ID is not null and hf.换车类型 = '跨月换车')
+            or
+            /*非废弃，非终止，非换车的合同*/
+            (isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and isnull(a.Fhc,0) != 1)
+            or
+            /*非废弃，非终止，当月换车的新合同*/
+            (isnull(b.FIsDrop,0) != 1 and isnull(a.WFState,0) != 3 and a.Fhc = 1 and hc.ID is not null and hc.换车类型 = '当月换车')
+            or
+              /*SX_2017010002换车换方案未能有效管理旧合同*/
+            a.ID = '4290'
+        )
+        /*剔除不算业绩的换车换方案*/
+        and a.ID not in ('6169','8194','10591')
+        and c.FDividendRatio != 0
+        and d.Name like '%营销部%'
+        and CONVERT(varchar(4),b.FContractTime,120) > 2016
+
+
+  </insert>
+
+  <!--喜相逢各月份销售台数-->
+  <select id="everyMouthSaleCount" resultType="java.util.LinkedHashMap" parameterType="com.example.xxf.bean.TBaseDataAnalyzeSalebasedata">
+    /*喜相逢各月份销售台数*/
+    select top 12
+    convert(varchar(7),FContractTime,120) 'month'
+    ,SUM(FDividendRatio) 'sales'
+    from t_base_data_analyze_saleBaseData
+    where 1 = 1
+    /*排除淘汽的就是喜相逢*/
+    and department != '淘汽互联网子公司'
+
+    /*全局参数--城市*/
+    <if test="city!='' and city!=null ">
+      and city = #{city}
+    </if>
+
+    /*全局参数--部门*/
+    <if test="department!='' and department!=null ">
+      and department = #{department}
+    </if>
+
+
+    /*全局参数--部门*/
+      and cast(convert(varchar(10),FContractTime,111) as datetime) between #{beginDate} and #{endDate}
+    /*全局参数--时间区间起*/
+
+
+    /*控件参数--战区*/
+    --and region = ''
+    /*控件参数--省级*/
+    --and province = ''
+    /*控件参数--城市*/
+    --and city = ''
+    /*控件参数--部门*/
+    --and saleman = ''
+
+    group by convert(varchar(7),FContractTime,120)
+    order by convert(varchar(7),FContractTime,120) desc
+
+  </select>
+
+</mapper>

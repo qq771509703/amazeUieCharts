@@ -1,10 +1,7 @@
 package com.example.xxf;
 
 import com.example.xxf.Util.MapUtil;
-import com.example.xxf.bean.Lborganization;
-import com.example.xxf.bean.SynergyevolvetableExample;
-import com.example.xxf.bean.perCapitaCapacity;
-import com.example.xxf.bean.perCapitaCapacityDetail;
+import com.example.xxf.bean.*;
 import com.example.xxf.controller.DataScreenController;
 import com.example.xxf.mapper.*;
 import com.example.xxf.service.*;
@@ -70,6 +67,9 @@ public class AmazeUiEChartsApplicationTests {
 
 	@Autowired
 	ForsalecardetailService forsalecardetailService;
+
+	@Autowired
+	TBaseDataAnalyzeSalebasedataService tBaseDataAnalyzeSalebasedataService;
 
 
 	@Before // 在测试开始前初始化工作
@@ -140,7 +140,11 @@ public class AmazeUiEChartsApplicationTests {
 		//perCapitaCapacityService.getPerCapitaCapacityListByBaseCount();
 
 		//forsalecardetailService.getForsalecardetailByXXFDB("厦门",0,10);
-		forsalecardetailService.getForsalecardetailCountByXXFDB("");
+		//forsalecardetailService.getForsalecardetailCountByXXFDB("");
+//		tBaseDataAnalyzeSalebasedataService.insertBaseDataTOLocal();
+		TBaseDataAnalyzeSalebasedata tBaseDataAnalyzeSalebasedata = new TBaseDataAnalyzeSalebasedata();
+		tBaseDataAnalyzeSalebasedata.setCity("福州");
+		//tBaseDataAnalyzeSalebasedataService.everyMouthSaleCount(tBaseDataAnalyzeSalebasedata);
 	}
 
 }

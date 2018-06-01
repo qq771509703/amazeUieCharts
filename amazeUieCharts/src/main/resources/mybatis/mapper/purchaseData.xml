@@ -7,7 +7,7 @@
         SELECT
         *
         FROM(
-        SELECT  ROW_NUMBER() OVER(ORDER BY area) AS rowid,*
+        SELECT  ROW_NUMBER() OVER(ORDER BY t.采购申请时间) AS rowid,*
         from
         (
                 select
@@ -57,16 +57,16 @@
         left join FColor k on h.FColor = k.ID
         where a.FAppType in (0,1)
         /*传入参数--区域*/
-        <if test="area!='' and area!=null">
+        <if test="areasList!= null and areasList.size >0">
         and replace(e.FName,'分公司','') in
-            <foreach collection="areas" index="index" item="area" open="(" separator="," close=")">
+            <foreach collection="areasList" index="index" item="area" open="(" separator="," close=")">
                 #{area}
             </foreach>
         </if>
         /*传入参数--品牌*/
-        <if test="area!='' and area!=null">
+        <if test="brandsList!= null and brandsList.size >0">
             and h.FBrand in
-            <foreach collection="brands" index="index" item="brand" open="(" separator="," close=")">
+            <foreach collection="brandsList" index="index" item="brand" open="(" separator="," close=")">
                 #{brand}
             </foreach>
         </if>
@@ -126,16 +126,16 @@
         left join FColor k on h.FColor = k.ID
         where a.FAppType in (0,1)
         /*传入参数--区域*/
-        <if test="area!='' and area!=null">
+        <if test="areasList!= null and areasList.size >0">
             and replace(e.FName,'分公司','') in
-            <foreach collection="areas" index="index" item="area" open="(" separator="," close=")">
+            <foreach collection="areasList" index="index" item="area" open="(" separator="," close=")">
                 #{area}
             </foreach>
         </if>
         /*传入参数--品牌*/
-        <if test="area!='' and area!=null">
+        <if test="brandsList!= null and brandsList.size >0">
             and h.FBrand in
-            <foreach collection="brands" index="index" item="brand" open="(" separator="," close=")">
+            <foreach collection="brandsList" index="index" item="brand" open="(" separator="," close=")">
                 #{brand}
             </foreach>
         </if>
